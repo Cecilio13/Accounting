@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Carbon\Carbon;
+use App\UserLoginLogs;
 class LoginController extends Controller
 {
     /*
@@ -50,9 +51,16 @@ class LoginController extends Controller
      */
     function authenticated(\Illuminate\Http\Request $request, $user)
     {
+        $data=new UserLoginLogs;
+        $data->user_id=$user->id;
+        $data->last_login_at=Carbon::now()->toDateTimeString();
+        $data->last_login_ip=$request->ip();
+        $data->system="Accounting";
+        
+        $data->save();
         $user->update([
             'last_login_at' => Carbon::now()->toDateTimeString(),
-            'last_login_ip' => $request->getClientIp()
+            'last_login_ip' => $request->ip()
         ]);
     }
 }
