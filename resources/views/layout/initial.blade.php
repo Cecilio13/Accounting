@@ -11,7 +11,7 @@
         @include('inc.head')
     </head>
     <body>
-        <aside id="left-panel" class="left-panel">
+        <aside id="left-panel" class="left-panel" style="min-width:250px">
         @include('inc.side')
         </aside>
         

@@ -33,12 +33,13 @@ class Customers extends Migration
             $table->string('country');
             $table->string('payment_method');
             $table->string('terms');
-            $table->float('opening_balance');
+            $table->string('opening_balance');
             $table->date('as_of_date');
             $table->string('account_no');
             $table->string('business_id_no');
             $table->string('notes');
             $table->string('attachment')->nullable();
+            $table->string('tin_no');
             $table->timestamps();
         });   
     }

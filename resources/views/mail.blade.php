@@ -1,6 +1,1 @@
-sample credit note text sample credit note text sample credit note text 
-sample credit note text sample credit note text sample credit note text 
-sample credit note text sample credit note text sample credit note text 
-sample credit note text sample credit note text sample credit note text 
-sample credit note text sample credit note text sample credit note text 
-sample credit note text sample credit note text sample credit note text 
+System-Generated Email

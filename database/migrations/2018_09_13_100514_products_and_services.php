@@ -20,8 +20,8 @@ class ProductsAndServices extends Migration
             $table->string('product_sku');
             $table->string('product_type');
             $table->string('product_sales_description');
-            $table->float('product_sales_price');
-            $table->float('product_cost');
+            $table->string('product_sales_price');
+            $table->string('product_cost');
             $table->integer('product_qty');
             $table->string('product_reorder_point');
             $table->timestamps();

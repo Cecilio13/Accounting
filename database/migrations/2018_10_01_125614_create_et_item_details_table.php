@@ -27,8 +27,8 @@ class CreateEtItemDetailsTable extends Migration
                     ->onDelete('cascade');
             $table->string('et_id_desc');
             $table->integer('et_id_qty');
-            $table->float('et_id_rate');
-            $table->float('et_id_total');
+            $table->string('et_id_rate');
+            $table->string('et_id_total');
             $table->timestamps();
         });
     }

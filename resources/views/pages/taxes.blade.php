@@ -43,7 +43,7 @@
             </div>
         </div>
         <div class="col-sm-4 d-flex status-message">
-            <img src="assets/images/check-green.png" class="status-icon">
+            <img src="{{asset('images/check-green.png')}}" style="height:50px;" class="status-icon">
             <div>
                 <h6>Great work</h6>
                 <p class="w-75">You’re current on your returns and payments.</p>                        
@@ -60,7 +60,7 @@
       <li class="nav-item">
           <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Payments</a>
       </li>
-      <select class="float-right view-reports">
+      <select class="form-control view-reports" style="width:30%;float:right;">
         <option>View Reports</option>
         <option>Taxable sales summary</option>
         <option>Transactions without sales tax</option>

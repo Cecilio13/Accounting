@@ -32,8 +32,8 @@ class SalesTransaction extends Migration
             $table->string('st_bill_address')->nullable();
             $table->string('st_note')->nullable();
             $table->string('st_memo')->nullable();
-            $table->float('st_balance')->nullable();
-            $table->float('st_amount_paid')->nullable();
+            $table->string('st_balance')->nullable();
+            $table->string('st_amount_paid')->nullable();
             $table->string('st_payment_for')->nullable();
             $table->string('st_i_attachment')->nullable();
             $table->timestamps();

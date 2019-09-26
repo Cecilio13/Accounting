@@ -1,9 +1,12 @@
 <div class="header-menu">
     @include('inc.modal')
+    <?php
+set_time_limit(0);
+    ?>
     <div class="col-sm-7">
-        <a id="menuToggle" class="menutoggle pull-left"><i class="fa fa fa-tasks"></i></a>
+        
         <div class="header-left">
-            <button class="search-trigger"><i class="fa fa-search"></i></button>
+            <button style="display:none;" class="search-trigger"><i class="fa fa-search"></i></button>
             <div class="form-inline">
                 <form class="search-form">
                     <input class="form-control mr-sm-2" type="text" placeholder="Search ..." aria-label="Search">
@@ -15,14 +18,11 @@
     <div class="col-sm-5">
         <div class="user-area dropdown float-right">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <img class="user-avatar rounded-circle" src="{{asset('images/admin.jpg')}}" alt="User Avatar">
+            <img class="user-avatar rounded-circle" src="{{asset('images/customers.png')}}" alt="User Avatar">
             </a>
             <div class="user-menu dropdown-menu">
-                <a class="nav-link"><i class="fa fa- user"></i>Username</a>
-                <a class="nav-link" href="#"><i class="fa fa- user"></i>User Profile</a>
-                <a class="nav-link" data-toggle="modal" data-target="#staticModal"><i class="fa fa- user"></i>Feedback</a>
-                <a class="nav-link" href="https://security.intuit.com/index.php/privacy"><i class="fa fa- user"></i>Privacy</a>
-                <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i>Sign Out</a>
+                <a class="nav-link" href="#"><i class="far fa-user"></i> {{Auth::user()->name}}</a>
+                <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i> Sign Out</a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                 </form>

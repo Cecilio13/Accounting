@@ -9,12 +9,118 @@ jQuery(document).ready(function($) {
 	} );
 
 	jQuery('.selectpicker').selectpicker;
+	
+	// var tableexport=$("#tablemain").tableExport({
 
+	// 	// Displays table headers (th or td elements) in the <thead>
+	// 	headers: true,                    
+	  
+	// 	// Displays table footers (th or td elements) in the <tfoot>    
+	// 	footers: true, 
+	  
+	// 	// Filetype(s) for the export
+	// 	formats: ["xls", "csv", "txt"],           
+	  
+	// 	// Filename for the downloaded file
+	// 	fileName: "id",                         
+	  
+	// 	// Style buttons using bootstrap framework  
+	// 	bootstrap: false,
+	  
+	// 	// Automatically generates the built-in export buttons for each of the specified formats   
+	// 	exportButtons: true,                          
+	  
+	// 	// Position of the caption element relative to table
+	// 	position: "top",                   
+	  
+	// 	// (Number, Number[]), Row indices to exclude from the exported file(s)
+	// 	ignoreRows: null,                             
+	  
+	// 	// (Number, Number[]), column indices to exclude from the exported file(s)              
+	// 	ignoreCols: null,                   
+	  
+	// 	// Removes all leading/trailing newlines, spaces, and tabs from cell text in the exported file(s)     
+	// 	trimWhitespace: false,
+	  
+	// 	// (Boolean), set direction of the worksheet to right-to-left (default: false)
+	// 	RTL: false, 
+	  
+	// 	// (id, String), sheet name for the exported spreadsheet, (default: 'id') 
+	// 	sheetname: "id" 
+	  
+	//   });
+	  
+	  $('#exporttoexcelbtn').on('click',function(event){
+		$("#tablemain").tableExport({
 
+			// Displays table headers (th or td elements) in the <thead>
+			headers: true,                    
+		  
+			// Displays table footers (th or td elements) in the <tfoot>    
+			footers: true, 
+		  
+			// Filetype(s) for the export
+			formats: ["xls", "csv", "txt"],           
+		  
+			// Filename for the downloaded file
+			fileName: "id",                         
+		  
+			// Style buttons using bootstrap framework  
+			bootstrap: false,
+		  
+			// Automatically generates the built-in export buttons for each of the specified formats   
+			exportButtons: true,                          
+		  
+			// Position of the caption element relative to table
+			position: "top",                   
+		  
+			// (Number, Number[]), Row indices to exclude from the exported file(s)
+			ignoreRows: null,                             
+		  
+			// (Number, Number[]), column indices to exclude from the exported file(s)              
+			ignoreCols: null,                   
+		  
+			// Removes all leading/trailing newlines, spaces, and tabs from cell text in the exported file(s)     
+			trimWhitespace: false,
+		  
+			// (Boolean), set direction of the worksheet to right-to-left (default: false)
+			RTL: false, 
+		  
+			// (id, String), sheet name for the exported spreadsheet, (default: 'id') 
+			sheetname: "id" 
+		  
+		  });
+		console.log('reset export buttons');
+		})
+	$('#setselectpickerbutton').on('click',function(event){
+		$('.selectpicker').selectpicker('refresh');
+		console.log('refresh selectpicker');
+		//refreshpicjer();
+	})
+	$('#destroyselectpickerbutton').on('click',function(event){
+		$("."+this.getAttribute('data-class')).selectpicker('destroy');
+		console.log(this.getAttribute('data-class'));
+		//destroy_select_picker();
+	})
+	$('#renderselectpickerbutton').on('click',function(event){
+		$('.selectpicker').selectpicker('render');
+		console.log('render selectpicker');
+		//render_select_picker();
+	})
+	$('#openmodalbtndynamically').on('click',function(event){
+		$("#"+this.getAttribute('data-id')).modal()
+		//render_select_picker();
+	})
 	$('#menuToggle').on('click', function(event) {
 		$('body').toggleClass('open');
 	});
-
+	$('#approval_tab_activator').click(function () {
+		$("#myTabApprovals a:eq(0)").click();
+		console.log('');
+		// or
+	   //$('#modalFormUlId a:first').tab('show');
+	  
+	  });
 	$('.search-trigger').on('click', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
@@ -41,10 +147,77 @@ jQuery(document).ready(function($) {
 			$("#company_name").prop('readonly', false);
 			$("#legal_name").prop('readonly', false);
 			$("#business_id_no").prop('readonly', false);
+			$("#com_tin_no").prop('readonly', false);
+			
 		}else{
 			$("#company_name").prop('readonly', true);
 			$("#legal_name").prop('readonly', true);
 			$("#business_id_no").prop('readonly', true);
+			$("#com_tin_no").prop('readonly', true);
+		}
+	});
+	$('#toggle_beginning_balance').on('click',function(event){
+		if($('#ad_beg_bal_shown').prop('readonly')){
+			$('#ad_beg_bal_shown').prop('readonly',false);
+		}else{
+			$('#ad_beg_bal_shown').prop('readonly',true);
+		}
+	});
+	$('#toggle_sales_receiptsetting').on('click',function(event){
+		if($('#preferred_bedit_cheque_account').prop('disabled')){
+			$('#preferred_bedit_cheque_account').prop('disabled',false);
+			$('div > div > div > input:text').prop('readonly',false);
+		}else{
+			$('#preferred_bedit_cheque_account').prop('disabled',true);
+			$('div > div > div > input:text').prop('readonly',false);
+		}
+	});
+	
+	$('#toggle_edit_numbering').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#numbering_sales_exp").prop('readonly')){
+			$("#numbering_sales_exp").prop('readonly', false);
+			$("#numbering_cash_voucher").prop('readonly', false);
+			$("#numbering_cheque_voucher").prop('readonly', false);
+
+			$("#numbering_credit_note").prop('readonly', false);
+			$("#numbering_sales_receipt").prop('readonly', false);
+			$("#numbering_bill").prop('readonly', false);
+			$("#numbering_suppliers_credit").prop('readonly', false);
+			$("#numbering_estimate").prop('readonly', false);
+			$("#numbering_bill_invoice_main").prop('readonly', false);
+			$("#numbering_sales_invoice_branch").prop('readonly', false);
+			$("#numbering_bill_invoice_branch").prop('readonly', false);
+
+			
+			
+			
+			
+		}else{
+			$("#numbering_sales_exp").prop('readonly', true);
+			$("#numbering_cash_voucher").prop('readonly', true);
+			$("#numbering_cheque_voucher").prop('readonly', true);
+			$("#numbering_credit_note").prop('readonly', true);
+			$("#numbering_sales_receipt").prop('readonly', true);
+			$("#numbering_bill").prop('readonly', true);
+			$("#numbering_suppliers_credit").prop('readonly', true);
+			$("#numbering_estimate").prop('readonly', true);
+			$("#numbering_bill_invoice_main").prop('readonly', true);
+			$("#numbering_sales_invoice_branch").prop('readonly', true);
+			$("#numbering_bill_invoice_branch").prop('readonly', true);
+		}
+	});
+	
+	$('#toggle_edit_cost_center').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#useCostCenter").prop('disabled')){
+			$("#useCostCenter").prop('disabled', false);
+			
+		}else{
+			$("#useCostCenter").prop('disabled', true);
+			
 		}
 	});
 
@@ -83,10 +256,16 @@ jQuery(document).ready(function($) {
 			$("#company_address").prop('readonly', false);
 			$("#customer_facing_address").prop('readonly', false);
 			$("#legal_address").prop('readonly', false);
+			$("#postal1").prop('readonly', false);
+			$("#postal2").prop('readonly', false);
+			$("#postal3").prop('readonly', false);
 		}else{
 			$("#company_address").prop('readonly', true);
 			$("#customer_facing_address").prop('readonly', true);
 			$("#legal_address").prop('readonly', true);
+			$("#postal1").prop('readonly', true);
+			$("#postal2").prop('readonly', true);
+			$("#postal3").prop('readonly', true);
 		}
 	});
 
@@ -225,11 +404,14 @@ jQuery(document).ready(function($) {
 			$("#first_month_of_tax_year").prop('disabled', false);
 			$("#accounting_method").prop('disabled', false);
 			$("#close_book").prop('disabled', false);
+			$("#end_month_of_fiscal_year").prop('disabled', false);
+			
 		}else{
 			$("#first_month_of_fiscal_year").prop('disabled', true);
 			$("#first_month_of_tax_year").prop('disabled', true);
 			$("#accounting_method").prop('disabled', true);
 			$("#close_book").prop('disabled', true);
+			$("#end_month_of_fiscal_year").prop('disabled', true);
 		}
 
 	});
@@ -412,6 +594,24 @@ jQuery(document).ready(function($) {
 		event.preventDefault();
 		
 		$('#billmodal').modal('hide');
+	});
+
+	$("#add_purchase_order_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#purchaseordermodal').modal('hide');
+	});
+
+	$("#add_supplier_credit_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#suppliercreditmodal').modal('hide');
+	});
+
+	$("#add_card_credit_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#creditcardcreditmodal').modal('hide');
 	});
 
 });

@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="float-right">
-                    <select class="mb-3 p-1 mt-2">
+                    <select class="mb-3 p-1 mt-2 normalselect" >
                         <option value="" disabled selected>Reminder List</option>
                         <option>Run Report</option>
                     </select>
@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="col-md-12 p-0 mb-3">
-                    <input type="text" name="" placeholder="Filter by Name">
+                    <input type="text" name="" placeholder="Filter by Name" class="normalinput">
                     <div class="d-inline-flex float-right">
                         <li class="fa fa-print pl-2"><a href=""></a></li>
                         <li class="fa fa-cog pl-2"><a href=""></a></li>

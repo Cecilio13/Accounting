@@ -1,6 +1,14 @@
 <footer>
-       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>  
+        {{-- <script src="{{asset('chosen/docsupport/jquery-3.2.1.min.js')}}" type="text/javascript"></script> --}}
+        {{-- <script src="{{asset('chosen/chosen.jquery.js')}}" type="text/javascript"></script>
+        <script src="{{asset('chosen/docsupport/prism.js')}}" type="text/javascript" charset="utf-8"></script>
+        <script src="{{asset('chosen/docsupport/init.js')}}" type="text/javascript" charset="utf-8"></script> --}}
+
+        <script src="{{asset('js/xlsx.core.min.js')}}"></script>
+        <script src="{{asset('js/FileSaver.js')}}"></script>
+        <script src="{{asset('js/tableexport.js')}}"></script>
+        <script src="{{asset('js/popper.js')}}"></script>
         <script src="{{asset('js/plugins.js')}}"></script>
         <script src="{{asset('js/main.js')}}"></script>
         <script src="{{asset('js/donut.js')}}"></script>
@@ -9,7 +17,11 @@
         <script src="{{asset('js/lib/chart-js/Chart.bundle.js')}}"></script>
         <script src="{{asset('js/dashboard.js')}}"></script>
         <script src="{{asset('js/widgets.js')}}"></script>
-        <script src="{{asset('jquery-3.3.1.min.js')}}"></script>
+        <script src="{{asset('js/html2canvas.js')}}"></script>
+        
+        <script src="{{asset('js/jquery.js')}}"></script>
+        
+
         <script src="{{asset('js/lib/vector-map/jquery.vmap.js')}}"></script>
         <script src="{{asset('js/lib/vector-map/jquery.vmap.min.js')}}"></script>
         <script src="{{asset('js/lib/vector-map/jquery.vmap.sampledata.js')}}"></script>
@@ -18,12 +30,13 @@
         <script src="{{asset('js/lib/chart-js/chartjs-init.js')}}"></script>
 
         <!-- Alert -->
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="{{asset('js/sweetalert.js')}}"></script>
 
         <!-- DataTables -->
-        <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="{{asset('js/datatable.js')}}"></script>
         
         <!--  flot-chart js -->
+        <script  src="{{asset('fontawesome/js/all.js')}}"></script>
         <script src="{{asset('js/lib/flot-chart/excanvas.min.js')}}"></script>
         <script src="{{asset('js/lib/flot-chart/jquery.flot.js')}}"></script>
         <script src="{{asset('js/lib/flot-chart/jquery.flot.pie.js')}}"></script>
@@ -34,6 +47,7 @@
         <script src="{{asset('js/lib/flot-chart/curvedLines.js')}}"></script>
         <script src="{{asset('js/lib/flot-chart/flot-tooltip/jquery.flot.tooltip.min.js')}}"></script>
         <script src="{{asset('js/lib/flot-chart/flot-chart-init.js')}}"></script>
+        <script>if (window.module) module = window.module;</script>
         <script>
                 ( function ( $ ) {
                 "use strict";
@@ -53,5 +67,36 @@
                 } )( jQuery );
 
 
+        </script>
+        <script>
+        function PrintElem(elem)
+        {
+        var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+        if(elem=="printablereport_employee_contact_list"){
+           document.getElementById('report_main_above_button').style.display="none";
+        }
+        mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+        mywindow.document.write('</head><body style="width:100%;">');
+        //mywindow.document.write('<h1>' + document.title  + '</h1>');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('<style>');
+        mywindow.document.write('.report-main{width:100%;}#tablemain{width:100%;border-spacing:0px;}#report_employee_companynameheader{border:0px solid black;}');
+        mywindow.document.write('#tablemain th{border-top:1px solid #ccc;border-bottom:2px solid #ccc;}');
+        mywindow.document.write('#tablemain tr td{border-bottom:1px solid #ccc;padding-left:0px;padding-right:0px;}');
+        mywindow.document.write('</style>');
+        mywindow.document.write('</body></html>');
+        if(elem=="printablereport_employee_contact_list"){
+           document.getElementById('report_main_above_button').style.display="table-row";
+        }
+        
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+        }
         </script>
 </footer>

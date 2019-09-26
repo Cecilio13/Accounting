@@ -27,12 +27,12 @@ class CreateStDelayedCreditsTable extends Migration
                     ->onDelete('cascade');
             $table->string('st_dcredit_desc');
             $table->integer('st_dcredit_qty');
-            $table->float('st_dcredit_rate');
-            $table->float('st_dcredit_total');
+            $table->string('st_dcredit_rate');
+            $table->string('st_dcredit_total');
             $table->string('st_p_method')->nullable();
             $table->string('st_p_reference_no')->nullable();
             $table->string('st_p_deposit_to')->nullable();
-            $table->float('st_p_amount')->default('0')->nullable();
+            $table->string('st_p_amount')->default('0')->nullable();
             $table->timestamps();
         });
     }

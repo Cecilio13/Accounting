@@ -24,7 +24,22 @@
                                 @endif
                             </div>
                         </div>
-
+                        <div class="form-group row">
+                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Position') }}</label>
+                            <div class="col-md-6">
+                                <input id="name" type="text" list="Position_lIst" class="form-control" name="position"  >
+                                <datalist id="Position_lIst">
+                                <option value="Sales">Position
+                                <option value="Expenses">Position
+                                <option value="A\P Local">Position
+                                <option value="A\P Others">Position
+                                <option value="A\R Sales Invoice">Position
+                                <option value="A\R Collection">Position
+                                <option value="Intermediate">Position
+                                <option value="Executive">Position
+                                </datalist>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
 

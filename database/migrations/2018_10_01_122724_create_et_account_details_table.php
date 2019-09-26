@@ -23,8 +23,8 @@ class CreateEtAccountDetailsTable extends Migration
             $table->string('et_ad_product');
             $table->string('et_ad_desc');
             $table->integer('et_ad_qty')->nullable();;
-            $table->float('et_ad_rate')->nullable();;
-            $table->float('et_ad_total');
+            $table->string('et_ad_rate')->nullable();;
+            $table->string('et_ad_total');
             $table->timestamps();
         });
     }

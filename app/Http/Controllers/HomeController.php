@@ -29,6 +29,6 @@ class HomeController extends Controller
     {
         $customers = Customers::all();
         $products_and_services = ProductsAndServices::all();
-        return view('pages.reports', compact('customers', 'products_and_services'));
+        return redirect()->intended('/dashboard');
     }
 }

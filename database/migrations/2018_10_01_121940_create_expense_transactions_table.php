@@ -21,6 +21,7 @@ class CreateExpenseTransactionsTable extends Migration
                     ->references('customer_id')
                     ->on('customers')
                     ->onDelete('cascade');
+            $table->string('et_email')->nullable();
             $table->string('et_billing_address')->nullable();
             $table->string('et_account')->nullable();
             $table->string('et_payment_method')->nullable();
@@ -28,6 +29,7 @@ class CreateExpenseTransactionsTable extends Migration
             $table->date('et_date')->nullable();
             $table->date('et_due_date')->nullable();
             $table->string('et_bill_no')->nullable();
+            $table->string('et_message')->nullable();
             $table->string('et_memo')->nullable();
             $table->string('et_attachment')->nullable();
             $table->string('et_reference_no')->nullable();

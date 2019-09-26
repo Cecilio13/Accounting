@@ -27,12 +27,12 @@ class CreateStDelayedChargesTable extends Migration
                     ->onDelete('cascade');
             $table->string('st_dc_desc');
             $table->integer('st_dc_qty');
-            $table->float('st_dc_rate');
-            $table->float('st_dc_total');
+            $table->string('st_dc_rate');
+            $table->string('st_dc_total');
             $table->string('st_p_method')->nullable();
             $table->string('st_p_reference_no')->nullable();
             $table->string('st_p_deposit_to')->nullable();
-            $table->float('st_p_amount')->default('0')->nullable();
+            $table->string('st_p_amount')->default('0')->nullable();
             $table->timestamps();
         });
     }

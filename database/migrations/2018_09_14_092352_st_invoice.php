@@ -27,12 +27,12 @@ class StInvoice extends Migration
                     ->onDelete('cascade');
             $table->string('st_i_desc');
             $table->integer('st_i_qty');
-            $table->float('st_i_rate');
-            $table->float('st_i_total');
+            $table->string('st_i_rate');
+            $table->string('st_i_total');
             $table->string('st_p_method')->nullable();
             $table->string('st_p_reference_no')->nullable();
             $table->string('st_p_deposit_to')->nullable();
-            $table->float('st_p_amount')->default('0')->nullable();
+            $table->string('st_p_amount')->default('0')->nullable();
             $table->timestamps();
         });   
     }

@@ -19,5 +19,8 @@
         "popper.js": "^1.12",
         "sweetalert": "^2.1.0",
         "vue": "^2.5.7"
+    },
+    "dependencies": {
+        "chosen-js": "^1.8.7"
     }
 }
