@@ -781,9 +781,9 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @if(count($customers)>0)
-                                @foreach($customers as $customer)
-                                @if($customer->account_type=="Supplier")
+                            @if(count($supplierss)>0)
+                                @foreach($supplierss as $customer)
+                                
                                 <tr>
                                         
                                     <td class="pt-3-half" style="vertical-align:middle;text-align:left;" contenteditable="false"><a class="text-info" href="get_supplier/?supplier_id={{$customer->customer_id}}">{{$customer->company!=""? $customer->company : ($customer->display_name!=""? $customer->display_name : $customer->f_name." ".$customer->l_name ) }}</a></td>
@@ -792,8 +792,7 @@
                                     <td class="pt-3-half" style="vertical-align:middle;" contenteditable="false">PHP {{number_format($customer->opening_balance)}}</td>
                                     
                                 </tr>
-                                @endif
-                                    
+                                
                                 @endforeach
                             @endif
                                 </tbody>

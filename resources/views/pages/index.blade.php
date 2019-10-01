@@ -5,7 +5,21 @@
 
 
 <script>
-
+$(document).ready(function(){
+    $.ajax({
+    method: "POST",
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    url: "import_employee",
+    dataType: "text",
+    data: {_token: '{{csrf_token()}}'},
+    success: function (data) {
+        
+    },
+    
+    });
+})
 // Load the Visualization API and the corechart package.
 
 google.charts.load('current', {'packages':['corechart', 'bar']});

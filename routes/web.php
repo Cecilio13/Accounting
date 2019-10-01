@@ -27,6 +27,7 @@ Route::group(['middleware'=>['auth']], function() {
     Route::get('/approvals', 'PagesController@approvals');
     
     Route::get('/checkregister', 'PagesController@checkregister');
+    Route::post('/import_employee', 'PagesController@import_employee');
     
     Route::post('/update_journal_entry', 'JournalEntryController@update_journal_entry')->name('update_journal_entry');
     Route::post('/delete_overwrite_journal_entry', 'JournalEntryController@delete_overwrite_journal_entry')->name('delete_overwrite_journal_entry');

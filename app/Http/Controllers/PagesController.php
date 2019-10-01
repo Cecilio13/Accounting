@@ -81,237 +81,7 @@ class PagesController extends Controller
         $arr2 = str_split($passww);
         $length=1;
         $dencrypted="";
-        /* foreach($arr2 as $arr22){
-
-            
-            if($arr22=="_"){
-                $dencrypted=$dencrypted." ";
-            }else{
-            $arr22=chr(ord($arr22) - $length);
-            $dencrypted=$dencrypted.$arr22;
-            }
-            $length++;
-        }
-        $passww= $dencrypted;   */ 
-       
-        //$emailll = $request->route()->getAction()['Email'];
-        //$passww = $request->route()->getAction()['Password'];
-        /* $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-A";
-        $cc_name="Administrative/Legal";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-B";
-        $cc_name="Human Resource";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-C";
-        $cc_name="Purchasing";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-D";
-        $cc_name="Security";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-E";
-        $cc_name="Accounting";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-F";
-        $cc_name="Budget";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-G";
-        $cc_name="Cashiering";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-H";
-        $cc_name="Safety";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-I";
-        $cc_name="Company Nurse";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-J";
-        $cc_name="Logistic";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-K";
-        $cc_name="Property Custodian";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="02";
-        $cc_type="Administrative";
-        $cc_name_code="02-L";
-        $cc_name="Technical Working Group";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-1";
-        $cc_name="CW Perimeter Lighting- Sarangani";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-2";
-        $cc_name="Construction and Improvement of Road Including Drainage at Sobrecary";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-3";
-        $cc_name="Demolition Job @ Astorga";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-4";
-        $cc_name="Installation of Gabion ( Tudaya 2 Dessander )";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-5";
-        $cc_name="Powerhouse A Dessander Gabion Installation ( Dessander B )";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-6";
-        $cc_name="Powerhouse A Access Road Gabions Installation";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-7";
-        $cc_name="Weir Trash Rack Modification";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-8";
-        $cc_name="Dredging of Conveyance Canal";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-9";
-        $cc_name="Contruction of CR @ Mintal";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-10";
-        $cc_name="Construction of Septic Tank @ Mintal";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-11";
-        $cc_name="Repair of Mess Hall @ Mintal";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-12";
-        $cc_name="DLPC Under Ground";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-13";
-        $cc_name="Intake Modification @ Mintal";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-A";
-        $cc_type="Civil Works";
-        $cc_name_code="03-A-14";
-        $cc_name="Talomo 3 Spillway Catalunan";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
         
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-1";
-        $cc_name="Magtuod 138KV";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-2";
-        $cc_name="Tugbok 69KV";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-3";
-        $cc_name="Substation Ponciano";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-4";
-        $cc_name="PLDT Under Ground";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-5";
-        $cc_name="Holcim- Transmission 69KV";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-6";
-        $cc_name="Saranggani-Electrical";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-7";
-        $cc_name="Talomo CCTV Plant 1A Project";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-8";
-        $cc_name="Baguio Project";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-B";
-        $cc_type="Electrical";
-        $cc_name_code="03-B-9";
-        $cc_name="Distribution Line Project Manolo";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-
-        $cc_type_code="03-C";
-        $cc_type="Telecommunication";
-        $cc_name_code="03-C-1";
-        $cc_name="FOC";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-C";
-        $cc_type="Telecommunication";
-        $cc_name_code="03-C-2";
-        $cc_name="Skycable";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-C";
-        $cc_type="Telecommunication";
-        $cc_name_code="03-C-3";
-        $cc_name="Surveillance Manolo";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-C";
-        $cc_type="Telecommunication";
-        $cc_name_code="03-C-4";
-        $cc_name="VECO Project";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-C";
-        $cc_type="Telecommunication";
-        $cc_name_code="03-C-5";
-        $cc_name="Surveillance CM Recto Mabini Street";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-        $cc_type_code="03-C";
-        $cc_type="Telecommunication";
-        $cc_name_code="03-C-6";
-        $cc_name="Surveillance Malagos Hedcor";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name);
-
-        $cc_type_code="13";
-        $cc_type="Arkpower";
-        $cc_name_code="13-A";
-        $cc_name="24/7 On call Electrician";
-        $this->adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name); */
-        
-       
         
         $userdata = array(
             'email' => $emailll ,
@@ -352,23 +122,10 @@ class PagesController extends Controller
 
             //return Redirect::to('checklogin');
             }  
-        /* $user = new User();
-        $user->name = "Cecilio";
-        $user->email = "Ceciliodeticio13@gmail.com";
-        $user->password = "Odanobunaga13";
-        Auth::logout();
-        Auth::login($user);
-        if (Auth::check()) {
-            // Get the currently authenticated user...
-            $user = Auth::user();
-            echo $user;
-            //echo "Authenticated!";
-        } else {
-            echo "<b>Not Authenticated!!!</b>";
-        } */
+        
         
     }
-    public function dashboard(Request $request){
+    public function import_employee(Request $request){
         try {
 			
             DB::connection('mysql_ms')->getPdo();
@@ -433,6 +190,9 @@ class PagesController extends Controller
             //connection not established
             //return $e;
         }
+    }
+    public function dashboard(Request $request){
+        
         $useracess=UserAccess::find("q");
         if(empty($useracess)){
             $useracess= new UserAccess;
@@ -460,89 +220,6 @@ class PagesController extends Controller
             $numbering->save();
         }
         
-        // $query = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME =  ?";
-        // $db = DB::select($query, ['consmanagementsys']);
-        // if(empty($db)){
-            
-        // }else{
-        //     $users2 = DB::table('products_and_services')->get();
-        //     $users1= DB::connection('mysql2')->select("SELECT * FROM assets WHERE asset_approval='1'");
-        //     if(count($users1) > 0){
-        //         foreach($users1 as $useri){
-        //                 //array_push($a,$useri->email);
-        //                 $dup=0;
-        //                 if(count($users2) > 0){
-        //                     foreach($users2 as $userso){
-        //                         if(strtolower($userso->product_name)==strtolower($useri->asset_tag)){
-        //                             $dup=1;
-                                    
-        //                             break;
-        //                         }
-        //                     }
-        //                 }
-                        
-        //                 if($dup==0){
-        //                     $user= new ProductsAndServices;
-        //                     $user->product_id=ProductsAndServices::count() + 1;
-        //                     $user->product_name=$useri->asset_tag;
-        //                     $user->product_sku=$useri->sku_code;
-        //                     $user->product_type=$useri->asset_type;
-        //                     $user->product_sales_description=$useri->asset_description;
-        //                     $user->product_sales_price=$useri->current_cost;
-        //                     $user->product_cost=$useri->current_cost;
-        //                     $user->product_qty='1';
-        //                     $user->product_reorder_point="0";
-        //                     $user->save();
-        //                 }
-        //         }
-    
-        //     }
-        // }
-        // $query = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME =  ?";
-        // $db = DB::select($query, ['acc_system']);
-        // if(empty($db)){
-
-        // }else{
-        //     $users1= DB::connection('mysql3')->select("SELECT * FROM customers");
-        //     return $users1;
-        // }
-            // $coa_title="Assets";
-            // $coa_account_type="Current Asset";
-            // $coa_detail_type="Cash in Bank";
-            // $coa_code="100";
-            // $coa_normal_balance="Debit";
-            // $coa_description=" ";
-            // $coa_sub_acc="Bank";
-            // $this->adddefaultcoa($coa_account_type,$coa_detail_type,$coa_code,$coa_normal_balance,$coa_title,$coa_description,$coa_sub_acc);
-
-            // $coa_account_type="Current Asset";
-            // $coa_detail_type="Accounts Receivable";
-            // $coa_code="200";
-            // $coa_normal_balance="Debit";
-            // $coa_description=" ";
-            // $coa_sub_acc="Receivable Accounts";
-            
-            // $this->adddefaultcoa($coa_account_type,$coa_detail_type,$coa_code,$coa_normal_balance,$coa_title,$coa_description,$coa_sub_acc);
-            
-            // $coa_account_type="Payable Accounts";
-            // $coa_title="Liabilities";
-
-            // $coa_detail_type="Accounts Payable";
-            // $coa_code="1000";
-            // $coa_normal_balance="Credit";
-            // $coa_description=" ";
-            // $coa_sub_acc="";
-            // $this->adddefaultcoa($coa_account_type,$coa_detail_type,$coa_code,$coa_normal_balance,$coa_title,$coa_description,$coa_sub_acc);
-
-            // $coa_title="Revenue";
-            // $coa_account_type="Revenue";
-            // $coa_detail_type="Service Revenue";
-            // $coa_code="1300";
-            // $coa_normal_balance="Credit";
-            // $coa_description=" ";
-            // $coa_sub_acc="";
-            // $this->adddefaultcoa($coa_account_type,$coa_detail_type,$coa_code,$coa_normal_balance,$coa_title,$coa_description,$coa_sub_acc);
-        
         $company = Company::first();
         $sales = Sales::first();
         $expenses = Expenses::first();
@@ -562,17 +239,7 @@ class PagesController extends Controller
                 ->get();
         $jounalcount=count($jounal)+1;
         $users2 = DB::table('users')->get();
-        //$users1= DB::connection('mysql2')->select("SELECT * FROM employee_info JOIN employee_email_address ON 
-        //employee_info.employee_id=employee_email_address.emp_id");
-        //return $a;
-        //$user= new User;
-        //$user->name="Cecilio";
-        //$user->email="Ceciliodeticio13@gmail.com";
-        //$user->password="Odanobunaga13";
-        //$user->save();
         
-
-        //return view('pages.index')->with('usss',$users);
         $VoucherCount=Voucher::count() + 1;
         if($VoucherCount<10){
             $VoucherCount="000".$VoucherCount;
@@ -1033,20 +700,20 @@ class PagesController extends Controller
             ->get();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-        $totalexp=0;
-        foreach($expense_transactions as $et){
-            if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
-        }
+        
         $COA= ChartofAccount::where('coa_active','1')->get();
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $favorite_report = DB::table('favorite_report')->get();
         $numbering = Numbering::first();         $st_invoice = DB::table('st_invoice')->get();
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
-        return view('pages.approvals', compact('numbering','st_invoice','cost_center_list','favorite_report','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','Report','customers', 'products_and_services','JournalEntry','jounalcount','VoucherCount'));
+        return view('pages.approvals', compact('numbering','st_invoice','cost_center_list','favorite_report','ETran','SS','COA','expense_transactions','et_acc','et_it','Report','customers', 'products_and_services','JournalEntry','jounalcount','VoucherCount'));
       
     }
     public function expenses(){
         $customers = Customers::all();
+        $supplierss = Customers::where([
+            ['account_type','=','Supplier']
+        ])->get();
         
         $products_and_services = ProductsAndServices::all();
         $Supplier= Supplier::where('supplier_active', '1')->get();
@@ -1056,20 +723,6 @@ class PagesController extends Controller
                 ->groupBy('je_no')
                 ->get();
         $jounalcount=count($jounal)+1;
-        $expense_transactions = DB::table('expense_transactions')
-            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
-            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
-            ->get();
-            $et_acc = DB::table('et_account_details')->get();
-            $et_it = DB::table('et_item_details')->get();
-        $totalexp=0;
-        foreach($expense_transactions as $et){
-            if($et->remark=="" && $et->et_type==$et->et_ad_type)
-            {
-                $totalexp=$totalexp+$et->et_ad_total;
-                //echo $et->et_ad_total."<br>";
-            }
-        }
         
         $VoucherCount=Voucher::count() + 1;
         if($VoucherCount<10){
@@ -1096,13 +749,8 @@ class PagesController extends Controller
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();         $st_invoice = DB::table('st_invoice')->get();
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
-        //return $expense_transactions;
-        // foreach($expense_transactions as $et){
-        //     print_r($et);
-        //     echo "<br>";
-        //     echo "<br>";
-        // }
-        return view('pages.expenses', compact('numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','et_it','et_acc','totalexp','expense_transactions','jounalcount','customers','Supplier', 'products_and_services','JournalEntry','VoucherCount'));
+        
+        return view('pages.expenses', compact('supplierss','numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','et_it','et_acc','totalexp','expense_transactions','jounalcount','customers','Supplier', 'products_and_services','JournalEntry','VoucherCount'));
     }
    
     public function taxes(){

@@ -9942,14 +9942,6 @@ function edit_journal_entries(je_no){
             
         }
         
-        // $('#customertable tbody').on('dblclick', 'tr', function () {
-        //     var data = customers_table.row( this ).data();
-        //     //alert( 'You clicked on '+data[1]+'\'s row' );
-        //     console.log(data.customer_id);
-        //     window.location.href = "/customerinfo/?customer_id="+data.customer_id;
-        // } );
-                               
-        
         sales_table = $('#salestable').DataTable({
             order: [[ 0, "desc" ]],
             paging: true,
