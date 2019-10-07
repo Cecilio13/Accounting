@@ -9772,40 +9772,39 @@ function edit_journal_entries(je_no){
                 }
             }],
             columns: [{
-                            data: 'checkbox',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'st_date'
-                        },
-                        {
-                            data: 'st_type'
-                        },
-                        {
-                            data: 'st_no'
-                        },
-                        {
-                            data: 'customer_name'
-                        },
-                        {
-                            data: 'st_due_date'
-                        },
-                        {
-                            data: 'customer_balance'
-                        },
-                        {
-                            data: 'transaction_total'
-                        },
-                        {
-                            data: 'st_status'
-                        },
-                        {
-                            data: "action",
-                            orderable: false,
-                            searchable: false
-                    }]
-            
+                data: 'checkbox',
+                orderable: false,
+                searchable: false
+            },
+            {
+                data: 'st_date'
+            },
+            {
+                data: 'st_type'
+            },
+            {
+                data: 'st_no'
+            },
+            {
+                data: 'customer_name'
+            },
+            {
+                data: 'st_due_date'
+            },
+            {
+                data: 'customer_balance'
+            },
+            {
+                data: 'transaction_total'
+            },
+            {
+                data: 'st_status'
+            },
+            {
+                data: "action",
+                orderable: false,
+                searchable: false
+            }]
         });
         document.getElementById('reconciletable_info').style.display="none";
 		document.getElementById('reconciletable_length').style.display="none";
@@ -9922,18 +9921,18 @@ function edit_journal_entries(je_no){
                 }
             }],
             columns: [{
-                            data: 'display_name'
-                        },
-                        {
-                            data: 'phone'
-                        },
-                        {
-                            data: 'email'
-                        },
-                        {
-                            data: 'opening_balance'
-                        }
-                        ]
+                data: 'display_name'
+            },
+            {
+                data: 'phone'
+            },
+            {
+                data: 'email'
+            },
+            {
+                data: 'opening_balance'
+            }
+            ]
         });
         if(document.getElementById('customertable_info')){
             document.getElementById('customertable_info').style.display="none";

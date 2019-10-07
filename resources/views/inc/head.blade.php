@@ -3,8 +3,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{config('app.name','None')}}</title>
         
-        <!-- Fonts -->
-        
         <link rel="stylesheet" href="{{asset('css/normalize.css')}}">
         <link rel="stylesheet" href="{{asset('css/bootstrap.min.css')}}">
         <link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
@@ -12,9 +10,6 @@
         <link rel="stylesheet" href="{{asset('css/flag-icon.min.css')}}">
         <link rel="stylesheet" href="{{asset('css/cs-skin-elastic.css')}}">
         
-        
-        
-        {{-- <link rel="stylesheet" href="{{asset('chosen/docsupport/style.css')}}"> --}}
         <link rel="stylesheet" href="{{asset('chosen/docsupport/prism.css')}}">
         <link rel="stylesheet" href="{{asset('chosen/chosen.css')}}">
         <!-- <link rel="stylesheet" href="assets/css/bootstrap-select.less"> -->

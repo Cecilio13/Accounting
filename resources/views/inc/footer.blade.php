@@ -65,8 +65,6 @@
                         normalizeFunction: 'polynomial'
                 } );
                 } )( jQuery );
-
-
         </script>
         <script>
         function PrintElem(elem)

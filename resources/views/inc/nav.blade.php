@@ -4,7 +4,6 @@
 set_time_limit(0);
     ?>
     <div class="col-sm-7">
-        
         <div class="header-left">
             <button style="display:none;" class="search-trigger"><i class="fa fa-search"></i></button>
             <div class="form-inline">

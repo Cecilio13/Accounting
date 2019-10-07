@@ -28,7 +28,7 @@ class FormstyleController extends Controller
 {
     public function add_form_style(Request $request)
     {
-        $message="";
+        $message="Successfully added new form style template";
         if($request->templatesettings['TemplateID']==""){
             $formstylecount = Formstyle::count()+1;
             $Formstyle = new  Formstyle;
