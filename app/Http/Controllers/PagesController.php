@@ -29,6 +29,7 @@ use App\UserAccess;
 class PagesController extends Controller
 {
     public function index(\Illuminate\Http\Request $request){
+        
         $query = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME =  ?";
         $db = DB::select($query, ['consmanagementsys']);
         if(empty($db)){
@@ -400,6 +401,8 @@ class PagesController extends Controller
         return view('pages.index', compact(['current_month_less_three','current_month_less_three_due','month_selected_less_three','year_less_three','three_month','one_month','two_month','current_month_less_two','current_month_less_two_due','month_selected_less_two','year_less_two','year_less_one','current_month_less_one','current_month_less_one_due','month_selected_raw','current_month_due','current_month','overduetotal_amount','unuetotal_amount','total_invoice_receivable','total_invoice_receivable_due','numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount', 'users2','customers', 'products_and_services','JournalEntry','VoucherCount']));
 
     }
+
+    
     private function adddefaultcostcenter($cc_type_code,$cc_type,$cc_name_code,$cc_name){
         $cc= DB::connection('mysql')->select("SELECT * FROM cost_center WHERE cc_name_code='$cc_name_code' AND cc_name='$cc_name' AND cc_type='$cc_type' AND cc_type_code='$cc_type_code'");
         $cc_count = count($cc);

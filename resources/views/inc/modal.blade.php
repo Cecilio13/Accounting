@@ -1,6 +1,6 @@
 
 <script>
-
+//alert('{{$hostss}}');
 
 
  function ResetBills(){

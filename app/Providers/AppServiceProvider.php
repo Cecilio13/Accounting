@@ -51,8 +51,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
-        // view()->share('signedIn', \Auth::check());
 
+        $this->setEnv('DB_HOST', '192.168.254.102');
+        // view()->share('signedIn', \Auth::check());
+        
+        view()->share('hostss', config('database.connections.mysql.host'));
         // //View::share('user', \Auth::user());
         view()->share('EXNew', ExpenseTransactionNew::where([
             ['et_status','=',NULL]
@@ -148,5 +151,17 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+    }
+    private function setEnv($key, $value)
+    {
+        $path = app()->environmentFilePath();
+
+        $escaped = preg_quote('='.env($key), '/');
+
+        file_put_contents($path, preg_replace(
+            "/^{$key}{$escaped}/m",
+            "{$key}={$value}",
+            file_get_contents($path)
+        ));
     }
 }
