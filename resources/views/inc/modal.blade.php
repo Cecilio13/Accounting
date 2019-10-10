@@ -4118,7 +4118,6 @@ function getModal(Location,TTTTT,e,type,sales){
                                     
                                     <td style="vertical-align:middle;" class="pl-0">
                                         <select class="form-control selectpicker" data-live-search="true" name="sales_receipt_account_debit_account_cheque"  id="sales_receipt_account_debit_account_cheque" required>
-                                        <option></option>
                                         <?php
                                         $a = 'Cash Clearing Account';
                                         ?>
