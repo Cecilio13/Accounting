@@ -13,6 +13,10 @@ use \setasign\Fpdi\Fpdi;
 
 Route::group(['middleware'=>['auth']], function() {
     
+    
+    Route::post('/get_customer_info', 'GetController@get_customer_info');
+    Route::post('/get_product_info', 'GetController@get_product_info');
+    
     Route::post('/destroy2', 'ChartofAccountsController@destroy2');
     Route::post('/supplierdestroy', 'SuppliersController@destroy2');
     Route::get('/dashboard', 'PagesController@dashboard');

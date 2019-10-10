@@ -408,20 +408,13 @@ function exporttoexcel(table_id){
                                          $estimate_start_no=$numbering->estimate_start_no;
                                          ?>
                                          @endif
-                                         @foreach ($VoucherCount as $vc)
-                                         @if("Cheque Voucher"==$vc->voucher_type)
                                          <?php
-                                         $v_count_cheque++;
+                                         $v_count_cheque=$VoucherCheckCount;
                                          ?>
-                                         @endif
-                                        @endforeach
-                                        @foreach ($VoucherCount as $vc)
-                                        @if("Cash Voucher"==$vc->voucher_type)
-                                        <?php
-                                        $v_count_cash++;
-                                        ?>
-                                        @endif
-                                        @endforeach
+                                         <?php
+                                         $v_count_cash=$VoucherCashCount;
+                                         ?>
+                                       
                                         <script>
                                             function changevoucher(e){
                                                 if(e=="Cheque Voucher"){
@@ -471,13 +464,9 @@ function exporttoexcel(table_id){
                                                 <?php
                                                 $v_count=0;
                                                 ?>
-                                                @foreach ($VoucherCount as $vc)
-                                                    @if("Cheque Voucher"==$vc->voucher_type)
-                                                    <?php
-                                                    $v_count++;
-                                                    ?>
-                                                    @endif
-                                                @endforeach
+                                                <?php
+                                                $v_count=$VoucherCheckCount;
+                                                ?>
                                                 <td width="10%" style="vertical-align:middle">No. </td>
                                                 <td width="20%" style="vertical-align:middle"><input type="text" class="form-control" id="VoucherNo" value="{{$v_count+$cheque_start}}" readonly></td>
                                             </tr>
@@ -7808,18 +7797,33 @@ function edit_journal_entries(je_no){
                                     <td class="pt-3-half" contenteditable="false">
                                        <input type="date" name="" id="paybill_paymentdate{{$paybillrowcount}}" class="w-100">
                                     </td>
-                                    <td class="pt-3-half" contenteditable="false">
+                                        <td class="pt-3-half" contenteditable="false" id="payee_{{$paybillrowcount}}">
                                         
-                                        @foreach ($customers as $cus)
-                                            @if($cus->customer_id==$et->et_customer)
-                                                @if($cus->display_name=="")
-                                                {{$cus->f_name." ".$cus->l_name}}
-                                                @else
-                                                {{$cus->display_name}}
-                                                @endif
-                                            @endif
-                                        @endforeach
                                     </td>
+                                    <script>
+                                        $(document).ready(function(){
+                                            $.ajax({
+                                                type: "POST",
+                                                headers: {
+                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                },
+                                                url: "get_customer_info",
+                                                data: {id:'{{$et->et_customer}}',_token:'{{csrf_token()}}'},
+                                                success: function (customer) {
+                                                    console.log(customer);
+                                                    console.log(customer['customer_id']);
+                                                    if(customer['display_name']==''){
+                                                        document.getElementById('payee_{{$paybillrowcount}}').innerHTML=customer['f_name']+" "+customer['l_name'];
+                                                    }else{
+                                                        document.getElementById('payee_{{$paybillrowcount}}').innerHTML=customer['display_name']; 
+                                                    }
+
+                                                    
+                                                }
+                                            });
+                                        })
+                                        
+                                    </script>
                                     <td class="pt-3-half" contenteditable="false">
                                        {{$et->et_shipping_address}}
                                     </td>
@@ -11329,22 +11333,28 @@ function removeComma(str){
     function GetProductRate(e){
         var id = document.getElementById('select_product_name_edit'+e).value;
         if(id != ""){
-        @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_edit' + e).val('{{$product->product_sales_description}}');
-                        $('#select_product_rate_edit' + e).val(price);
-                        $('#select_product_rate_edit' + e).attr('title',price);
-                        $('#select_product_rate_edit_mask' + e).val(number_format(price,2));
-                        $('#select_product_rate_edit_mask' + e).attr('title',price);
-                        $('#total_amount_edit' + e).html(number_format(price * $('#product_qty_edit' + e).val(),2));
-                        $('#total_amount_edit' + e).attr('title',price * $('#product_qty_edit' + e).val());
-                    }
-            @endforeach
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "get_product_info",
+                data: {id:id,_token:'{{csrf_token()}}'},
+                success: function (product) {
+                    var price = product['product_sales_price'];
+                    $('#select_product_description_edit' + position).val(product['product_sales_description']);
+                    $('#select_product_rate_edit' + e).val(price);
+                    $('#select_product_rate_edit' + e).attr('title',price);
+                    $('#select_product_rate_edit_mask' + e).val(number_format(price,2));
+                    $('#select_product_rate_edit_mask' + e).attr('title',price);
+                    $('#total_amount_edit' + e).html(number_format(price * $('#product_qty_edit' + e).val(),2));
+                    $('#total_amount_edit' + e).attr('title',price * $('#product_qty_edit' + e).val());
+                }
+            });
         }
         update_total_edit();
     }
-    function update_total_edit(){
+        function update_total_edit(){
             var total_invoice = 0;
             $('.product_total_edit').each(function() {
                 var add_total = $(this).attr('title');
@@ -11506,11 +11516,17 @@ function removeComma(str){
                     $('#total_amount' + position).html('');
                     $('#total_amount_journal' + position).html('');
                 }else{
-                @foreach($products_and_services as $product)
-                        if(id == {{$product->product_id}}){
-                            var price = '{{$product->product_sales_price}}';
-                            $('#select_product_description' + position).val('{{$product->product_sales_description}}');
-                            $('#select_product_description_journal' + position).val('{{$product->product_sales_description}}');
+                    $.ajax({
+                        type: "POST",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "get_product_info",
+                        data: {id:id,_token:'{{csrf_token()}}'},
+                        success: function (product) {
+                            var price = product['product_sales_price'];
+                            $('#select_product_description' + position).val(product['product_sales_description']);
+                            $('#select_product_description_journal' + position).val(product['product_sales_description']);
                             $('#unformated_select_sales_rate' + position).val(number_format(price,2));
                             $('#select_product_rate'+ position).val(price);
                             $('#select_product_rate'+ position).attr('title', price);
@@ -11521,7 +11537,8 @@ function removeComma(str){
                             $('#total_amount_journal' + position).html(number_format(price * $('#product_qty_journal' + position).val(),2));
                             $('#total_amount_journal' + position).attr('title',price * $('#product_qty_journal' + position).val());
                         }
-                @endforeach
+                    });
+                
                 }
             }
             
@@ -11537,15 +11554,28 @@ function removeComma(str){
                 $('#big_invoicebalance').html('PHP 0.00');
             }else{
             var res = id.split(" - ");
-            @foreach($customers as $customer)
-                    if(res[0] == {{$customer->customer_id}}){
-                        $('#invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#term').val('{{$customer->terms}}');
-                        $('#email').val('{{$customer->email}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:res[0],_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#invoicebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_invoicebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#bill_address').val($('#bill_address').val().replace(' null',''));
+                        $('#bill_address').val($('#bill_address').val().replace(' null',''));
+                        $('#bill_address').val($('#bill_address').val().replace(' null',''));
+                        $('#bill_address').val($('#bill_address').val().replace(' null',''));
+                        $('#bill_address').val($('#bill_address').val().replace(' null',''));
+                        // $('#rr_payment_method').val(customer['payment_method']);
+                        $('#email').val(customer['email']);
+                        $('#term').val(customer['terms']);
                     }
-            @endforeach
+                });  
+            
             }
         });
         $(document).on('change', '#invoicecustomer_journal', function(event){
@@ -11555,15 +11585,28 @@ function removeComma(str){
                 $('#invoicebalance_journal').html('PHP 0.00');
                 $('#big_invoicebalance_journal').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#invoicebalance_journal').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_invoicebalance_journal').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#bill_address_journal').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#term_journal').val('{{$customer->terms}}');
-                        $('#email_journal').val('{{$customer->email}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#invoicebalance_journal').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_invoicebalance_journal').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#bill_address_journal').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#bill_address_journal').val($('#bill_address_journal').val().replace(' null',''));
+                        $('#bill_address_journal').val($('#bill_address_journal').val().replace(' null',''));
+                        $('#bill_address_journal').val($('#bill_address_journal').val().replace(' null',''));
+                        $('#bill_address_journal').val($('#bill_address_journal').val().replace(' null',''));
+                        $('#bill_address_journal').val($('#bill_address_journal').val().replace(' null',''));
+                        // $('#rr_payment_method').val(customer['payment_method']);
+                        $('#email_journal').val(customer['email']);
+                        $('#term_journal').val(customer['terms']);
                     }
-            @endforeach
+                });  
+            
             }
         });
         $(document).on('change', '.product_qty', function(){
@@ -11848,16 +11891,23 @@ function removeComma(str){
                     $('#select_product_rate_estimate' + position).val('');
                     $('#total_amount_estimate' + position).html('');
                 }else{
-                @foreach($products_and_services as $product)
-                        if(id == {{$product->product_id}}){
-                            var price = '{{$product->product_sales_price}}';
-                            $('#select_product_description_estimate' + position).val('{{$product->product_sales_description}}');
+                    $.ajax({
+                        type: "POST",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "get_product_info",
+                        data: {id:id,_token:'{{csrf_token()}}'},
+                        success: function (product) {
+                            var price = product['product_sales_price'];
+                            $('#select_product_description_estimate' + position).val(product['product_sales_description']);
                             $('#select_product_rate_estimate' + position).val(number_format(price,2));
                             $('#select_product_rate_estimate' + position).attr('title',price);
                             $('#total_amount_estimate' + position).html(number_format(price * $('#product_qty_estimate' + position).val(),2));
                             $('#total_amount_estimate' + position).attr('title',price * $('#product_qty_estimate' + position).val());
                         }
-                @endforeach
+                    });
+                
                 }
             }
             
@@ -11872,15 +11922,30 @@ function removeComma(str){
                 $('#estimatebalance').html('PHP 0.00');
                 $('#big_estimatebalance').html('PHP 0.00');
             }else{
-            var res = id.split(" - ");    
-            @foreach($customers as $customer)
-                    if(res[0] == {{$customer->customer_id}}){
-                        $('#estimatebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_estimatebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#e_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#e_email').val('{{$customer->email}}');
-                    }
-            @endforeach
+            var res = id.split(" - ");  
+            $.ajax({
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "get_customer_info",
+                dataType: "text",
+                data: {id:res[0],_token:'{{csrf_token()}}'},
+                success: function (customer) {
+                    $('#estimatebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                    $('#big_estimatebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                    $('#e_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
+                    // $('#rr_payment_method').val(customer['payment_method']);
+                    $('#e_email').val(customer['email']);
+                    // $('#cheque_email').val(customer['terms']);
+                }
+            });  
+            
             }
         });
 
@@ -12001,16 +12066,23 @@ function removeComma(str){
                 $('#select_product_rate_sales_receipt' + position).val('');
                 $('#total_amount_sales_receipt' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_sales_receipt' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_sales_receipt' + position).val(product['product_sales_description']);
                         $('#select_product_rate_sales_receipt' + position).val(number_format(price,2));
                         $('#select_product_rate_sales_receipt' + position).attr('title',price);
                         $('#total_amount_sales_receipt' + position).html(number_format(price * $('#product_qty_sales_receipt' + position).val(),2));
                         $('#total_amount_sales_receipt' + position).attr('title',price * $('#product_qty_sales_receipt' + position).val());
                     }
-            @endforeach
+                });
+                
             }
 
             update_total_sales_receipt();
@@ -12023,33 +12095,45 @@ function removeComma(str){
                 //$('#sales_receiptbalance').html('PHP 0.00');
                 //$('#big_sales_receiptbalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        //$('#sales_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        //$('#big_sales_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#sr_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        if('{{$customer->payment_method}}'!=""){
-                            $('#sr_payment_method').val('{{$customer->payment_method}}');
-                        }
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#sr_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#sr_bill_address').val($('#sr_bill_address').val().replace(' null',''));
+                        $('#sr_bill_address').val($('#sr_bill_address').val().replace(' null',''));
+                        $('#sr_bill_address').val($('#sr_bill_address').val().replace(' null',''));
+                        $('#sr_bill_address').val($('#sr_bill_address').val().replace(' null',''));
+                        $('#sr_bill_address').val($('#sr_bill_address').val().replace(' null',''));
+                        $('#sr_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                         
-                        $('#sr_email').val('{{$customer->email}}');
-                        $('#tin_no_sr').val('{{$customer->tin_no}}');
-                        $('#business_style_sr').val('{{$customer->business_style}}');
-                        if('{{$customer->payment_method}}'=='Cheque'){
+                        if(customer['payment_method']!=""){
+                            $('#sr_payment_method').val(customer['payment_method']);
+                            
+                        }
+                        $('#tin_no_sr').val(customer['tin_no']);
+                        $('#business_style_sr').val(customer['business_style']);
+                        if(customer['payment_method']=='Cheque'){
                             var x=document.getElementsByClassName("ChequeColumnssc");
-                                    var i;
-                                    for (i = 0; i < x.length; i++) {
-                                    x[i].style.display = "block";
-                                    }
+                                var i;
+                                for (i = 0; i < x.length; i++) {
+                                x[i].style.display = "block";
+                                }
                         }else{
                             var x=document.getElementsByClassName("ChequeColumnssc");
-                                    var i;
-                                    for (i = 0; i < x.length; i++) {
-                                    x[i].style.display = "none";
-                                    }  
+                                var i;
+                                for (i = 0; i < x.length; i++) {
+                                x[i].style.display = "none";
+                                }  
                         }
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -12171,14 +12255,23 @@ function removeComma(str){
                 $('#select_product_rate_refund_receipt' + position).val('');
                 $('#total_amount_refund_receipt' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_refund_receipt' + position).val('{{$product->product_sales_description}}');
-                        $('#select_product_rate_refund_receipt' + position).val(price);
-                        $('#total_amount_refund_receipt' + position).html(price * $('#product_qty_refund_receipt' + position).val());
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_refund_receipt' + position).val(product['product_sales_description']);
+                        $('#select_product_rate_refund_receipt' + position).val(number_format(price,2));
+                        // $('#select_product_rate_credit_note' + position).attr('title',price);
+                        $('#total_amount_refund_receipt' + position).html(number_format(price * $('#product_qty_refund_receipt' + position).val(),2));
+                        // $('#total_amount_credit_note' + position).attr('title',price * $('#product_qty_credit_note' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_refund_receipt();
@@ -12191,15 +12284,28 @@ function removeComma(str){
                 $('#refund_receiptbalance').html('PHP 0.00');
                 $('#big_refund_receiptbalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#refund_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_refund_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#rr_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#rr_payment_method').val('{{$customer->payment_method}}');
-                        $('#rr_email').val('{{$customer->email}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#refund_receiptbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_refund_receiptbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#rr_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#rr_bill_address').val($('#rr_bill_address').val().replace(' null',''));
+                        $('#rr_bill_address').val($('#rr_bill_address').val().replace(' null',''));
+                        $('#rr_bill_address').val($('#rr_bill_address').val().replace(' null',''));
+                        $('#rr_bill_address').val($('#rr_bill_address').val().replace(' null',''));
+                        $('#rr_bill_address').val($('#rr_bill_address').val().replace(' null',''));
+                        $('#rr_payment_method').val(customer['payment_method']);
+                        $('#rr_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -12318,14 +12424,23 @@ function removeComma(str){
                 $('#select_product_rate_delayed_charge' + position).val('');
                 $('#total_amount_delayed_charge' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_delayed_charge' + position).val('{{$product->product_sales_description}}');
-                        $('#select_product_rate_delayed_charge' + position).val(price);
-                        $('#total_amount_delayed_charge' + position).html(price * $('#product_qty_delayed_charge' + position).val());
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_delayed_charge' + position).val(product['product_sales_description']);
+                        $('#select_product_rate_delayed_charge' + position).val(number_format(price,2));
+                        // $('#select_product_rate_credit_note' + position).attr('title',price);
+                        $('#total_amount_delayed_charge' + position).html(number_format(price * $('#product_qty_delayed_charge' + position).val(),2));
+                        // $('#total_amount_credit_note' + position).attr('title',price * $('#product_qty_credit_note' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_delayed_charge();
@@ -12338,12 +12453,23 @@ function removeComma(str){
                 $('#delayed_chargebalance').html('PHP 0.00');
                 $('#big_delayed_chargebalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#delayed_chargebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_delayed_chargebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#delayed_chargebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_delayed_chargebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        // $('#cn_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        // $('#cn_payment_method').val(customer['payment_method']);
+                        // $('#cn_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -12458,14 +12584,23 @@ function removeComma(str){
                 $('#select_product_rate_delayed_credit' + position).val('');
                 $('#total_amount_delayed_credit' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_delayed_credit' + position).val('{{$product->product_sales_description}}');
-                        $('#select_product_rate_delayed_credit' + position).val(price);
-                        $('#total_amount_delayed_credit' + position).html(price * $('#product_qty_delayed_credit' + position).val());
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_delayed_credit' + position).val(product['product_sales_description']);
+                        $('#select_product_rate_delayed_credit' + position).val(number_format(price,2));
+                        // $('#select_product_rate_credit_note' + position).attr('title',price);
+                        $('#total_amount_delayed_credit' + position).html(number_format(price * $('#product_qty_delayed_credit' + position).val(),2));
+                        // $('#total_amount_credit_note' + position).attr('title',price * $('#product_qty_credit_note' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_delayed_credit();
@@ -12478,12 +12613,23 @@ function removeComma(str){
                 $('#delayed_creditbalance').html('PHP 0.00');
                 $('#big_delayed_creditbalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#delayed_creditbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_delayed_creditbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#delayed_creditbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_delayed_creditbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        // $('#cn_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        // $('#cn_payment_method').val(customer['payment_method']);
+                        // $('#cn_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                     }
-            @endforeach
+                });
+           
             }
         });
 
@@ -12598,16 +12744,23 @@ function removeComma(str){
                 $('#select_product_rate_credit_note' + position).val('');
                 $('#total_amount_credit_note' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_credit_note' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_credit_note' + position).val(product['product_sales_description']);
                         $('#select_product_rate_credit_note' + position).val(number_format(price,2));
                         $('#select_product_rate_credit_note' + position).attr('title',price);
                         $('#total_amount_credit_note' + position).html(number_format(price * $('#product_qty_credit_note' + position).val(),2));
                         $('#total_amount_credit_note' + position).attr('title',price * $('#product_qty_credit_note' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_credit_note();
@@ -12621,15 +12774,28 @@ function removeComma(str){
                 $('#big_credit_notebalance').html('PHP 0.00');
             }else{
                 var res = id.split(" - ");
-            @foreach($customers as $customer)
-                    if(res[0] == {{$customer->customer_id}}){
-                        $('#credit_notebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_credit_notebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#cn_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#cn_payment_method').val('{{$customer->payment_method}}');
-                        $('#cn_email').val('{{$customer->email}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:res[0],_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#credit_notebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_credit_notebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#cn_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#cn_bill_address').val($('#cn_bill_address').val().replace(' null',''));
+                        $('#cn_bill_address').val($('#cn_bill_address').val().replace(' null',''));
+                        $('#cn_bill_address').val($('#cn_bill_address').val().replace(' null',''));
+                        $('#cn_bill_address').val($('#cn_bill_address').val().replace(' null',''));
+                        $('#cn_bill_address').val($('#cn_bill_address').val().replace(' null',''));
+                        $('#cn_payment_method').val(customer['payment_method']);
+                        $('#cn_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -12747,15 +12913,23 @@ function removeComma(str){
                 $('#select_product_rate_expense' + position).val('');
                 $('#total_amount_expense' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_expense' + position).val('{{$product->product_sales_description}}');
-                        $('#select_product_rate_expense' + position).val(price);
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_expense' + position).val(product['product_sales_description']);
+                        $('#select_product_rate_expense' + position).val(number_format(price,2));
+                        // $('#select_product_rate_expense' + position).attr('title',price);
                         $('#total_amount_expense' + position).html(number_format(price * $('#product_qty_expense' + position).val(),2));
                         $('#total_amount_expense' + position).attr('title',price * $('#product_qty_expense' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_expense();
@@ -12768,15 +12942,23 @@ function removeComma(str){
                 $('#expense_total_balance').html('PHP 0.00');
                 $('#big_expensebalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#expense_total_balance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_expensebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#expense_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#expense_payment_method').val('{{$customer->payment_method}}');
-                        $('#expense_email').val('{{$customer->email}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#expense_total_balance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_expensebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#expense_bill_address').val((customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']).replace(" null", ""));
+                        $('#expense_payment_method').val(customer['payment_method']);
+                        $('#expense_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -12955,16 +13137,23 @@ function removeComma(str){
                 $('#select_product_rate_cheque' + position).val('');
                 $('#total_amount_cheque' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_cheque' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_cheque' + position).val(product['product_sales_description']);
                         $('#select_product_rate_cheque' + position).val(number_format(price,2));
                         $('#select_product_rate_cheque' + position).attr('title',price);
                         $('#total_amount_cheque' + position).html(number_format(price * $('#product_qty_cheque' + position).val(),2));
                         $('#total_amount_cheque' + position).attr('title',price * $('#product_qty_cheque' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_cheque();
@@ -12977,15 +13166,28 @@ function removeComma(str){
                 $('#cheque_total_balance').html('PHP 0.00');
                 $('#big_chequebalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#cheque_total_balance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_chequebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#cheque_billing_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#cheque_payment_method').val('{{$customer->payment_method}}');
-                        $('#cheque_email').val('{{$customer->email}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#cheque_total_balance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_chequebalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#cheque_billing_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#cheque_billing_address').val($('#cheque_billing_address').val().replace(' null',''));
+                        $('#cheque_billing_address').val($('#cheque_billing_address').val().replace(' null',''));
+                        $('#cheque_billing_address').val($('#cheque_billing_address').val().replace(' null',''));
+                        $('#cheque_billing_address').val($('#cheque_billing_address').val().replace(' null',''));
+                        $('#cheque_billing_address').val($('#cheque_billing_address').val().replace(' null',''));
+                        $('#cheque_payment_method').val(customer['payment_method']);
+                        $('#bill_email').val(customer['email']);
+                        // $('#cheque_email').val(customer['terms']);
                     }
-            @endforeach
+                });
+           
             }
         });
 
@@ -13164,8 +13366,8 @@ function removeComma(str){
         }
 
 
-         // ------------------------------------------------------------- BILL TRANSACTION STARTS HERE --------------------------
-         $(document).on('change', '#bill_terms', function(event){
+        // ------------------------------------------------------------- BILL TRANSACTION STARTS HERE --------------------------
+        $(document).on('change', '#bill_terms', function(event){
                 event.preventDefault();
 
                 var term = $('#bill_terms').val();
@@ -13229,7 +13431,7 @@ function removeComma(str){
                     $('#bill_due_date_bill').val($('#bill_date_bill').val());
                 }
             });
-         $(document).on('change', '.product_select_bill', function(event){
+        $(document).on('change', '.product_select_bill', function(event){
             event.preventDefault();
             var id = $(this).val();
             var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
@@ -13238,14 +13440,21 @@ function removeComma(str){
                 $('#select_product_rate_bill' + position).val('');
                 $('#total_amount_bill' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_bill' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_bill' + position).val(product['product_sales_description']);
                         $('#select_product_rate_bill' + position).val(price);
                         $('#total_amount_bill' + position).html(price * $('#product_qty_bill' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_bill();
@@ -13259,16 +13468,28 @@ function removeComma(str){
                 $('#big_billbalance').html('PHP 0.00');
             }else{
                 var res = id.split(" - ");
-            @foreach($customers as $customer)
-                    if(res[0] == {{$customer->customer_id}}){
-                        $('#billbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_billbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#bill_billing_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#bill_payment_method').val('{{$customer->payment_method}}');
-                        $('#bill_email').val('{{$customer->email}}');
-                        $('#bill_terms').val('{{$customer->terms}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:res[0],_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        console.log(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#billbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_billbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#bill_billing_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#bill_billing_address').val($('#bill_billing_address').val().replace(' null',''));
+                        $('#bill_billing_address').val($('#bill_billing_address').val().replace(' null',''));
+                        $('#bill_billing_address').val($('#bill_billing_address').val().replace(' null',''));
+                        $('#bill_billing_address').val($('#bill_billing_address').val().replace(' null',''));
+                        $('#bill_billing_address').val($('#bill_billing_address').val().replace(' null',''));
+                        $('#bill_payment_method').val(customer['payment_method']);
+                        $('#bill_email').val(customer['email']);
+                        $('#bill_terms').val(customer['terms']);
                     }
-            @endforeach
+                });
             }
         });
 
@@ -13472,14 +13693,21 @@ function removeComma(str){
                 $('#select_product_rate_po' + position).val('');
                 $('#total_amount_po' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_po' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_po' + position).val(product['product_sales_description']);
                         $('#select_product_rate_po' + position).val(price);
                         $('#total_amount_po' + position).html(price * $('#product_qty_po' + position).val());
                     }
-            @endforeach
+                });
+            
             }
 
             update_total_po();
@@ -13492,16 +13720,28 @@ function removeComma(str){
                 $('#pobalance').html('PHP 0.00');
                 $('#big_pobalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                    if(id == {{$customer->customer_id}}){
-                        $('#pobalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_pobalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#po_mail_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
-                        $('#po_payment_method').val('{{$customer->payment_method}}');
-                        $('#po_email').val('{{$customer->email}}');
-                        $('#po_terms').val('{{$customer->terms}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#pobalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_pobalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#po_mail_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#po_mail_address').val($('#po_mail_address').val().replace(' null',''));
+                        $('#po_mail_address').val($('#po_mail_address').val().replace(' null',''));
+                        $('#po_mail_address').val($('#po_mail_address').val().replace(' null',''));
+                        $('#po_mail_address').val($('#po_mail_address').val().replace(' null',''));
+                        $('#po_mail_address').val($('#po_mail_address').val().replace(' null',''));
+                        $('#po_payment_method').val(customer['payment_method']);
+                        $('#po_email').val(customer['email']);
+                        $('#po_terms').val(customer['terms']);
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -13677,14 +13917,21 @@ function removeComma(str){
                 $('#select_product_rate_sc' + position).val('');
                 $('#total_amount_sc' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_sc' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_sc' + position).val(product['product_sales_description']);
                         $('#select_product_rate_sc' + position).val(price);
                         $('#total_amount_sc' + position).html(price * $('#product_qty_sc' + position).val());
                     }
-            @endforeach
+                }); 
+           
             }
 
             update_total_sc();
@@ -13698,16 +13945,28 @@ function removeComma(str){
                 $('#big_scbalance').html('PHP 0.00');
             }else{
                 var res = id.split(" - ");
-            @foreach($customers as $customer)
-                    if(res[0] == {{$customer->customer_id}}){
-                        $('#scbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#big_scbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                        $('#sc_mail_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->scstal_code." ".$customer->country}}');
-                        $('#sc_payment_method').val('{{$customer->payment_method}}');
-                        $('#sc_email').val('{{$customer->email}}');
-                        $('#sc_terms').val('{{$customer->terms}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:res[0],_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#scbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_scbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#sc_mail_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#sc_mail_address').val($('#sc_mail_address').val().replace(' null',''));
+                        $('#sc_mail_address').val($('#sc_mail_address').val().replace(' null',''));
+                        $('#sc_mail_address').val($('#sc_mail_address').val().replace(' null',''));
+                        $('#sc_mail_address').val($('#sc_mail_address').val().replace(' null',''));
+                        $('#sc_mail_address').val($('#sc_mail_address').val().replace(' null',''));
+                        $('#sc_payment_method').val(customer['payment_method']);
+                        $('#sc_email').val(customer['email']);
+                        $('#sc_terms').val(customer['terms']);
                     }
-            @endforeach
+                });
+            
             }
         });
 
@@ -13885,14 +14144,21 @@ function removeComma(str){
                 $('#select_product_rate_cc' + position).val('');
                 $('#total_amount_cc' + position).html('');
             }else{
-            @foreach($products_and_services as $product)
-                    if(id == {{$product->product_id}}){
-                        var price = '{{$product->product_sales_price}}';
-                        $('#select_product_description_cc' + position).val('{{$product->product_sales_description}}');
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_product_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (product) {
+                        var price = product['product_sales_price'];
+                        $('#select_product_description_cc' + position).val(product['product_sales_description']);
                         $('#select_product_rate_cc' + position).val(price);
                         $('#total_amount_cc' + position).html(price * $('#product_qty_cc' + position).val());
                     }
-            @endforeach
+                });   
+
             }
 
             update_total_cc();
@@ -13905,16 +14171,27 @@ function removeComma(str){
                 $('#ccbalance').html('PHP 0.00');
                 $('#big_ccbalance').html('PHP 0.00');
             }else{
-            @foreach($customers as $customer)
-                if(id == {{$customer->customer_id}}){
-                $('#ccbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                $('#big_ccbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
-                $('#cc_mail_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->ccstal_code." ".$customer->country}}');
-                $('#cc_payment_method').val('{{$customer->payment_method}}');
-                $('#cc_email').val('{{$customer->email}}');
-                $('#cc_terms').val('{{$customer->terms}}');
-                }
-            @endforeach
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "get_customer_info",
+                    data: {id:id,_token:'{{csrf_token()}}'},
+                    success: function (customer) {
+                        $('#ccbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#big_ccbalance').html('PHP '+number_format(customer['opening_balance'],2));
+                        $('#cc_mail_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
+                        $('#cc_mail_address').val($('#cc_mail_address').val().replace(' null',''));
+                        $('#cc_mail_address').val($('#cc_mail_address').val().replace(' null',''));
+                        $('#cc_mail_address').val($('#cc_mail_address').val().replace(' null',''));
+                        $('#cc_mail_address').val($('#cc_mail_address').val().replace(' null',''));
+                        $('#cc_mail_address').val($('#cc_mail_address').val().replace(' null',''));
+                        $('#cc_payment_method').val(customer['payment_method']);
+                        $('#cc_email').val(customer['email']);
+                        $('#cc_terms').val(customer['terms']);
+                    }
+                });
             }
         });
 
@@ -14095,5 +14372,5 @@ function removeComma(str){
 
     });    
 
-    
+ 
 </script>

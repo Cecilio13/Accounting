@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        $this->setEnv('DB_HOST', '192.168.254.102');
+        //$this->setEnv('DB_HOST', '192.168.254.102');
         // view()->share('signedIn', \Auth::check());
         
         view()->share('hostss', config('database.connections.mysql.host'));
@@ -62,6 +62,8 @@ class AppServiceProvider extends ServiceProvider
         ])->get());
         view()->share('ETANew', ETAccountDetailNew::all());
         view()->share('Voucher', Voucher::all());
+        view()->share('VoucherCheckCount', count(Voucher::where('voucher_type','=','Cheque Voucher')->get()));
+        view()->share('VoucherCashCount', count(Voucher::where('voucher_type','=','Cash Voucher')->get()));
         view()->share('VoucherTransaction', VoucherTransaction::all());
         view()->share('VoucherJournalEntry', VoucherJournalEntry::all());
         
