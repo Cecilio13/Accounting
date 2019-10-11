@@ -1,14 +1,21 @@
 
 <?php
     $customers_list_after_foreach='';
+    $cc_list_after_foreach='';
 ?>
 @foreach($customers as $customer)
 <?php
-$customers_list_after_foreach.="<option title='".$customer->account_type."' value='".$customer->customer_id."'>".($customer->display_name!=''? $customer->display_name : $customer->f_name.' '.$customer->l_name)."</option>"
+//$customers_list_after_foreach.="<option title='".$customer->account_type."' value='".$customer->customer_id."'>".($customer->display_name!=''? $customer->display_name : $customer->f_name.' '.$customer->l_name)."</option>"
 ?>
-
+<?php
+$customers_list_after_foreach.="<option  value='".$customer->customer_id."'>".($customer->display_name!=''? $customer->display_name : $customer->f_name.' '.$customer->l_name)."</option>"
+?>
 @endforeach
-
+@foreach ($cost_center_list as $list)
+<?php
+$cc_list_after_foreach.="<option  value='".$list->cc_no."'>".$list->cc_name."</option>";
+?>
+@endforeach
 <script>
 
 //alert('{{$hostss}}');
@@ -1819,9 +1826,7 @@ function setJournalAccount(id){
                                     <p>Cost Center</p>
                                     <select name="CostCenterSupplierCreditEdit" id="CostCenterSupplierCreditEdit" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                         <option value="">--Select Cost Center--</option>
-                                        @foreach ($cost_center_list as $list)
-                                        <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                        @endforeach
+                                        {!! $cc_list_after_foreach !!}
                                     </select>
                                 </div>
                                 <div class="col-md-3 p-0">
@@ -2091,9 +2096,7 @@ function setJournalAccount(id){
                                     <p>Cost Center</p>
                                     <select name="CostCenterChequeEdit" id="CostCenterChequeEdit" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                         <option value="">--Select Cost Center--</option>
-                                        @foreach ($cost_center_list as $list)
-                                        <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                        @endforeach
+                                        {!! $cc_list_after_foreach !!}
                                     </select>
                                 </div>
                             </div>
@@ -2308,9 +2311,7 @@ function setJournalAccount(id){
                                     <p>Cost Center</p>
                                     <select name="CostCenterExpenseEdit" id="CostCenterExpenseEdit" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                         <option value="">--Select Cost Center--</option>
-                                        @foreach ($cost_center_list as $list)
-                                        <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                        @endforeach
+                                        {!! $cc_list_after_foreach !!}
                                     </select>
                                 </div>
                             </div>
@@ -2529,9 +2530,7 @@ function setJournalAccount(id){
                                         <p>Cost Center</p>
                                         <select name="CostCenterBillEdit" id="CostCenterBillEdit" class="w-100 selectpicker" data-live-search="true" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                             <option value="">--Select Cost Center--</option>
-                                            @foreach ($cost_center_list as $list)
-                                            <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                            @endforeach
+                                            {!! $cc_list_after_foreach !!}
                                         </select>
                                     </div>
                                     <div class="col-md-3 p-0">
@@ -3543,9 +3542,7 @@ function getModal(Location,TTTTT,e,type,sales){
                             <p>Cost Center</p>
                             <select name="CostCenterSalesReceipt" class="form-control"  id="CostCenterSalesReceipt" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}} disabled>
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                             </select>
                         </div>
                         <div class="col-md-2 p-0">
@@ -4317,9 +4314,7 @@ function getModal(Location,TTTTT,e,type,sales){
                             <p>Cost Center</p>
                             <select name="CostCenterCreditNote" onchange="EnableCreditNoteInput(this)" id="CostCenterCreditNote" class="w-100 form-control" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                             </select>
                         </div>
                         
@@ -4831,9 +4826,7 @@ function getModal(Location,TTTTT,e,type,sales){
                             <p>Cost Center</p>
                             <select name="CostCenterExpense" onchange="EnableExpenseInput(this)" id="CostCenterExpense" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                             </select>
                         </div>
                     </div>
@@ -5078,9 +5071,7 @@ function getModal(Location,TTTTT,e,type,sales){
                             <p>Cost Center</p>
                             <select name="CostCenterCheque" onchange="EnableChequeInput(this)" id="CostCenterCheque" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                             </select>
                         </div>
                     </div>
@@ -5241,9 +5232,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                 <p>Cost Center</p>
                                 <select name="CostCenterBill" id="CostCenterBill" onchange="EnableBillInput(this)" class="w-100 selectpicker CostCenterBill" data-live-search="true" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                     <option value="">--Select Cost Center--</option>
-                                    @foreach ($cost_center_list as $list)
-                                    <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                    @endforeach
+                                    {!! $cc_list_after_foreach !!}
                                     </select>
                             </div>
                             
@@ -5595,9 +5584,7 @@ function getModal(Location,TTTTT,e,type,sales){
                             <p>Cost Center</p>
                             <select class="selectpicker" data-live-search="true" name="CostCenterSupplierCredit" onchange="EnableSupplierCreditInput(this)" id="CostCenterSupplierCredit" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                                 </select>
                         </div>
                         <div class="col-md-3 p-0">
@@ -6362,9 +6349,7 @@ function addCardCreditedit(){
                             <p>Cost Center</p>
                             <select name="" class="selectpicker form-control" data-live-search="true" id="CostCenterJournalEntrty" onchange="enableFiledsJournalEntry(this.value)">
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                             </select>
                         </div>
                     </div>
@@ -7030,9 +7015,7 @@ function edit_journal_entries(je_no){
                             <p>Cost Center</p>
                             <select name="" class="form-control selectpicker" data-live-search="true" id="CostCenterJournalEntrtyEdit">
                                 <option value="">--Select Cost Center--</option>
-                                @foreach ($cost_center_list as $list)
-                                <option value="{{$list->cc_no}}">{{$list->cc_name}}</option>
-                                @endforeach
+                                {!! $cc_list_after_foreach !!}
                             </select>
                         </div>
                     </div>
