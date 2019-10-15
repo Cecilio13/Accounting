@@ -709,7 +709,6 @@
                     @if (!empty($advance) && $advance->advance_beginning_balance)
                         <input type="text" class="text-dark input-custom" value="{{number_format($advance->advance_beginning_balance,2)}}" id="ad_beg_bal_shown" name="ad_beg_bal_shown">
                         <input type="hidden" class="text-dark input-custom" value="{{$advance->advance_beginning_balance}}" id="ad_beg_bal" name="ad_beg_bal">
-                        
                     @else
                         <input type="text" class="text-dark input-custom" value="0.00" id="ad_beg_bal_shown" name="ad_beg_bal_shown">
                         <input type="hidden" class="text-dark input-custom" value="0.00" id="ad_beg_bal" name="ad_beg_bal">

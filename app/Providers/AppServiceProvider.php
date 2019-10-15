@@ -41,6 +41,8 @@ use App\ETAccountDetailNew;
 use App\Voucher;
 use App\VoucherTransaction;
 use App\VoucherJournalEntry;
+use App\CC_Type;
+use App\CostCenter;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -51,11 +53,30 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
-
-        //$this->setEnv('DB_HOST', '192.168.254.102');
         // view()->share('signedIn', \Auth::check());
-        
-        view()->share('hostss', config('database.connections.mysql.host'));
+        $cost_center_list= CostCenter::groupBy('cc_type')->get();
+        foreach($cost_center_list as $ccl){
+            $dd=0;
+            $dd=count(CC_Type::where([['cc_type','=',$ccl->cc_type]])->get());
+            if($dd<1){
+                $data=new CC_Type;
+                $data->cc_type=$ccl->cc_type;
+                $data->cc_code=$ccl->cc_type_code;
+                $data->save();
+            }
+        }
+        $cost_center_list= CostCenter::groupBy('cc_name')->get();
+        foreach($cost_center_list as $ccl){
+            $dd=0;
+            $dd=count(CC_Type::where([['cc_type','=',$ccl->cc_name]])->get());
+            if($dd<1){
+                $data=new CC_Type;
+                $data->cc_type=$ccl->cc_name;
+                $data->cc_code=$ccl->cc_name_code;
+                $data->save();
+            }
+        }
+        view()->share('CC_Types_list', CC_Type::orderBy('cc_code', 'asc')->get());
         // //View::share('user', \Auth::user());
         view()->share('EXNew', ExpenseTransactionNew::where([
             ['et_status','=',NULL]
@@ -153,17 +174,5 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
-    }
-    private function setEnv($key, $value)
-    {
-        $path = app()->environmentFilePath();
-
-        $escaped = preg_quote('='.env($key), '/');
-
-        file_put_contents($path, preg_replace(
-            "/^{$key}{$escaped}/m",
-            "{$key}={$value}",
-            file_get_contents($path)
-        ));
     }
 }

@@ -18,7 +18,7 @@ $cc_list_after_foreach.="<option  value='".$list->cc_no."'>".$list->cc_name."</o
 @endforeach
 <script>
 
-//alert('{{$hostss}}');
+
 var product_list_js='@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach';
 var coa_list_js='@foreach($COA as $coa)<option value="{{$coa->id}}">{{$coa->coa_name}}</option>@endforeach';
 var coa_list2_js='@foreach($COA as $coa)<option title="{{$coa->coa_account_type}}" value="{{$coa->id}}">{{$coa->coa_name}}</option>@endforeach';
@@ -9626,7 +9626,7 @@ function edit_journal_entries(je_no){
                     </div>
                     <div class="col-md-6 p-1">
                         <p>Balance</p>
-                        <input id="coaBalance" type="number" name="COABalance" value="0" min="0" class="w-100">
+                        <input id="coaBalance" type="number" name="COABalance" value="0" min="0" step="0.01" class="w-100">
                         
                     </div>
                     <div class="col-md-6 p-1">

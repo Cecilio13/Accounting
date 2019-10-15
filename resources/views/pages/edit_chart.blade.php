@@ -1650,7 +1650,7 @@
             <script>document.getElementById('sub_accoinmt2').value="{{$chart->coa_sub_account}}";</script>
             <div class="col-md-6 p-1">
                 <p>Balance</p>
-                <input id="coaBalance2" type="number" value="{{$chart->coa_beginning_balance}}" name="COABalance2" min="0" class="w-100">
+                <input id="coaBalance2" type="number" value="{{$chart->coa_beginning_balance}}" name="COABalance2" min="0" step="0.01" class="w-100">
                 
             </div>
             <div class="col-md-6 p-1">

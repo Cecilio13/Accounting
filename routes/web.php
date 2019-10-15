@@ -14,6 +14,9 @@ use \setasign\Fpdi\Fpdi;
 Route::group(['middleware'=>['auth']], function() {
     
     
+    Route::post('/save_cc_type', 'GetController@save_cc_type');
+    Route::post('/check_cost_center_code', 'GetController@check_cost_center_code');
+    Route::post('/check_cost_center_name', 'GetController@check_cost_center_name');
     Route::post('/get_customer_info', 'GetController@get_customer_info');
     Route::post('/get_product_info', 'GetController@get_product_info');
     

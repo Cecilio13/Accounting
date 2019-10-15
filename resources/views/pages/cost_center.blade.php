@@ -201,19 +201,133 @@
         </div>
     </div>
     </div>
+    <script>
+        function openswal_cost_centertype(close,open){
+            var typename="";
+            var typecode="";
+            document.getElementById(close).click();
+            swal({
+            text: 'New Cost Center Type',
+            content: "input",
+            button: {
+                text: "proceed",
+                closeModal: false,
+            },
+            })
+            .then(name => {
+            
+                if (!name) throw null;
+
+                $.ajax({
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: 'check_cost_center_name',                
+                data: {name:name,_token: '{{csrf_token()}}'},
+                success: function(data) {
+                    swal.stopLoading();
+                    swal.close();
+                    if(data<1){
+                        typename=name;
+                        
+                        swal({
+                        text: 'New Cost Center Type Code',
+                        content: "input",
+                        button: {
+                            text: "proceed",
+                            closeModal: false,
+                        },
+                        })
+                        .then(name => {
+                            if (!name) throw null;
+                            $.ajax({
+                            type: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            url: 'check_cost_center_code',                
+                            data: {name:name,_token: '{{csrf_token()}}'},
+                            success: function(data) {
+                                swal.stopLoading();
+                                swal.close();
+                                if(data<1){
+                                    typecode=name;
+                                        swal({
+                                        title: typename+"("+typecode+")",
+                                        text: "Are you sure to add this cost center type?",
+                                        icon: "warning",
+                                        buttons: true,
+                                        dangerMode: true,
+                                        })
+                                        .then((willDelete) => {
+                                        if (willDelete) {
+                                            //ajax to save data
+                                            $.ajax({
+                                                type: "POST",
+                                                headers: {
+                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                },
+                                                url: "save_cc_type",
+                                                data: {typename:typename,typecode:typecode,_token:'{{csrf_token()}}'},
+                                                success: function (data) {
+                                                    
+                                                    swal({title: "Done!", text:"Successfully Added Cost Center Type", type: 
+                                                    "success"}).then(function(){
+                                                    location.reload();                                    
+                                                    });
+                                                }
+                                            });
+                                            
+                                        } else {
+                                            
+                                        }
+                                        });
+                                }else{
+                                    document.getElementById(open).click();
+                                }
+                            }
+                            })
+                        })
+                        .catch(err => {
+                        if (err) {
+                            swal("Error", "The AJAX request failed!", "error");
+                        } else {
+                            swal.stopLoading();
+                            swal.close();
+                        }
+                        }); 
+                    }else{
+                        document.getElementById(open).click();
+                    }
+                    
+                }
+                })
+                
+                
+            
+            })
+            .catch(err => {
+            if (err) {
+                swal("Error", "The AJAX request failed!", "error");
+            } else {
+                swal.stopLoading();
+                swal.close();
+            }
+            });
+        }
+    </script>
 <!--Cost Center Modal--->
 <div class="modal fade" id="CostCenterModal" tabindex="-1" role="dialog" aria-labelledby="CostCenterModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="CostCenterModalLabel">Cost Center</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn btn-primary" onclick="openswal_cost_centertype('closemodalcostcenter','costcenter_modal_open')">Add Cost Center Type</button>
       </div>
       <div class="modal-body">
         <div class="col-md-12">
-        <p>Cost Center Type : </p>    
+        <p>Cost Center Type : </p> 
         </div>
         
         <div class="col-md-8">
@@ -298,24 +412,8 @@
         </script>
         <select class="form-control selectpicker" data-live-search="true" id="CostCenterType"  onchange="SetCode(this)">
         
-        <option value="01">Motorpool</option>
-        <option value="02">Administrative</option>
-        <option value="03-A">Civil Works</option>
-        <option value="03-B">Electrical</option>
-        <option value="03-C">Telecommunication</option>
-        <option value="04">Discon</option>
-        <option value="05">PLDT</option>
-        <option value="06">Smart</option>
-        <option value="07">Sales Marketing</option>
-        <option value="08">Lines</option>
-        <option value="09">Small Crew</option>
-        <option value="10">Metering</option>
-        <option value="11">Street Light</option>
-        <option value="12">Ecrew</option>
-        <option value="13">Arkpower</option>
-        <option value="14">Reel Place</option>
-        @foreach ($cost_center_list as $cost_centers)
-            <option value="{{$cost_centers->cc_name_code}}">{{$cost_centers->cc_name}}</option>
+        @foreach ($CC_Types_list as $cost_centers)
+            <option value="{{$cost_centers->cc_code}}">{{$cost_centers->cc_type}}</option>
         @endforeach
         </select>
         </div>
@@ -551,7 +649,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+        <button type="button" class="btn btn-secondary" id="closemodalcostcenter" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="SaveCostCenterButton" onclick="SaveCostCenter()">Save</button>
       </div>
     </div>
@@ -565,7 +664,7 @@
       <div class="modal-header">
         <h5 class="modal-title" id="CostCenterModalLabelEdit">Edit Cost Center</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
@@ -683,24 +782,9 @@
         </script>
         <select class="form-control form-control-sm chosen-select" id="CostCenterTypeEdit" onchange="SetCodeEdit(this)">
         <option value="">--Select Cost Center--</option>
-        <option value="01">Motorpool</option>
-        <option value="02">Administrative</option>
-        <option value="03-A">Civil Works</option>
-        <option value="03-B">Electrical</option>
-        <option value="03-C">Telecommunication</option>
-        <option value="04">Discon</option>
-        <option value="05">PLDT</option>
-        <option value="06">Smart</option>
-        <option value="07">Sales Marketing</option>
-        <option value="08">Lines</option>
-        <option value="09">Small Crew</option>
-        <option value="10">Metering</option>
-        <option value="11">Street Light</option>
-        <option value="12">Ecrew</option>
-        <option value="13">Arkpower</option>
-        <option value="14">Reel Place</option>
-        @foreach ($cost_center_list as $cost_centers)
-            <option value="{{$cost_centers->cc_name_code}}">{{$cost_centers->cc_name}}</option>
+        
+        @foreach ($CC_Types_list as $cost_centers)
+            <option value="{{$cost_centers->cc_code}}">{{$cost_centers->cc_type}}</option>
         @endforeach
         </select>
         </div>
@@ -960,7 +1044,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" id="edit_modal_cost_center" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="SaveCostCenterButtonEdit" onclick="SaveCostCenterEdit()">Save</button>
       </div>
     </div>
@@ -969,7 +1053,7 @@
 <!-- Cost Center Modal Edit End --> 
             </div>
             <div class="col-md-12 mb-5 mt-3 p-0">
-                    <a class="btn btn-success" href="#" data-toggle="modal" data-target="#CostCenterModal">New Cost Center</a>
+                    <a class="btn btn-success" href="#" data-toggle="modal" id="costcenter_modal_open" data-target="#CostCenterModal">New Cost Center</a>
                     <a class="btn btn-success" href="#" data-toggle="modal" data-target="#ImportCCModal">Import Cost Center</a>
                     <a class="btn btn-success" href="#" data-toggle="modal" data-target="#ImportBIDOFQUOTATIONModal">Import Bid of Quotation</a>
                     
