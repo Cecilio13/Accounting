@@ -180,6 +180,7 @@ class PdfController extends Controller
 		$A_expense=0;
 		$A_boq=0;
 		$A_UAA=0;
+		$require_coist_center=0;
         if($request->has('accesscostcenter')){
             $accesscostcenter=$request->accesscostcenter;
             UserCostCenterAccess::where([
@@ -193,7 +194,11 @@ class PdfController extends Controller
                 $CostCenter->save();
             }
         }
+        
         foreach($access as $re){
+            if($re=="RequireCostCenter"){
+                $require_coist_center=1;
+            }
             if($re=="Approvals"){
                 $Approvals=1;
             }
@@ -279,6 +284,16 @@ class PdfController extends Controller
                 $A_UAA=1;
             }
         }
+        $ddddd=User::find($userid_accounting);
+        if(!empty($ddddd)){
+            if($require_coist_center==1){
+
+            }else{
+                $ddddd->require_cost_center='1';
+            }
+            $ddddd->save(); 
+        }
+        
         $UserAccess=UserAccess::find($userid_accounting);
         if(empty($UserAccess)){
             $UserAccess=new UserAccess;

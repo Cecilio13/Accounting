@@ -6334,7 +6334,7 @@ function addCardCreditedit(){
                     <div class="col-md-12 p-0 mb-4">
                         <div class="col-md-2 p-0">
                             <p>Journal Date</p>
-                        <input type="date" name="" id="journalDate" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'disabled'}}  value="{{date('Y-m-d')}}">
+                        <input type="date" name="" id="journalDate" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : ($user_position->require_cost_center=='1'? '' : 'disabled')}}  value="{{date('Y-m-d')}}">
                         </div>
                         <div class="col-md-2 p-0">
                             <p>Journal No.</p>
@@ -6356,15 +6356,20 @@ function addCardCreditedit(){
                     <script>
                         function enableFiledsJournalEntry(e){
                             if(e==0){
-                                document.getElementById('journalDate').disabled=true;
-                                document.getElementById('accjournbale1').disabled=true;
-                                document.getElementById('accjournbale2').disabled=true;
-                                document.getElementById('journalentryaddrow').disabled=true;
-                                document.getElementById('journalentrydeleteallrow').disabled=true;
-                                document.getElementById('JournalMemo').disabled=true;
-                                document.getElementById('JournalEntrySaveButton').disabled=true;
-                                document.getElementById('journalnamename1').disabled=true;
-                                document.getElementById('journalnamename2').disabled=true;
+                                if('{{$user_position->require_cost_center}}'=='1'){
+
+                                }else{
+                                    document.getElementById('journalDate').disabled=true;
+                                    document.getElementById('accjournbale1').disabled=true;
+                                    document.getElementById('accjournbale2').disabled=true;
+                                    document.getElementById('journalentryaddrow').disabled=true;
+                                    document.getElementById('journalentrydeleteallrow').disabled=true;
+                                    document.getElementById('JournalMemo').disabled=true;
+                                    document.getElementById('JournalEntrySaveButton').disabled=true;
+                                    document.getElementById('journalnamename1').disabled=true;
+                                    document.getElementById('journalnamename2').disabled=true;
+                                }
+                                
                                 
                             }else{
                                 document.getElementById('journalDate').disabled=false;
@@ -6533,8 +6538,8 @@ function addCardCreditedit(){
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'disabled'}} id="journalentryaddrow" class="btn btn-outline-dark rounded mr-1 font14" onclick="AddTableRow()">Add Items</button>
-                                <button {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'disabled'}} id="journalentrydeleteallrow" class="btn btn-outline-dark rounded mr-1 font14" onclick="DeleteAllRows()">Clear All Items</button>
+                                <button {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : ($user_position->require_cost_center=='1'? '' : 'disabled')}} id="journalentryaddrow" class="btn btn-outline-dark rounded mr-1 font14" onclick="AddTableRow()">Add Items</button>
+                                <button {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : ($user_position->require_cost_center=='1'? '' : 'disabled')}} id="journalentrydeleteallrow" class="btn btn-outline-dark rounded mr-1 font14" onclick="DeleteAllRows()">Clear All Items</button>
                             </div>
                         </div>
                         <div class="float-right">
@@ -6899,7 +6904,7 @@ function addCardCreditedit(){
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100" id="JournalMemo" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'disabled'}}></textarea>
+                            <textarea rows="3" class="w-100" id="JournalMemo" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : ($user_position->require_cost_center=='1'? '' : 'disabled')}}></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0" style="display:none">
                             <div class="d-inline-flex">

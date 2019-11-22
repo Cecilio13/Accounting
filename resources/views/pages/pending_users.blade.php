@@ -83,6 +83,20 @@
                         $('#UserAccessModal').find('input[type=checkbox]:checked').removeAttr('checked');
 						document.getElementById('ModalTitle').innerHTML=name;
 						document.getElementById('userid_accounting').value=id;
+						console.log(id);
+						@foreach($all_system_users as $sss)
+							console.log('{{$sss->id}}'+" asdasds");
+							if(id=='{{$sss->id}}'){
+								
+								if('{{$sss->require_cost_center}}'=='1'){
+
+								}else{
+									$("input[value='RequireCostCenter']").prop('checked', true);
+								}
+							}
+
+						@endforeach
+						
                         @foreach($all_system_users_access as $acc)
                         if(id=="<?php echo $acc->user_id; ?>"){
                             if("<?php echo $acc->approvals ?>"=="1"){
@@ -330,6 +344,11 @@
 							</div>
 							<div class="checkbox">
 							  <label><input type="checkbox" name="access[]" value="Journal Entry">Journal Entry</label>
+							</div>
+							<div class="checkbox" style="padding-left:20px;" id="journal_entry_sub" >
+								<div class="checkbox">
+								<label ><input type="checkbox" name="access[]" class="approval_sub" value="RequireCostCenter">Require Cost Center?</label>
+								</div>
 							</div>
 							<div class="checkbox">
 							  <label><input type="checkbox" name="access[]" value="Fund Feeds">Fund Feeds</label>

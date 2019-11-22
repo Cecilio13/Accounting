@@ -412,7 +412,7 @@
         </script>
         <select class="form-control selectpicker" data-live-search="true" id="CostCenterType"  onchange="SetCode(this)">
         
-        @foreach ($CC_Types_list as $cost_centers)
+        @foreach ($CC_Types_list_groupped as $cost_centers)
             <option value="{{$cost_centers->cc_code}}">{{$cost_centers->cc_type}}</option>
         @endforeach
         </select>
