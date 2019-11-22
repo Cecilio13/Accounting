@@ -1635,7 +1635,7 @@ class ChartofAccountsController extends Controller
                 if($unique==$row->journal_no){
                     $individualjournalnocount++;
                     if($row->journal_date!=""){
-                        if($row->cost_center!=""){
+                        // if($row->cost_center!=""){
                             if($row->journal_no!=""){
                                 if($row->account!=""){
                                     if($row->debit=="" && $row->credit==""){
@@ -1663,12 +1663,12 @@ class ChartofAccountsController extends Controller
                                 //$error_count++;
                                 $Log.="Empty Journal No on row ".$rowcount." from file.\n"; 
                              }
-                        }else{
-                            $valid=1; 
-                            //empty first name
-                            //$error_count++;
-                            $Log.="Empty Cost Center on row ".$rowcount." from file.\n"; 
-                         }
+                        // }else{
+                        //     $valid=1; 
+                        //     //empty first name
+                        //     //$error_count++;
+                        //     $Log.="Empty Cost Center on row ".$rowcount." from file.\n"; 
+                        //  }
                     }else{
                         $valid=1; 
                         //empty first name
@@ -1689,7 +1689,7 @@ class ChartofAccountsController extends Controller
                     $jounalcount=count($jounal)+1;
                     $Valid_je_no = []; 
                     $valid_coa=0;
-                    $valid_cc=0;
+                    $valid_cc=1;
                     foreach($data as $row){
                         if($unique==$row->journal_no){
                             $account=$row->account;
@@ -1701,13 +1701,13 @@ class ChartofAccountsController extends Controller
                             }else{
                                 $valid_coa=1;
                             }
-                            $COA= CostCenter::where('cc_name_code',$row->cost_center)->first();
-                            if(empty($COA)){
-                                $valid_cc=0; 
-                                break;
-                            }else{
-                                $valid_cc=1;     
-                            }
+                            // $COA= CostCenter::where('cc_name_code',$row->cost_center)->first();
+                            // if(empty($COA)){
+                            //     $valid_cc=0; 
+                            //     break;
+                            // }else{
+                            //     $valid_cc=1;     
+                            // }
                             
                                 
 
@@ -1732,8 +1732,11 @@ class ChartofAccountsController extends Controller
                                 $type="Journal Entry";
                                 $CostCenter=$row->cost_center;
                                 $COA= CostCenter::where('cc_name_code',$row->cost_center)->first();
-        
-                                $CostCenter=$COA->cc_no;
+                                $CostCenter="";
+                                if(!empty($COA)){
+                                    $CostCenter=$COA->cc_no;
+                                }
+                                
                                 
                                 $journal_entries = new  JournalEntry;
                                 $journal_entries->je_id = $no;//duplicate if multiple entry *for fix*
