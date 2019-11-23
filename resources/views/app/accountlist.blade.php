@@ -602,7 +602,10 @@
                                     <td style="vertical-align:middle;">{{$coc->coa_account_type}}</td>
                                     <td style="vertical-align:middle;">{{$coc->coa_detail_type}}</td>
                                     <td style="vertical-align:middle;">{{$coc->coa_description}}</td>
-                                    <td style="vertical-align:middle;">{{number_format($coc->coa_balance,2)}}</td>
+                                    <td style="vertical-align:middle;">
+                                        
+                                        {{number_format($coc->coa_balance,2)}}
+                                    </td>
                                     <td style="vertical-align:middle;">{{$coc->created_at!=""? date('m-d-Y',strtotime($coc->created_at)) : ""}}</td>
                                     </tr>
                                     @endif
