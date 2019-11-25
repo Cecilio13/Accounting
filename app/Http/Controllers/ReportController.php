@@ -7894,7 +7894,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -7960,38 +7960,42 @@ class ReportController extends Controller
                 }
                 $CustomerTotal2RE=0;
                 $RetainedEarningsSubs=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotalRE+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotalRE-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotalRE-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotalRE-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotalRE-=$coa->coa_balance;
+                    // }
                    
                     if ($coa->coa_title=="Expenses" && $coa->coa_account_type!="Cost of Sales"){
                         foreach ($JournalEntryformpast as $JE){
@@ -8495,7 +8499,7 @@ class ReportController extends Controller
                     $IncomeTotal=0;
                     
                     foreach ($COA as $Coa){
-                        if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                        if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                             $tablecontent.='<tr>';
                             $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                             $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -8543,38 +8547,42 @@ class ReportController extends Controller
                     $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;">Retained Earnings</td>';
                     $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;text-align:right;">';
                     $CustomerTotalRE=0;
+                    $data=Advance::first();
+                    if(!empty($data)){
+                        $CustomerTotalRE+=$data->advance_beginning_balance;
+                    }
                     foreach ($COA as $coa){
                         //experimental retained earning
-                        if ($coa->coa_sub_account=="Bank"){
-                            $CustomerTotalRE+=$coa->coa_balance;
-                        }
-                        if ($coa->coa_sub_account=="Cash on Hand"){
-                            $CustomerTotalRE+=$coa->coa_balance;
-                        }
-                        if ($coa->coa_sub_account=="Receivable Accounts"){
-                            $CustomerTotalRE+=$coa->coa_balance;
-                        }
-                        if ($coa->coa_sub_account=="Inventories"){
-                            $CustomerTotalRE+=$coa->coa_balance;
-                        }
+                        // if ($coa->coa_sub_account=="Bank"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
+                        // }
+                        // if ($coa->coa_sub_account=="Cash on Hand"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
+                        // }
+                        // if ($coa->coa_sub_account=="Receivable Accounts"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
+                        // }
+                        // if ($coa->coa_sub_account=="Inventories"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
+                        // }
                         
-                        if ($coa->coa_sub_account=="Prepayments"){
-                            $CustomerTotalRE+=$coa->coa_balance;
+                        // if ($coa->coa_sub_account=="Prepayments"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
                         
-                        }
-                        if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                            $CustomerTotalRE+=$coa->coa_balance;
-                        }
-                        if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                            $CustomerTotalRE+=$coa->coa_balance;
-                        }
+                        // }
+                        // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
+                        // }
+                        // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                        //     $CustomerTotalRE+=$coa->coa_balance;
+                        // }
                         
-                        if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                            $CustomerTotalRE-=$coa->coa_balance;
-                        }
-                        if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                            $CustomerTotalRE-=$coa->coa_balance;
-                        }
+                        // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                        //     $CustomerTotalRE-=$coa->coa_balance;
+                        // }
+                        // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                        //     $CustomerTotalRE-=$coa->coa_balance;
+                        // }
                         if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                             foreach ($JournalEntryformpast as $JE){
                                 if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
@@ -9018,7 +9026,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 $TotalLiabilities=0;
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Current Liabilities" || $Coa->coa_account_type=="Current Liability" ||  $Coa->coa_account_type=="Payable Accounts"){
+                    if ($Coa->coa_account_type=="Current Liabilities" || $Coa->coa_account_type=="Current Liability" ||  $Coa->coa_account_type=="Payable Accounts" ){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -9058,7 +9066,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -9106,38 +9114,42 @@ class ReportController extends Controller
                 $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;">Retained Earnings</td>';
                 $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;text-align:right;">';
                 $CustomerTotalRE=0;
+                $data=Advance::first();
+                    if(!empty($data)){
+                        $CustomerTotalRE+=$data->advance_beginning_balance;
+                    }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotalRE+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotalRE+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotalRE+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotalRE-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotalRE-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotalRE-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotalRE-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
@@ -9944,7 +9956,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 $IncomeTotalpv=0;
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -10015,38 +10027,42 @@ class ReportController extends Controller
                 $RetainedEarningspv=0;
                 $RetainedEarningsSubs=0;
                 $RetainedEarningsSubspv=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarnings+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotal+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotal+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
@@ -10814,7 +10830,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 $IncomeTotalpv=0;
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -10882,38 +10898,42 @@ class ReportController extends Controller
                 $CustomerTotal=0;
                 $RetainedEarnings=0;
                 $RetainedEarningspv=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarnings+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotal+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotal+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'&& $JE->je_cost_center==$ccl->cc_no){
@@ -11626,7 +11646,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 $IncomeTotalpv=0;
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -11696,38 +11716,42 @@ class ReportController extends Controller
                 $RetainedEarningsSubs=0;
                 $RetainedEarningsSubspv=0;
                 $RetainedEarningspv=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarnings+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotal+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotal+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'&& $JE->je_cost_center==$CostCenterFilter){
@@ -12735,7 +12759,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -12816,38 +12840,42 @@ class ReportController extends Controller
                 $CustomerTotal=0;
                 $RetainedEarnings=0;
                 $RetainedEarningsSubs=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarnings+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotal+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotal+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
@@ -13606,7 +13634,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -13686,39 +13714,42 @@ class ReportController extends Controller
                 $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;text-align:right;">';
                 $CustomerTotal=0;
                 $RetainedEarnings=0;
-
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarnings+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotal+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotal+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED' && $JE->je_cost_center==$ccl->cc_no){
@@ -14454,7 +14485,7 @@ class ReportController extends Controller
                 $IncomeTotal=0;
                 
                 foreach ($COA as $Coa){
-                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables"){
+                    if ($Coa->coa_account_type=="Other Current Liabilities" || $Coa->coa_account_type=="Other Current Liability" || $Coa->coa_account_type=="Other Payables" || $Coa->coa_account_type=="Non-Current Liabilities"){
                         $tablecontent.='<tr>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
                         $tablecontent.='<td width="10px" style="vertical-align:middle;font-weight:bold;font-size:11px;"></td>';
@@ -14535,38 +14566,42 @@ class ReportController extends Controller
                 $CustomerTotal=0;
                 $RetainedEarnings=0;
                 $RetainedEarningsSubs=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarnings+=$data->advance_beginning_balance;
+                }
                 foreach ($COA as $coa){
                     //experimental retained earning
-                    if ($coa->coa_sub_account=="Bank"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Cash on Hand"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Receivable Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ($coa->coa_sub_account=="Inventories"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_sub_account=="Bank"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Cash on Hand"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Receivable Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_sub_account=="Inventories"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_sub_account=="Prepayments"){
-                        $CustomerTotal+=$coa->coa_balance;
+                    // if ($coa->coa_sub_account=="Prepayments"){
+                    //     $CustomerTotal+=$coa->coa_balance;
                     
-                    }
-                    if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
-                    if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
-                        $CustomerTotal+=$coa->coa_balance;
-                    }
+                    // }
+                    // if ( $coa->coa_account_type=="Fixed Assets" || $coa->coa_account_type=="Fixed Asset" || $coa->coa_account_type=="Land, Building and Improvements" || $coa->coa_account_type=="Equipment and Improvements" || $coa->coa_account_type=="Asset Contra Accounts"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
+                    // if ( $coa->coa_account_type=="Non Current Assets" || $coa->coa_account_type=="Non Current Asset" || $coa->coa_account_type=="Improvements"){
+                    //     $CustomerTotal+=$coa->coa_balance;
+                    // }
                     
-                    if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
-                    if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
-                        $CustomerTotal-=$coa->coa_balance;
-                    }
+                    // if ($coa->coa_account_type=="Current Liabilities" || $coa->coa_account_type=="Current Liability" || $coa->coa_account_type=="Payable Accounts"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
+                    // if ($coa->coa_account_type=="Other Current Liabilities" || $coa->coa_account_type=="Other Current Liability" || $coa->coa_account_type=="Other Payables"){
+                    //     $CustomerTotal-=$coa->coa_balance;
+                    // }
                     if ($coa->coa_account_type=="Revenues" || $coa->coa_account_type=="Revenue" || $coa->coa_account_type=='Cost of Sales'){
                         foreach ($JournalEntryformpast as $JE){
                             if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED' && $JE->je_cost_center==$CostCenterFilter){

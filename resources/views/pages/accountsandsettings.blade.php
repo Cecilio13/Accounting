@@ -698,9 +698,10 @@
                     <a href="#" id="toggle_edit_advance_company_type" class="far fa-edit"></a>
                 </div>
             </div>
-            <div class="col-md-12 mt-3" style="display:none;">
+            <div class="col-md-12 mt-3  border border-bottom border-light"></div>
+            <div class="col-md-12 mt-3" >
                 <div class="col-md-3">
-                    <p class="text-dark">Beginning Balance</p>
+                    <p class="text-dark">Retained Earnings</p>
                 </div>
                 <div class="col-md-4">
                     <p class="text-dark">Beginning Balance</p>
@@ -1168,8 +1169,9 @@
 
 <script>
 $(document).ready(function () {
-    $('select').prop('disabled', true);
-    $('input').prop('readonly', true);
+    
+    $('#right-panel select').prop('disabled', true);
+    $('#right-panel input').prop('readonly', true);
     console.log('input enabling');
     $("#add_bank_form :input").prop("readonly", false);
     $("#add_bank_form :input").prop("disabled", false);
