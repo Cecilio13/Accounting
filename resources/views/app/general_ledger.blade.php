@@ -129,6 +129,7 @@
                                 var FROM= document.getElementById('Fromdate').value;
                                 var TO= document.getElementById('Todate').value;
                                 var CostCenterFilter = document.getElementById('CostCenterFilter').value;
+                                var AccountFilter = document.getElementById('AccountFilter').value;
                                 if((FROM=="" || TO=="") && filtertemplate!="All"){
                                     
                                 }
@@ -138,7 +139,7 @@
                                     $.ajax({
                                         type: 'POST',
                                         url: 'General_Ledger_by_date',                
-                                        data: {CostCenterFilter:CostCenterFilter,filtertemplate:filtertemplate,FROM:FROM,TO:TO,_token: '{{csrf_token()}}'},
+                                        data: {AccountFilter:AccountFilter,CostCenterFilter:CostCenterFilter,filtertemplate:filtertemplate,FROM:FROM,TO:TO,_token: '{{csrf_token()}}'},
                                         success: function(data) {
                                         $( "#tablemain" ).replaceWith( data);
                                         $("input[name='columnnames[]']").each( function () {
@@ -317,7 +318,6 @@
                     <div >
                     
                     <div class="col-md-6 ">
-                            
                             <p>Date</p>
                             <select class="form-control" id="filtertemplate" onchange="changedates(this)">
                                     <option>All</option>
@@ -371,6 +371,19 @@
                                 })
                             </script>
                     </div>
+                <div class="col-md-6 ">
+                        
+                </div>
+                <div class="col-md-6 ">
+                        <p>Account</p>
+                        <select class="form-control selectpicker" data-live-search="true" id="AccountFilter" onchange="submitdates()" >
+                            <option value="All">All</option>
+                            @foreach ($c_o_a_sorted as $item)
+                                <option value="{{$item->id}}">{{$item->coa_name}}</option>
+                            @endforeach
+                        </select>
+                        
+                </div>
                 </div>
             </div>  
         

@@ -47,7 +47,7 @@
                         $(document).ready(function(){
                             //tablemain
                             
-                            for(var i=9;i<13;i++){
+                            for(var i=8;i<13;i++){
                                 $('td:nth-child('+i+'),th:nth-child('+i+')','#tablemain ').hide();
                             }
                             
@@ -97,7 +97,7 @@
                         <label class="custom-control-label" for="customCheck5">Open Balance</label>
                         </div>
                         <div class="custom-control custom-checkbox">
-                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" class="custom-control-input" value="9" id="customCheck9">
+                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" checked class="custom-control-input" value="9" id="customCheck9">
                         <label class="custom-control-label" for="customCheck9">Billing Address</label>
                         </div>
                         <div class="custom-control custom-checkbox">
