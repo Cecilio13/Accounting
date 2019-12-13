@@ -14,6 +14,12 @@ use \setasign\Fpdi\Fpdi;
 Route::group(['middleware'=>['auth']], function() {
     
     
+    Route::post('/check_supplier_credit_no', 'GetController@check_supplier_credit_no');
+    Route::post('/check_bill_no', 'GetController@check_bill_no');
+    Route::post('/check_sales_receipt_no', 'GetController@check_sales_receipt_no');
+    Route::post('/check_credit_note_no', 'GetController@check_credit_note_no');
+    Route::post('/check_estimate_no', 'GetController@check_estimate_no');
+    Route::post('/check_invoice_no', 'GetController@check_invoice_no');
     Route::post('/save_cc_type', 'GetController@save_cc_type');
     Route::post('/check_cost_center_code', 'GetController@check_cost_center_code');
     Route::post('/check_cost_center_name', 'GetController@check_cost_center_name');

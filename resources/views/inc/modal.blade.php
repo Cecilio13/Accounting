@@ -1179,27 +1179,30 @@ function exporttoexcel(table_id){
                         function setInvoice_no_new(){
                             var invoice_location_top=document.getElementById('invoice_location_top').value;
                             var invoice_type_top=document.getElementById('invoice_type_top').value;
-                            var invoice_no_field=document.getElementById('invoice_invoiceno');
-                            if(invoice_location_top=="Main"){
-                                if(invoice_type_top=="Sales Invoice"){
-                                    invoice_no_field.value="{{count($invoice_count)+$sales_exp_start_no}}";
-                                }else if(invoice_type_top=="Bill Invoice"){
-                                    invoice_no_field.value="{{count($main_Bill_invoice_count)+$main_bill_invoice_start}}";
+                            var invoice_no_field=document.getElementById('invoice_invoiceno').value;
+                            $.ajax({
+                                method: "POST",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                url: "check_invoice_no",
+                                data: {invoice_location_top:invoice_location_top,invoice_type_top:invoice_type_top,invoice_no_field:invoice_no_field,_token: '{{csrf_token()}}'},
+                                success: function (data) {
+                                    if(data>0){
+                                        document.getElementById('invoice_invoiceno').style.border="1px solid red";
+                                        document.getElementById('invoice_add_button').disabled=true;
+                                    }else{
+                                        document.getElementById('invoice_invoiceno').style.border="1px solid green";
+                                        document.getElementById('invoice_add_button').disabled=false;
+                                    }
                                 }
-                            }
-                            else if(invoice_location_top=="Branch"){
-                                if(invoice_type_top=="Sales Invoice"){
-                                    invoice_no_field.value="{{count($branch_Sales_invoice_count)+$branch_sales_invoice_start}}";
-                                }else if(invoice_type_top=="Bill Invoice"){
-                                    invoice_no_field.value="{{count($branch_Bill_invoice_count)+$branch_bill_invoice_start}}";
-                                }
-                            }
+                            });
                         }
                     </script>
                     <div class="col-md-12 p-0 mb-4">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Invoice No</p>
-                            <input id="invoice_invoiceno" type="text" value="{{count($invoice_count)+$sales_exp_start_no}}" name="invoice_invoiceno" class="w-100 form-control" readonly>
+                            <input id="invoice_invoiceno" type="text"  value="{{count($invoice_count)+$sales_exp_start_no}}" name="invoice_invoiceno" class="w-100 form-control" onkeyup="setInvoice_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Invoice Date</p>
@@ -1397,7 +1400,7 @@ function exporttoexcel(table_id){
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="invoiceadd" class="btn btn-success rounded" type="submit">Save</button>
+                <button id="invoice_add_button" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
@@ -1939,11 +1942,6 @@ function setJournalAccount(id){
                                                     
                                                     @endforeach
                                                     </select>
-                                                    <script>
-                                                    $(document).ready(function(){
-                                                        document.getElementById('supplier_credit_account_debit_account').value="3";
-                                                    })
-                                                    </script>
                                                 </td>
                                             </tr>
                                             
@@ -2509,7 +2507,7 @@ function setJournalAccount(id){
                                 <div class="col-md-12 p-0">
                                     <div class="col-md-2 p-0 pr-3">
                                         <p>Bill No.</p>
-                                        <input type="text" name="bill_bill_no"  id="billbillnoedit" class="w-100 form-control" readonly>
+                                        <input type="text" id="bill_bill_no" name="bill_bill_no"  id="billbillnoedit" class="w-100 form-control" readonly>
                                     </div>
                                     <div class="col-md-2 p-0 pr-3">
                                         <p>Bill Date</p>
@@ -3366,7 +3364,29 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="col-md-12 p-0 " style="margin-bottom:20px;">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Estimate No</p>
-                            <input id="" type="text" value="{{count($estimate_count)+$estimate_start_no}}" name="" class="w-100 form-control" readonly>
+                            <input id="estimate_no" type="text" value="{{count($estimate_count)+$estimate_start_no}}" name="estimate_no" class="w-100 form-control" onkeyup="setestimate_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                            <script>
+                                function setestimate_no_new(){
+                                    var invoice_no_field=document.getElementById('estimate_no').value;
+                                    $.ajax({
+                                        method: "POST",
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        url: "check_estimate_no",
+                                        data: {invoice_no_field:invoice_no_field,_token: '{{csrf_token()}}'},
+                                        success: function (data) {
+                                            if(data>0){
+                                                document.getElementById('estimate_no').style.border="1px solid red";
+                                                document.getElementById('estimateadd').disabled=true;
+                                            }else{
+                                                document.getElementById('estimate_no').style.border="1px solid green";
+                                                document.getElementById('estimateadd').disabled=false;
+                                            }
+                                        }
+                                    });
+                                }
+                            </script>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Estimate Date</p>
@@ -3511,7 +3531,29 @@ function getModal(Location,TTTTT,e,type,sales){
                 <div class="col-md-12 p-0">
                     <div class="col-md-4 p-0 pr-3">
                         <p>Sales Receipt No</p>
-                        <input type="text" name="" id="" class="w-100 form-control" value="{{count($sales_receipt_count)+$sales_receipt_start_no}}" readonly>
+                        <input type="text" name="sales_receipt_no" id="sales_receipt_no" onkeyup="setsales_receipt_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" class="w-100 form-control" value="{{count($sales_receipt_count)+$sales_receipt_start_no}}" required>
+                        <script>
+                            function setsales_receipt_no_new(){
+                                var invoice_no_field=document.getElementById('sales_receipt_no').value;
+                                $.ajax({
+                                    method: "POST",
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    url: "check_sales_receipt_no",
+                                    data: {invoice_no_field:invoice_no_field,_token: '{{csrf_token()}}'},
+                                    success: function (data) {
+                                        if(data>0){
+                                            document.getElementById('sales_receipt_no').style.border="1px solid red";
+                                            document.getElementById('salesradd').disabled=true;
+                                        }else{
+                                            document.getElementById('sales_receipt_no').style.border="1px solid green";
+                                            document.getElementById('salesradd').disabled=false;
+                                        }
+                                    }
+                                });
+                            }
+                        </script>
                     </div>
                     <div class="col-md-2 p-0 pr-3 ">
                         <p>Sales Receipt Date</p>
@@ -4280,7 +4322,29 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="col-md-12 p-0 " style="margin-bottom:20px;">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Credit Note No</p>
-                            <input type="text" name="" id="" class="w-100 form-control" value="{{count($credit_note_count)+$credit_note_start_no}}" readonly>
+                            <input type="text" onkeyup="setcredit_note_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" name="credit_note_no" id="credit_note_no" class="w-100 form-control" value="{{count($credit_note_count)+$credit_note_start_no}}" required>
+                            <script>
+                                function setcredit_note_no_new(){
+                                    var invoice_no_field=document.getElementById('credit_note_no').value;
+                                    $.ajax({
+                                        method: "POST",
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        url: "check_credit_note_no",
+                                        data: {invoice_no_field:invoice_no_field,_token: '{{csrf_token()}}'},
+                                        success: function (data) {
+                                            if(data>0){
+                                                document.getElementById('credit_note_no').style.border="1px solid red";
+                                                document.getElementById('creditnadd').disabled=true;
+                                            }else{
+                                                document.getElementById('credit_note_no').style.border="1px solid green";
+                                                document.getElementById('creditnadd').disabled=false;
+                                            }
+                                        }
+                                    });
+                                }
+                            </script>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Credit Note Date</p>
@@ -5197,7 +5261,30 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="col-md-12 p-0" >
                         <div class="col-md-2 p-0 pr-3">
                             <p>Bill No.</p>
-                            <input type="text" value="{{count($bill_transaction_count_new)+count($bill_transaction_count)+$bill_start_no}}" name="bill_bill_no" class="w-100 form-control" readonly required>
+                            <input type="text" value="{{count($bill_transaction_count_new)+count($bill_transaction_count)+$bill_start_no}}" onkeyup="setbill_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" id="bill_bill_no2" name="bill_bill_no" class="w-100 form-control" required>
+                            <script>
+                                function setbill_no_new(){
+                                    
+                                    var invoice_no_field=document.getElementById('bill_bill_no2').value;
+                                    $.ajax({
+                                        method: "POST",
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        url: "check_bill_no",
+                                        data: {invoice_no_field:invoice_no_field,_token: '{{csrf_token()}}'},
+                                        success: function (data) {
+                                            if(data>0){
+                                                document.getElementById('bill_bill_no2').style.border="1px solid red";
+                                                document.getElementById('billadd2').disabled=true;
+                                            }else{
+                                                document.getElementById('bill_bill_no2').style.border="1px solid green";
+                                                document.getElementById('billadd2').disabled=false;
+                                            }
+                                        }
+                                    });
+                                }
+                            </script>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Bill Date</p>
@@ -5380,7 +5467,7 @@ function getModal(Location,TTTTT,e,type,sales){
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="billadd" class="btn btn-success rounded" type="submit">Save</button>
+                <button id="billadd2" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
@@ -5573,6 +5660,32 @@ function getModal(Location,TTTTT,e,type,sales){
             <div class="modal-body p-4" id="result">
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
+                        <div class="col-md-3 p-0  pr-3">
+                            <p>Supplier Credit No.</p>
+                            <input type="text" name="suppliers_credit_no" id="suppliers_credit_no" required class="form-control" onkeyup="setsupplier_credit_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+                            <script>
+                                function setsupplier_credit_no_new(){
+                                    var invoice_no_field=document.getElementById('suppliers_credit_no').value;
+                                    $.ajax({
+                                        method: "POST",
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        url: "check_supplier_credit_no",
+                                        data: {invoice_no_field:invoice_no_field,_token: '{{csrf_token()}}'},
+                                        success: function (data) {
+                                            if(data>0){
+                                                document.getElementById('suppliers_credit_no').style.border="1px solid red";
+                                                document.getElementById('supplier_credit_button').disabled=true;
+                                            }else{
+                                                document.getElementById('suppliers_credit_no').style.border="1px solid green";
+                                                document.getElementById('supplier_credit_button').disabled=false;
+                                            }
+                                        }
+                                    });
+                                }
+                            </script>
+                        </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Name</p>
                             <select  name="sc_customer"  id="sc_customer" class="w-100 selectpicker" data-live-search="true">
@@ -5587,8 +5700,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                 {!! $cc_list_after_foreach !!}
                                 </select>
                         </div>
-                        <div class="col-md-3 p-0">
-                        </div>
+                        
                         <div class="col-md-4 p-0 d-inline-flex center-content" style="text-align:center;">
                             <h4 class="mr-2">CREDIT AMOUNT: </h4>
                             <h4>PHP 0.00</h4>
@@ -5686,7 +5798,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                     <td style="vertical-align:middle;text-align:center;">Debit</td>
                                     <td style="vertical-align:middle;" class="pr-0">
                                         <select class="form-control selectpicker" data-live-search="true" name="supplier_credit_account_debit_account"  id="supplier_credit_account_debit_account" required>
-                                        <option value="">--Select Account--</option>
+                                        <option value="" selected>--Select Account--</option>
                                         @foreach($c_o_a_sorted as $coa)
                                         @if ($coa->id=="3")
                                         <option value="{{$coa->id}}" selected>{{$coa->coa_name}}</option> 
@@ -5696,11 +5808,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                         
                                         @endforeach
                                         </select>
-                                        <script>
-                                        $(document).ready(function(){
-                                            document.getElementById('supplier_credit_account_debit_account').value="3";
-                                        })
-                                        </script>
+                                        
                                     </td>
                                 </tr>
                                 
@@ -5711,7 +5819,7 @@ function getModal(Location,TTTTT,e,type,sales){
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-success rounded" type="submit">Save</button>
+                <button class="btn btn-success rounded" id="supplier_credit_button" type="submit">Save</button>
             </div>
         </div>
     </div>
@@ -6492,10 +6600,10 @@ function addCardCreditedit(){
                                 </select>
                             </td>
                             <td class="pt-3-half" contenteditable="false" >
-                                <input type="number" step="0.01" onkeyup="swap2('journalcredit','1')" oninput="swap2('journalcredit','1')" id="journaldebit1" >
+                                <input type="number" step="0.01" onkeyup="swap2('journalcredit','1'),update_journal_total()" oninput="swap2('journalcredit','1'),update_journal_total()" id="journaldebit1" >
                             </td>
                             <td class="pt-3-half" contenteditable="false" >
-                                <input type="number" step="0.01" onkeyup="swap2('journaldebit','1')" oninput="swap2('journaldebit','1')" id="journalcredit1" >
+                                <input type="number" step="0.01" onkeyup="swap2('journaldebit','1'),update_journal_total()" oninput="swap2('journaldebit','1'),update_journal_total()" id="journalcredit1" >
                             </td>
                             <td class="pt-3-half" contenteditable="true" id="journaldescription1" style="text-transform: capitalize;"></td>
                             <td class="pt-3-half" contenteditable="false" >
@@ -6516,8 +6624,8 @@ function addCardCreditedit(){
                                     @endforeach
                                 </select>    
                             </td>
-                            <td class="pt-3-half" contenteditable="false" ><input type="number" step="0.01" onkeyup="swap2('journalcredit','2')" oninput="swap2('journalcredit','2')" id="journaldebit2" ></td>
-                            <td class="pt-3-half" contenteditable="false" ><input type="number" step="0.01" onkeyup="swap2('journaldebit','2')" oninput="swap2('journaldebit','2')" id="journalcredit2"></td>
+                            <td class="pt-3-half" contenteditable="false" ><input type="number" step="0.01" onkeyup="swap2('journalcredit','2'),update_journal_total()" oninput="swap2('journalcredit','2'),update_journal_total()" id="journaldebit2" ></td>
+                            <td class="pt-3-half" contenteditable="false" ><input type="number" step="0.01" onkeyup="swap2('journaldebit','2'),update_journal_total()" oninput="swap2('journaldebit','2'),update_journal_total()" id="journalcredit2"></td>
                             <td class="pt-3-half" contenteditable="true" id="journaldescription2" style="text-transform: capitalize;"></td>
                             <td class="pt-3-half" contenteditable="false" >
                                     <input type="text" class="w-100" list="customer_list_all" placeholder="Supplier/Customer" onkeyup="addnewCustomerDatalist(this)" onchange="addnewCustomerDatalist(this)" id="journalnamename2" >
@@ -6534,7 +6642,7 @@ function addCardCreditedit(){
                         <!-- This is our clonable table line -->
                         </tbody>
                     </table>
-                    
+
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
@@ -6733,7 +6841,26 @@ function addCardCreditedit(){
 
                                 
                             }
-                            
+                            function update_journal_total(){
+                                var debitJhint=0;
+                                var creditJhint=0;
+                                for(var c=1;c<=journalrow;c++){
+                                    var td3 = document.getElementById("journaldebit"+c);
+                                    var td4 = document.getElementById("journalcredit"+c);
+                                    if(td3.value!=""){
+                                        
+                                        debitJhint=debitJhint+parseFloat(td3.value);
+                                        
+                                    }
+                                    if(td4.value!=""){
+                                        
+                                        creditJhint=creditJhint+parseFloat(td4.value);
+                                        
+                                    }
+                                }
+                                document.getElementById('debit_total_hitn').innerHTML=number_format(debitJhint,2);
+                                document.getElementById('credit_total_hitn').innerHTML=number_format(creditJhint,2);
+                            }
                             function AddTableRow(){
                                 var debitJhint=0;
                                 var creditJhint=0;
@@ -6777,8 +6904,8 @@ function addCardCreditedit(){
                                 x3.setAttribute("type", "number");
                                 x3.setAttribute("id", "journaldebit"+journalrow);
                                 x3.setAttribute("step", "0.01");
-                                x3.setAttribute("onkeyup", "swap2('journalcredit',"+journalrow+")");
-                                x3.setAttribute("oninput", "swap2('journalcredit',"+journalrow+")");
+                                x3.setAttribute("onkeyup", "swap2('journalcredit',"+journalrow+"),update_journal_total()");
+                                x3.setAttribute("oninput", "swap2('journalcredit',"+journalrow+"),update_journal_total()");
                                 td3.appendChild(x3);
                                 
                                 td4.setAttribute("contenteditable", "false");
@@ -6787,8 +6914,8 @@ function addCardCreditedit(){
                                 x4.setAttribute("type", "number");
                                 x4.setAttribute("id", "journalcredit"+journalrow);
                                 x4.setAttribute("step", "0.01");
-                                x4.setAttribute("onkeyup", "swap2('journaldebit',"+journalrow+")");
-                                x4.setAttribute("oninput", "swap2('journaldebit',"+journalrow+")");
+                                x4.setAttribute("onkeyup", "swap2('journaldebit',"+journalrow+"),update_journal_total()");
+                                x4.setAttribute("oninput", "swap2('journaldebit',"+journalrow+"),update_journal_total()");
                                 td4.appendChild(x4);
                                 td5.setAttribute("contenteditable", "true");
                                 td5.setAttribute("class", "pt-3-half");
@@ -11902,17 +12029,17 @@ function removeComma(str){
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 url: "get_customer_info",
-                dataType: "text",
                 data: {id:res[0],_token:'{{csrf_token()}}'},
                 success: function (customer) {
                     $('#estimatebalance').html('PHP '+number_format(customer['opening_balance'],2));
                     $('#big_estimatebalance').html('PHP '+number_format(customer['opening_balance'],2));
                     $('#e_bill_address').val(customer['street']+" "+customer['city']+" "+customer['state']+" "+customer['postal_code']+" "+customer['country']);
-                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
-                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
-                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
-                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
-                    $('#e_bill_address').val($('#e_bill_address').val().replace(' null',''));
+                    console.log(customer['street']);
+                    $('#e_bill_address').val($('#e_bill_address').val().replace('null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace('null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace('null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace('null',''));
+                    $('#e_bill_address').val($('#e_bill_address').val().replace('null',''));
                     // $('#rr_payment_method').val(customer['payment_method']);
                     $('#e_email').val(customer['email']);
                     // $('#cheque_email').val(customer['terms']);

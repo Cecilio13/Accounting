@@ -335,7 +335,7 @@ class CustomersController extends Controller
 
         
         $sales_transaction = new SalesTransaction;
-        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_no = $request->invoice_invoiceno;
         $sales_transaction->st_date = $request->date;
         $sales_transaction->st_type = $request->transaction_type;
         $sales_transaction->st_term = $request->term;
@@ -375,7 +375,7 @@ class CustomersController extends Controller
         for($x=0;$x<$request->product_count;$x++){
             $x2=$x+1;
             $st_invoice = new StInvoice;
-            $st_invoice->st_i_no = $sales_number;
+            $st_invoice->st_i_no = $request->invoice_invoiceno;
             $st_invoice->st_i_item_no = $x2;
             
             $st_invoice->st_i_product = $request->input('select_product_name'.$x);
@@ -395,7 +395,7 @@ class CustomersController extends Controller
             $st_invoice->save();
 
             $JDate=$request->date;
-            $JNo=$sales_number;
+            $JNo=$request->invoice_invoiceno;
             $JMemo=$request->memo;
             $account=$request->input('invoice_account_debit_account'.$x2);
             $debit= $request->input('product_qty'.$x) * preg_replace("/[^0-9\.]/", "", $request->input('select_product_rate'.$x));
@@ -441,7 +441,7 @@ class CustomersController extends Controller
             $journal_entries->save();
 
             $JDate=$request->date;
-            $JNo=$sales_number;
+            $JNo=$request->invoice_invoiceno;
             $JMemo=$request->memo;
             $account=$request->input('invoice_account_credit_account'.$x2);
             $debit= "";
@@ -500,7 +500,7 @@ class CustomersController extends Controller
             $AuditLogcount=AuditLog::count()+1;
             $userid = Auth::user()->id;
             $username = Auth::user()->name;
-            $eventlog="Added Invoice No. ".$sales_number;
+            $eventlog="Added Invoice No. ".$request->invoice_invoiceno;
             $AuditLog->log_id=$AuditLogcount;
             $AuditLog->log_user_id=$username;
             $AuditLog->log_event=$eventlog;
@@ -657,7 +657,7 @@ class CustomersController extends Controller
         $sales_number = SalesTransaction::where('st_type','Estimate')->count() + $numbering->estimate_start_no;
 
         $sales_transaction = new SalesTransaction;
-        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_no = $request->estimate_no;
         $sales_transaction->st_date = $request->e_date;
         $sales_transaction->st_type = $request->transaction_type_estimate;
         $sales_transaction->st_term = null;
@@ -679,7 +679,7 @@ class CustomersController extends Controller
         $customer = Customers::find($sss[0]);
         for($x=0;$x<$request->product_count_estimate;$x++){
             $st_estimate = new StEstimate;
-            $st_estimate->st_e_no = $sales_number;
+            $st_estimate->st_e_no = $request->estimate_no;
             $st_estimate->st_e_product = $request->input('select_product_name_estimate'.$x);
             $st_estimate->st_e_desc = $request->input('select_product_description_estimate'.$x);
             $st_estimate->st_e_qty = $request->input('product_qty_estimate'.$x);
@@ -749,7 +749,7 @@ class CustomersController extends Controller
         $sales_number = SalesTransaction::where('st_type','Sales Receipt')->count() + $numbering->sales_receipt_start_no;
 
         $sales_transaction = new SalesTransaction;
-        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_no = $request->sales_receipt_no;
         $sales_transaction->st_date = $request->sr_date;
         $sales_transaction->st_type = $request->transaction_type_sales_receipt;
         $sales_transaction->st_term = null;
@@ -805,7 +805,7 @@ class CustomersController extends Controller
         $AuditLogcount=AuditLog::count()+1;
         $userid = Auth::user()->id;
         $username = Auth::user()->name;
-        $eventlog="Added Sales Receipt No.".$sales_number;
+        $eventlog="Added Sales Receipt No.".$request->sales_receipt_no;
         $AuditLog->log_id=$AuditLogcount;
         $AuditLog->log_user_id=$username;
         $AuditLog->log_event=$eventlog;
@@ -824,7 +824,7 @@ class CustomersController extends Controller
         $AuditLog->save();
         if($request->reload_sr=='0'){
             $JDate=$request->sr_date;
-            $JNo=$sales_number;
+            $JNo=$request->sales_receipt_no;
             $JMemo=$request->sr_memo;
             if($request->sr_payment_method=="Cash" || $request->sr_payment_method=="Cash & Cheque"){
                 $account=$request->sales_receipt_account_debit_account;
@@ -865,7 +865,7 @@ class CustomersController extends Controller
             $journal_entries->save();
 
             $JDate=$request->sr_date;
-            $JNo=$sales_number;
+            $JNo=$request->sales_receipt_no;
             $JMemo=$request->sr_memo;
             $account=$request->sales_receipt_account_credit_account;
             $debit= "";
@@ -903,7 +903,7 @@ class CustomersController extends Controller
         $value;
         for($x=0;$x<$request->product_count_sales_receipt;$x++){
             $st_sales_receipt = new StSalesReceipt;
-            $st_sales_receipt->st_s_no = $sales_number;
+            $st_sales_receipt->st_s_no = $request->sales_receipt_no;
             $st_sales_receipt->st_s_product = $request->input('select_product_name_sales_receipt'.$x);
             $st_sales_receipt->st_s_desc = $request->input('select_product_description_sales_receipt'.$x);
             $st_sales_receipt->st_s_qty = $request->input('product_qty_sales_receipt'.$x);
@@ -962,7 +962,7 @@ class CustomersController extends Controller
             $sales_number = SalesTransaction::where('st_type','Sales Receipt')->count() + $numbering->sales_exp_start_no;
 
             $sales_transaction = new SalesTransaction;
-            $sales_transaction->st_no = $sales_number;
+            $sales_transaction->st_no = $request->sales_receipt_no;
             $sales_transaction->st_date = $request->sr_date;
             $sales_transaction->st_type = $request->transaction_type_sales_receipt;
             $sales_transaction->st_term = null;
@@ -1017,7 +1017,7 @@ class CustomersController extends Controller
             $AuditLogcount=AuditLog::count()+1;
             $userid = Auth::user()->id;
             $username = Auth::user()->name;
-            $eventlog="Added Sales Receipt No.".$sales_number;
+            $eventlog="Added Sales Receipt No.".$request->sales_receipt_no;
             $AuditLog->log_id=$AuditLogcount;
             $AuditLog->log_user_id=$username;
             $AuditLog->log_event=$eventlog;
@@ -1027,7 +1027,7 @@ class CustomersController extends Controller
             $AuditLog->save();
             if($request->reload_sr=='0'){
                 $JDate=$request->sr_date;
-                $JNo=$sales_number;
+                $JNo=$request->sales_receipt_no;
                 $JMemo=$request->sr_memo;
                 
                 $account=$request->sales_receipt_account_debit_account_cheque;
@@ -1063,7 +1063,7 @@ class CustomersController extends Controller
                 $journal_entries->save();
 
                 $JDate=$request->sr_date;
-                $JNo=$sales_number;
+                $JNo=$request->sales_receipt_no;
                 $JMemo=$request->sr_memo;
                 $account=$request->sales_receipt_account_credit_account;
                 $debit= "";
@@ -1100,7 +1100,7 @@ class CustomersController extends Controller
             $value;
             for($x=0;$x<$request->product_count_sales_receipt;$x++){
                 $st_sales_receipt = new StSalesReceipt;
-                $st_sales_receipt->st_s_no = $sales_number;
+                $st_sales_receipt->st_s_no = $request->sales_receipt_no;
                 $st_sales_receipt->st_s_product = $request->input('select_product_name_sales_receipt'.$x);
                 $st_sales_receipt->st_s_desc = $request->input('select_product_description_sales_receipt'.$x);
                 $st_sales_receipt->st_s_qty = $request->input('product_qty_sales_receipt'.$x);
@@ -1158,7 +1158,7 @@ class CustomersController extends Controller
             $sales_number = SalesTransaction::where('st_type','Sales Receipt')->count() + $numbering->sales_exp_start_no;
 
             $sales_transaction = new SalesTransaction;
-            $sales_transaction->st_no = $sales_number;
+            $sales_transaction->st_no = $request->sales_receipt_no;
             $sales_transaction->st_date = $request->sr_date;
             $sales_transaction->st_type = $request->transaction_type_sales_receipt;
             $sales_transaction->st_term = null;
@@ -1213,7 +1213,7 @@ class CustomersController extends Controller
             $AuditLogcount=AuditLog::count()+1;
             $userid = Auth::user()->id;
             $username = Auth::user()->name;
-            $eventlog="Added Sales Receipt No.".$sales_number;
+            $eventlog="Added Sales Receipt No.".$request->sales_receipt_no;
             $AuditLog->log_id=$AuditLogcount;
             $AuditLog->log_user_id=$username;
             $AuditLog->log_event=$eventlog;
@@ -1223,7 +1223,7 @@ class CustomersController extends Controller
             $AuditLog->save();
             if($request->reload_sr=='0'){
                 $JDate=$request->sr_date;
-                $JNo=$sales_number;
+                $JNo=$request->sales_receipt_no;
                 $JMemo=$request->sr_memo;
                 
                 $account=$request->sales_receipt_account_debit_account_cheque;
@@ -1261,7 +1261,7 @@ class CustomersController extends Controller
                 $journal_entries->save();
 
                 $JDate=$request->sr_date;
-                $JNo=$sales_number;
+                $JNo=$request->sales_receipt_no;
                 $JMemo=$request->sr_memo;
                 $account=$request->sales_receipt_account_credit_account;
                 $debit= "";
@@ -1298,7 +1298,7 @@ class CustomersController extends Controller
             $value;
             for($x=0;$x<$request->product_count_sales_receipt;$x++){
                 $st_sales_receipt = new StSalesReceipt;
-                $st_sales_receipt->st_s_no = $sales_number;
+                $st_sales_receipt->st_s_no = $request->sales_receipt_no;
                 $st_sales_receipt->st_s_product = $request->input('select_product_name_sales_receipt'.$x);
                 $st_sales_receipt->st_s_desc = $request->input('select_product_description_sales_receipt'.$x);
                 $st_sales_receipt->st_s_qty = $request->input('product_qty_sales_receipt'.$x);
@@ -1361,7 +1361,7 @@ class CustomersController extends Controller
             $sales_number = SalesTransaction::where('st_type','Sales Receipt')->count() + $numbering->sales_exp_start_no;
 
             $sales_transaction = new SalesTransaction;
-            $sales_transaction->st_no = $sales_number;
+            $sales_transaction->st_no = $request->sales_receipt_no;
             $sales_transaction->st_date = $request->sr_date;
             $sales_transaction->st_type = $request->transaction_type_sales_receipt;
             $sales_transaction->st_term = null;
@@ -1416,7 +1416,7 @@ class CustomersController extends Controller
             $AuditLogcount=AuditLog::count()+1;
             $userid = Auth::user()->id;
             $username = Auth::user()->name;
-            $eventlog="Added Sales Receipt No.".$sales_number;
+            $eventlog="Added Sales Receipt No.".$request->sales_receipt_no;
             $AuditLog->log_id=$AuditLogcount;
             $AuditLog->log_user_id=$username;
             $AuditLog->log_event=$eventlog;
@@ -1426,7 +1426,7 @@ class CustomersController extends Controller
             $AuditLog->save();
             if($request->reload_sr=='0'){
                 $JDate=$request->sr_date;
-                $JNo=$sales_number;
+                $JNo=$request->sales_receipt_no;
                 $JMemo=$request->sr_memo;
                 
                 $account=$request->input('additionalcashDebitAccount'.$c);
@@ -1464,7 +1464,7 @@ class CustomersController extends Controller
                 $journal_entries->save();
 
                 $JDate=$request->sr_date;
-                $JNo=$sales_number;
+                $JNo=$request->sales_receipt_no;
                 $JMemo=$request->sr_memo;
                 $account=$request->input('additionalcashCreditAccount'.$c);
                 $debit= "";
@@ -1688,7 +1688,7 @@ class CustomersController extends Controller
         $sales_number = SalesTransaction::where('st_type','Credit Note')->count() + $numbering->credit_note_start_no;
         
         $sales_transaction = new SalesTransaction;
-        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_no = $request->credit_note_no;
         $sales_transaction->st_date = $request->cn_date;
         $sales_transaction->st_type = $request->transaction_type_credit_note;
         $sales_transaction->st_term = null;
@@ -1709,7 +1709,7 @@ class CustomersController extends Controller
         $AuditLogcount=AuditLog::count()+1;
         $userid = Auth::user()->id;
         $username = Auth::user()->name;
-        $eventlog="Added Credit Note No.".$sales_number;
+        $eventlog="Added Credit Note No.".$request->credit_note_no;
         $AuditLog->log_id=$AuditLogcount;
         $AuditLog->log_user_id=$username;
         $AuditLog->log_event=$eventlog;
@@ -1725,7 +1725,7 @@ class CustomersController extends Controller
 
         for($x=0;$x<$request->product_count_credit_note;$x++){
             $st_credit_note = new StCreditNote;
-            $st_credit_note->st_cn_no = $sales_number;
+            $st_credit_note->st_cn_no = $request->credit_note_no;
             $st_credit_note->st_cn_product = $request->input('select_product_name_credit_note'.$x);
             $st_credit_note->st_cn_desc = $request->input('select_product_description_credit_note'.$x);
             $st_credit_note->st_cn_qty = $request->input('product_qty_credit_note'.$x);
@@ -1739,7 +1739,7 @@ class CustomersController extends Controller
             $st_credit_note->save();
 
             $JDate=$request->cn_date;
-            $JNo=$sales_number;
+            $JNo=$request->credit_note_no;
             $JMemo=$request->cn_memo;
             $account=$request->credit_note_account_debit_account;
             $debit= $request->input('product_qty_credit_note'.$x) * preg_replace("/[^0-9\.]/", "", $request->input('select_product_rate_credit_note'.$x));
@@ -1768,7 +1768,7 @@ class CustomersController extends Controller
             $journal_entries->save();
 
             $JDate=$request->cn_date;
-            $JNo=$sales_number;
+            $JNo=$request->credit_note_no;
             $JMemo=$request->cn_memo;
             $account=$request->credit_note_account_credit_account;
             $debit= "";
