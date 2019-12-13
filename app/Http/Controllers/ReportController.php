@@ -27979,7 +27979,27 @@ class ReportController extends Controller
                 $totaltotalssasdasd_d=0;
                 $beginningbalance_total=0;
                 $beginningbalance_total_d=0;
+                $retaunbedearnings=0;
                 foreach ($COA as $coa){
+                    if($coa->coa_name=='Arkcons, Capital'){
+                        $retaunbedearnings=1;
+                        $RetainedEarningsSubs=0;
+                        $data=Advance::first();
+                        if(!empty($data)){
+                            $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                        }
+                        $tablecontent.='<tr>';  
+                        $tablecontent.='<td style="vertical-align:middle;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
+                        $tablecontent.='<td style="vertical-align:middle;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                        $tablecontent.='</tr>'; 
+                    } 
                     $coa_name_total=0;
                     $coa_name_totalc=0;
                     $coa_name_totald=0;
@@ -28056,14 +28076,32 @@ class ReportController extends Controller
                     $coa_name_totaldebit+=$coa_name_totald;
                     $coa_name_totalcredit+=$coa_name_totalc;
                 }
+                if($retaunbedearnings==0){
+                    $RetainedEarningsSubs=0;
+                    $data=Advance::first();
+                    if(!empty($data)){
+                        $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                    }
+                    $tablecontent.='<tr>';  
+                    $tablecontent.='<td style="vertical-align:middle;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
+                    $tablecontent.='<td style="vertical-align:middle;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                    $tablecontent.='</tr>'; 
+                } 
                 $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
                 $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';  
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total,2).'</td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total+$RetainedEarningsSubs,2).'</td>';
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totaldebit,2).'</td>'; 
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totalcredit,2).'</td>';
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d,2).'</td>';  
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd,2).'</td>';  
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd-$RetainedEarningsSubs,2).'</td>';  
                 $tablecontent.='</tr>';  
             }else if($CostCenterFilter=="By Cost Center"){
                 foreach($cost_center_list as $ccl){
@@ -28085,7 +28123,27 @@ class ReportController extends Controller
                         $coa_name_totalcredit=0;
                         $totaltotalssasdasd=0;
                         $totaltotalssasdasd_d=0;
+                        $retaunbedearnings=0;
                         foreach ($COA as $coa){
+                            if($coa->coa_name=='Arkcons, Capital'){
+                                $retaunbedearnings=1;
+                                $RetainedEarningsSubs=0;
+                                $data=Advance::first();
+                                if(!empty($data)){
+                                    $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                                }
+                                $tablecontent.='<tr>';  
+                                $tablecontent.='<td style="vertical-align:middle;"></td>';
+                                $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
+                                $tablecontent.='<td style="vertical-align:middle;"></td>';
+                                $tablecontent.='<td style="vertical-align:middle;"></td>';
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                                $tablecontent.='</tr>'; 
+                            } 
                             $coa_name_total=0;
                             $coa_name_totalc=0;
                             $coa_name_totald=0;
@@ -28155,6 +28213,24 @@ class ReportController extends Controller
                             $coa_name_totaldebit+=$coa_name_totald;
                             $coa_name_totalcredit+=$coa_name_totalc;
                         }
+                        if($retaunbedearnings==0){
+                            $RetainedEarningsSubs=0;
+                            $data=Advance::first();
+                            if(!empty($data)){
+                                $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                            }
+                            $tablecontent.='<tr>';  
+                            $tablecontent.='<td style="vertical-align:middle;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
+                            $tablecontent.='<td style="vertical-align:middle;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                            $tablecontent.='</tr>'; 
+                        } 
                         $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
                         $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';  
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
@@ -28188,7 +28264,27 @@ class ReportController extends Controller
             $coa_name_totalcredit=0;
             $totaltotalssasdasd=0;
             $totaltotalssasdasd_d=0;
+            $retaunbedearnings=0;
             foreach ($COA as $coa){
+                if($coa->coa_name=='Arkcons, Capital'){
+                    $retaunbedearnings=1;
+                    $RetainedEarningsSubs=0;
+                    $data=Advance::first();
+                    if(!empty($data)){
+                        $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                    }
+                    $tablecontent.='<tr>';  
+                    $tablecontent.='<td style="vertical-align:middle;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
+                    $tablecontent.='<td style="vertical-align:middle;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                    $tablecontent.='</tr>'; 
+                } 
                 $beginningbalance_total=0;
                 $beginningbalance_total_d=0;
                 $coa_name_total=0;
@@ -28260,6 +28356,24 @@ class ReportController extends Controller
                 $coa_name_totaldebit+=$coa_name_totald;
                 $coa_name_totalcredit+=$coa_name_totalc;
             }
+            if($retaunbedearnings==0){
+                $RetainedEarningsSubs=0;
+                $data=Advance::first();
+                if(!empty($data)){
+                    $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                }
+                $tablecontent.='<tr>';  
+                $tablecontent.='<td style="vertical-align:middle;"></td>';
+                $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
+                $tablecontent.='<td style="vertical-align:middle;"></td>';
+                $tablecontent.='<td style="vertical-align:middle;"></td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                $tablecontent.='</tr>'; 
+            } 
             $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
             $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';  
             $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
