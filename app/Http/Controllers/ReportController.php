@@ -103,7 +103,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -180,7 +180,7 @@ class ReportController extends Controller
         $date = date('l, d F Y h:i a \G\T\MO');
         $Report = Report::all();
         $cost_center_list=CostCenter::all();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
         $expense_transactions= DB::table('expense_transactions')
                 ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
@@ -574,7 +574,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -630,7 +630,7 @@ class ReportController extends Controller
             ->whereBetween('et_date', [$FROM, $TO])
             ->get();
         $cost_center_list=CostCenter::all();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $tablecontent="";
         
         $totaltaxall=0;
@@ -1365,7 +1365,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -1417,7 +1417,7 @@ class ReportController extends Controller
             ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
             ->whereBetween('et_date', [$FROM, $TO])
             ->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
         $tablecontent="";
         if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
@@ -1871,7 +1871,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -1925,7 +1925,7 @@ class ReportController extends Controller
                             JOIN et_account_details ON expense_transactions.et_no=et_account_details.et_ad_no
                             ".$sortsettingex." 
                             ORDER BY et_no ASC");
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
         $tablecontent="";
         $PaymentFor="";
@@ -2286,7 +2286,7 @@ class ReportController extends Controller
         $ex_tran = DB::table('expense_transactions')->get();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $selected=$request->desc;
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
@@ -2371,7 +2371,7 @@ class ReportController extends Controller
                 ->whereBetween('updated_at', [$FROM, $TO])
                 ->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
         $selected=$request->desc;
@@ -3768,7 +3768,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -3852,7 +3852,7 @@ class ReportController extends Controller
                 ->get();
         $et_it = DB::table('et_item_details')
                 ->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
         $ssasdsad="";
         $tablecontent="";
@@ -6281,7 +6281,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -6334,7 +6334,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -6381,7 +6381,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -6439,7 +6439,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -6544,7 +6544,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -6603,7 +6603,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -6702,7 +6702,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -6812,7 +6812,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -6923,7 +6923,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -7033,7 +7033,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -7131,7 +7131,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -7236,7 +7236,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -7295,7 +7295,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -7354,7 +7354,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -7413,7 +7413,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -7490,7 +7490,7 @@ class ReportController extends Controller
         $date = date('l, d F Y h:i a \G\T\MO');
         $Report = Report::all();
         $cost_center_list=CostCenter::all();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
         $coa_sub_account_type=ChartofAccount::groupBy('coa_sub_account')->orderBy('coa_detail_type','ASC')->get();
         $expense_transactions= DB::table('expense_transactions')
@@ -9527,7 +9527,7 @@ class ReportController extends Controller
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();  
             $JournalEntrypv = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();     
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $coa_sub_account_type=ChartofAccount::groupBy('coa_sub_account')->orderBy('coa_detail_type','ASC')->get();
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get(); 
         $et_account_details= DB::table('et_account_details')->get();
@@ -12305,7 +12305,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
@@ -12377,7 +12377,7 @@ class ReportController extends Controller
         $Report = Report::all();
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
         $coa_sub_account_type=ChartofAccount::groupBy('coa_sub_account')->orderBy('coa_detail_type','ASC')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $expense_transactions= DB::table('expense_transactions')
                 ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
                 ->whereBetween('et_date', [$FROM, $TO])
@@ -15221,7 +15221,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -15314,7 +15314,7 @@ class ReportController extends Controller
                 ->get();    
         }
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();
         $ETran = DB::table('expense_transactions')->get();      
         $et_account_details= DB::table('et_account_details')->get();
@@ -17265,7 +17265,7 @@ class ReportController extends Controller
             $VoucherCount=Voucher::all();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
             $numbering = Numbering::first();
             $st_invoice = DB::table('st_invoice')->get();
@@ -17474,7 +17474,7 @@ class ReportController extends Controller
             $VoucherCount=Voucher::all();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
             $numbering = Numbering::first();
             $st_invoice = DB::table('st_invoice')->get();
@@ -17536,7 +17536,7 @@ class ReportController extends Controller
             $VoucherCount=Voucher::all();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
             $numbering = Numbering::first();
             $st_invoice = DB::table('st_invoice')->get();
@@ -17597,7 +17597,7 @@ class ReportController extends Controller
             $VoucherCount=Voucher::all();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
             $numbering = Numbering::first();
             $st_invoice = DB::table('st_invoice')->get();
@@ -17653,7 +17653,7 @@ class ReportController extends Controller
             $VoucherCount=Voucher::all();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
             $numbering = Numbering::first();
             $st_invoice = DB::table('st_invoice')->get();
@@ -18064,7 +18064,7 @@ class ReportController extends Controller
             $VoucherCount=Voucher::all();
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
             $numbering = Numbering::first();
             $st_invoice = DB::table('st_invoice')->get();
@@ -18193,7 +18193,7 @@ class ReportController extends Controller
                     ->groupBy('st_customer_id')
                     ->orderBy('display_name', 'ASC')
                     ->get();    
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
             $et_account_details= DB::table('et_account_details')->get();
             $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
             $combinedarray=array();
@@ -20881,7 +20881,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -20979,7 +20979,7 @@ class ReportController extends Controller
         date_default_timezone_set('Asia/Manila');
         $date = date('l, d F Y h:i a \G\T\MO');
         $Report = Report::all();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $coa_account_type= ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
         $expense_transactions= DB::table('expense_transactions')
                 ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
@@ -22581,7 +22581,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         
@@ -22654,7 +22654,7 @@ class ReportController extends Controller
                         ->select('st_customer_id')
                         ->groupBy('st_customer_id')
                         ->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
         $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
         $customers = Customers::orderBy('display_name', 'ASC')->get();
@@ -23774,7 +23774,7 @@ class ReportController extends Controller
                 ->get();
         $jounalcount=count($jounal)+1;
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
         date_default_timezone_set('Asia/Manila');
         $date = date('l, d F Y h:i a \G\T\MO');
@@ -24416,7 +24416,7 @@ class ReportController extends Controller
                 ->groupBy('je_no')
                 ->get();
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();    
-        $COA= ChartofAccount::where('coa_active','1')->get();    
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");    
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
         $jounalcount=count($jounal)+1;
         date_default_timezone_set('Asia/Manila');
@@ -25334,7 +25334,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -25390,7 +25390,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -25450,7 +25450,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -25505,7 +25505,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -26877,7 +26877,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -27239,11 +27239,10 @@ class ReportController extends Controller
                             ".$sortsettingjournal.$sortjournal." 
                             ORDER BY created_at ASC");
         if($AccountFilter=='All'){
-            $COA= ChartofAccount::where('coa_active','1')->get();
+                    $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         }else{
-            $COA= ChartofAccount::where([
-                ['id','=',$AccountFilter]
-            ])->get();
+            $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE id='$AccountFilter' ORDER BY coa_code+0 ASC");
+            
         }
         
         $jounal = DB::table('journal_entries')
@@ -27615,7 +27614,7 @@ class ReportController extends Controller
         $VoucherCount=Voucher::all();
         $et_acc = DB::table('et_account_details')->get();
         $et_it = DB::table('et_item_details')->get();
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();
         $ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
@@ -27946,7 +27945,8 @@ class ReportController extends Controller
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
                             ORDER BY created_at ASC");
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $jounal = DB::table('journal_entries')
                 ->select('je_no')
                 ->groupBy('je_no')
@@ -27980,6 +27980,7 @@ class ReportController extends Controller
                 $beginningbalance_total=0;
                 $beginningbalance_total_d=0;
                 $retaunbedearnings=0;
+                $LandImprovements=0;
                 foreach ($COA as $coa){
                     if($coa->coa_name=='Arkcons, Capital'){
                         $retaunbedearnings=1;
@@ -28015,7 +28016,9 @@ class ReportController extends Controller
                             }
                         }
                     }
-                    
+                    if($coa->coa_name=='Land Improvements'){
+                        
+                    }
                     //if ("$coa_name_totalc!=0 || $coa_name_totald!=0"){
                     if(""==""){
                         
@@ -28093,7 +28096,7 @@ class ReportController extends Controller
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
                     $tablecontent.='</tr>'; 
-                } 
+                }
                 $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
                 $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';  
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
@@ -28452,7 +28455,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -28498,7 +28502,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -28550,7 +28555,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -28597,7 +28603,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
          $st_invoice = DB::table('st_invoice')->get();
@@ -29434,7 +29441,8 @@ class ReportController extends Controller
                             ".$sortjournal." 
                             ORDER BY created_at ASC");
         
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $tablecontent="";
         $tablecontent.="<script>";
         
@@ -31518,7 +31526,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -31570,7 +31579,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -31629,7 +31639,8 @@ class ReportController extends Controller
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -32140,7 +32151,8 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -32199,7 +32211,7 @@ class ReportController extends Controller
         foreach($expense_transactions as $et){
             if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
         }
-        $COA= ChartofAccount::where('coa_active','1')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
         $numbering = Numbering::first();
         $st_invoice = DB::table('st_invoice')->get();
@@ -32297,7 +32309,7 @@ class ReportController extends Controller
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $userpos=Auth::user()->position;
-        $COA= ChartofAccount::where('coa_active','1')->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         if($Type=="Invoice"){
             $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
                 JOIN customers ON sales_transaction.st_customer_id=customers.customer_id WHERE st_no='".$request->id."' AND st_type='Invoice' AND st_location='".$Location."' AND st_invoice_type='".$TTTT."'");

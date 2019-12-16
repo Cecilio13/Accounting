@@ -1467,7 +1467,7 @@ function addInvoicejournal(){
     $('#total_balance_journal').val($('#invoicetotal_journal').text());
    
    $(".invoice_lines").each(function() {
-       $("#product_count_journal").val(parseInt($("#product_count_journal").val())+1);
+       $("#product_count_journal").val(parseFloat($("#product_count_journal").val())+1);
    });
    
    var counter = 0;
@@ -2507,7 +2507,7 @@ function setJournalAccount(id){
                                 <div class="col-md-12 p-0">
                                     <div class="col-md-2 p-0 pr-3">
                                         <p>Bill No.</p>
-                                        <input type="text" id="bill_bill_no" name="bill_bill_no"  id="billbillnoedit" class="w-100 form-control" readonly>
+                                        <input type="text" name="bill_bill_no"  id="billbillnoedit" class="w-100 form-control" readonly>
                                     </div>
                                     <div class="col-md-2 p-0 pr-3">
                                         <p>Bill Date</p>
@@ -2785,13 +2785,16 @@ function ViewExpenseTransaction(id,type,modal_id){
                                            document.getElementById('billpayeeedit').value="{{$et->et_customer}}";
                                            document.getElementById('update_bill_id').value="{{$et->et_no}}";
                                            //document.getElementById('billpayeeedit').disabled=true;
+                                           
                                            document.getElementById('bill_billing_addressedit').value="{{$et->et_billing_address}}";
                                            document.getElementById('bill_termsedit').value="{{$et->et_terms}}";
                                            document.getElementById('billdateedit').value="{{$et->et_date}}";
                                            document.getElementById('billduedateedit').value="{{$et->et_due_date}}";
+                                           
                                            document.getElementById('billbillnoedit').value="{{$et->et_bill_no}}";
+                                           console.log('bill');
                                            document.getElementById('bill_memoedit').value="{{$et->et_memo}}";
-
+                                           
                                            document.getElementById('RF_bill_edit').value="{{$et->et_shipping_address}}";
                                            document.getElementById('PO_bill_edit').value="{{$et->et_shipping_to}}";
                                            document.getElementById('CI_bill_edit').value="{{$et->et_shipping_via}}";
@@ -3497,6 +3500,13 @@ function getModal(Location,TTTTT,e,type,sales){
 </div>
 
 <div class="modal fade p-0" id="salesreceiptmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<script>
+    $(document).ready(function(){
+        $('#add_sales_receipt_form').submit(function(e){
+            e.preventDefault();
+        })
+    })
+</script>
 <form action="#" class="form-horizontal " id="add_sales_receipt_form" onsubmit="addSalesReceipt()" autocomplete="off">
 {{ csrf_field() }}
     <input type="hidden" id="reload_sr" name="reload_sr" value="0">
@@ -3656,7 +3666,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                                 }
                                                 var totalamount=0;
                                             for(var c=1;c<=data.length;c++){
-
+                                                    console.log('c='+c+' data.length='+data.length);
                                                     document.getElementById('add_lines_sales_receipt').click();
 
                                                     
@@ -3682,13 +3692,13 @@ function getModal(Location,TTTTT,e,type,sales){
                                                         document.getElementById('CostCenterSalesReceipt').value='None'; 
                                                     }
                                                     //alert(data[c-1]['st_p_debit']);
-                                                    if(data[c-1]['st_p_debit']!=""){
-                                                        document.getElementById('sales_receipt_account_credit_account').value=data[c-1]['st_p_debit'];
-                                                        document.getElementById('sales_receipt_account_credit_account_cheque').value=data[c-1]['st_p_debit'];
+                                                    // if(data[c-1]['st_p_debit']!=""){
+                                                    //     document.getElementById('sales_receipt_account_credit_account').value=data[c-1]['st_p_debit'];
+                                                    //     document.getElementById('sales_receipt_account_credit_account_cheque').value=data[c-1]['st_p_debit'];
                                                         
-                                                    }
-                                                    document.getElementById('sales_receipt_account_credit_account').disabled="true";
-                                                    document.getElementById('sales_receipt_account_credit_account_cheque').disabled="true";
+                                                    // }
+                                                    // document.getElementById('sales_receipt_account_credit_account').disabled="true";
+                                                    // document.getElementById('sales_receipt_account_credit_account_cheque').disabled="true";
                                                     
                                                     document.getElementById('select_product_description_sales_receipt'+c).value=data[c-1]['st_i_desc'];
                                                     document.getElementById('product_qty_sales_receipt'+c).value=data[c-1]['st_i_qty'];
@@ -3696,12 +3706,15 @@ function getModal(Location,TTTTT,e,type,sales){
                                                     document.getElementById('select_product_rate_sales_receipt'+c).title=data[c-1]['st_i_rate'];
                                                     document.getElementById('total_amount_sales_receipt'+c).innerHTML=number_format(data[c-1]['st_i_total'],2);
                                                     document.getElementById('total_amount_sales_receipt'+c).title=data[c-1]['st_i_total'];
-                                                    totalamount=(parseInt(totalamount)+(parseInt(data[c-1]['st_i_total'])-parseInt(data[c-1]['st_p_amount'])));
+                                                    totalamount=(parseFloat(totalamount)+(parseFloat(data[c-1]['st_i_total'])-parseFloat(data[c-1]['st_p_amount'])));
+                                                    console.log('csasd');
                                             }
                                             $('#big_sales_receiptbalance').attr('title',totalamount);
                                             $('#big_sales_receiptbalance').html('PHP '+number_format(totalamount,2));
                                             document.getElementById('amountreceived_sr').value=totalamount;
                                             document.getElementById('amountreceived_sr_mask').value=number_format(totalamount,2);
+                                            document.getElementById('TotalDebitSalesReceiptTD').innerHTML="Total : "+number_format(totalamount,2);
+                                            document.getElementById('hiddentotaldebitamountsalesreceipt').value=totalamount;
                                             $('#sales_receiptbalance').html('PHP '+number_format(totalamount,2));
                                             document.getElementById('amountreceived_sr').max=totalamount;
                                             document.getElementById('amountreceived_sr_mask').max=totalamount;
@@ -3709,7 +3722,8 @@ function getModal(Location,TTTTT,e,type,sales){
                                             document.getElementById('sales_receipttotal').innerHTML=number_format(totalamount,2);
                                             
                                             $('#sales_receipttotal').attr('title',totalamount);
-                                            } 											 
+                                            
+                                            }										 
                                         });
                                     }
                                     document.getElementById('setselectpickerbutton').click();
@@ -3749,17 +3763,15 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="col-md-12 p-0 mt-3 d-inline-flex" style="margin-bottom:20px;">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Payment Method</p>
-                            <select onchange="SC_payment_method(this)" onkeyup="SC_payment_method(this)" name="sr_payment_method" id="sr_payment_method" placeholder="Choose payment method" class="w-100 form-control" required>
-                            <option>Cash</option>
+                            <select  name="sr_payment_method" id="sr_payment_method" class="w-100 form-control" required>
+                            <option selected>Cash</option>
                             <option>Cheque</option>
                             <option>Cash & Cheque</option>
                             </select>
                             <input type="hidden" name="additional_count" value="0" id="additional_count">
                             <input type="hidden" name="additional_count_cash_account" value="0" id="additional_count_cash_account">
                             <script>
-                                $(document).ready(function(){
-                                    $('#sr_payment_method').trigger('change');
-                                })
+                               
                                 var additionalchequecount=0;
                                 function GenerateFieldSalesReceipt(){
                                     additionalchequecount++;
@@ -3792,19 +3804,19 @@ function getModal(Location,TTTTT,e,type,sales){
                                         
                                     
                                     $("#AmountFromChequeAdditional").append(markup);
-                                                        var textbox = '#amountreceived_sr_from_cheque_mask'+additionalchequecount;
-                                                        var hidden = '#amountreceived_sr_from_cheque'+additionalchequecount;
-                                                        
-                                                        $(textbox).keyup(function () {
-                                                            $(textbox).val(this.value.match(/[0-9.,-]*/));
-                                                        var num = $(textbox).val();
-                                                            var comma = /,/g;
-                                                            num = num.replace(comma,'');
-                                                            $(hidden).val(num);
-                                                            $(hidden).attr('title',num);
-                                                            var numCommas = addCommas(num);
-                                                            $(textbox).val(numCommas);
-                                                        });
+                                    var textbox = '#amountreceived_sr_from_cheque_mask'+additionalchequecount;
+                                    var hidden = '#amountreceived_sr_from_cheque'+additionalchequecount;
+                                    
+                                    $(textbox).keyup(function () {
+                                        $(textbox).val(this.value.match(/[0-9.,-]*/));
+                                    var num = $(textbox).val();
+                                        var comma = /,/g;
+                                        num = num.replace(comma,'');
+                                        $(hidden).val(num);
+                                        $(hidden).attr('title',num);
+                                        var numCommas = addCommas(num);
+                                        $(textbox).val(numCommas);
+                                    });
                                                                    
                                 }
                                 var AdditionalCashAccountCount=0;
@@ -3815,7 +3827,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                         
                                         markup=markup+'<td style="vertical-align:middle;" class="pl-0">';
 
-                                        markup=markup+'<select required class="form-control selectpicker" data-live-search="true" name="additionalcashDebitAccount'+AdditionalCashAccountCount+'" id="additionalcashDebitAccount'+AdditionalCashAccountCount+'">';
+                                        markup=markup+'<select required class="form-control selectpicker" data-live-search="true" name="additionalcashDebitAccount'+AdditionalCashAccountCount+'" id="additionalcashDebitAccount'+AdditionalCashAccountCount+'"><option value="">--Select--</option>';
                                         @foreach($COA as $coo)
                                             if('{{$coo->id}}'=="1"){
                                                 markup=markup+'<option selected value="'+'{{$coo->id}}'+'">'+'{{$coo->coa_name}}'+'</option>'; 
@@ -3828,116 +3840,49 @@ function getModal(Location,TTTTT,e,type,sales){
                                         markup=markup+'</select>'; 
                                             
                                         markup=markup+'</td>';
-                                        markup=markup+'<td style="vertical-align:middle;" class="pr-0">';
-                                        markup=markup+'<select disabled required class="form-control" name="additionalcashCreditAccount'+AdditionalCashAccountCount+'" id="additionalcashCreditAccount'+AdditionalCashAccountCount+'">';
-                                            @foreach($COA as $coo)
-                                            markup=markup+'<option value="'+'{{$coo->id}}'+'">'+'{{$coo->coa_name}}'+'</option>'; 
-                                            @endforeach
                                         
-                                        markup=markup+'</select>';    
-                                        
-                                        markup=markup+'</td>';
                                         markup=markup+'<td style="text-align:right;vertical-align:middle;" class="pr-0">';
-                                                markup=markup+'<input style="text-align:right;" class="form-control" type="text" onchange="computeoutstanding()" onkeyup="computeoutstanding()" id="additionalCashAmount_mask'+AdditionalCashAccountCount+'" name="additionalCashAmount_mask'+AdditionalCashAccountCount+'" placeholder="0.00" value="0" required>';
-                                                markup=markup+'<input type="hidden" onchange="computeoutstanding()" onkeyup="computeoutstanding()" id="additionalCashAmount'+AdditionalCashAccountCount+'" name="additionalCashAmount'+AdditionalCashAccountCount+'" placeholder="0.00"  required>';
+                                                markup=markup+'<input style="text-align:right;" class="form-control" type="text" onchange="computeoutstanding()" onkeyup="SetCommaValue(\'additionalCashAmount_mask'+AdditionalCashAccountCount+'\',\'additionalCashAmount'+AdditionalCashAccountCount+'\'),swap_amounts(\'additionalCashAmount_mask_c'+AdditionalCashAccountCount+'\',\'additionalCashAmount_c'+AdditionalCashAccountCount+'\'),computeoutstanding()" id="additionalCashAmount_mask'+AdditionalCashAccountCount+'" name="additionalCashAmount_mask'+AdditionalCashAccountCount+'" placeholder="0.00" value="0" required>';
+                                                markup=markup+'<input type="hidden" onchange="computeoutstanding()" onkeyup="computeoutstanding()" id="additionalCashAmount'+AdditionalCashAccountCount+'" name="additionalCashAmount'+AdditionalCashAccountCount+'" placeholder="0.00" value="0"  required>';
+                                        markup=markup+'</td>';
+                                        markup=markup+'<td style="vertical-align:middle;" class="pr-0">';
+                                                markup=markup+'<input type="text" style="text-align: right;" id="additionalCashAmount_mask_c'+AdditionalCashAccountCount+'" class="form-control" name="additionalCashAmount_mask_c'+AdditionalCashAccountCount+'" onchange="computeoutstanding_c()" onkeyup="SetCommaValue(\'additionalCashAmount_mask_c'+AdditionalCashAccountCount+'\',\'additionalCashAmount_c'+AdditionalCashAccountCount+'\'),swap_amounts(\'additionalCashAmount_mask'+AdditionalCashAccountCount+'\',\'additionalCashAmount'+AdditionalCashAccountCount+'\'),computeoutstanding_c()" placeholder="0.00" value="0" required>';
+                                                markup=markup+'<input type="hidden"  id="additionalCashAmount_c'+AdditionalCashAccountCount+'"  onchange="computeoutstanding_c()" onkeyup="computeoutstanding_c()" name="additionalCashAmount_c'+AdditionalCashAccountCount+'" placeholder="0.00" value="0" required>';
                                         markup=markup+'</td>';
                                         markup=markup+'</tr>';
                                         $("#additionalCashSalesReceiptTbody").append(markup); 
-                                        document.getElementById('additionalcashCreditAccount'+AdditionalCashAccountCount).value=document.getElementById('sales_receipt_account_credit_account').value;
-                                        var textbox = '#additionalCashAmount_mask'+AdditionalCashAccountCount;
-                                                        var hidden = '#additionalCashAmount'+AdditionalCashAccountCount;
-                                                        
-                                                        $(textbox).keyup(function () {
-                                                            $(textbox).val(this.value.match(/[0-9.,-]*/));
-                                                        var num = $(textbox).val();
-                                                            var comma = /,/g;
-                                                            num = num.replace(comma,'');
-                                                            $(hidden).val(num);
-                                                            $(hidden).attr('title',num);
-                                                            var numCommas = addCommas(num);
-                                                            $(textbox).val(numCommas);
-                                                        });
-                                                        refreshpicjer();
+                                        //document.getElementById('additionalcashCreditAccount'+AdditionalCashAccountCount).value=document.getElementById('sales_receipt_account_credit_account').value;
+                                        
+                                        refreshpicjer();
+                                }
+                                function SetCommaValue(textbox,hidden){
+                                    $('#'+textbox).val(document.getElementById(textbox).value.match(/[0-9.,-]*/));
+                                    var num = $('#'+textbox).val();
+                                    var comma = /,/g;
+                                    num = num.replace(comma,'');
+                                    $('#'+hidden).val(num);
+                                    $('#'+hidden).attr('title',num);
+                                    var numCommas = addCommas(num);
+                                    $('#'+textbox).val(numCommas);
                                 }
                             </script>
                             <div id="NoOfChequeDivb" style="display:none;"><button type="button" onclick="GenerateFieldSalesReceipt()" class="btn btn-secondary btn-sm mt-1">Additional cheque</button></div>
                         </div>
                         <script>
-                            function SC_payment_method(input){
-                                if(input.value=="Cheque" || input.value=="Cash & Cheque"){
-                                    document.getElementById('NoOfChequeDivb').style.display="block";
-                                    
-                                    var x=document.getElementsByClassName("ChequeColumnssc");
-                                    var i;
-                                    for (i = 0; i < x.length; i++) {
-                                    x[i].style.display = "block";
-                                    }
-                                    if(input.value=="Cash & Cheque"){
-                                        document.getElementById('CashAccountFirstTD').append(document.getElementById('amountreceived_sr_mask'));
-                                        document.getElementById('SalesReceiptAmountFromChequeDivTransferDiv').style.display="none";
-                                        document.getElementById('CashAccountDivSalesReceipt').style.display="inline";
-                                        document.getElementById('ChequeAccountDivSalesReceipt').style.display="inline";
-                                        //document.getElementById('CashAmountLabel').innerHTML="Cash Amount";
-                                        document.getElementById("SalesReceiptAmountFromChequeDiv").style.display="table-row-group";
-                                    }else{
-                                        //Cheque
-                                        document.getElementById('ChequeAccountFirstTDTransger').append(document.getElementById('amountreceived_sr_mask'));
-                                        document.getElementById('SalesReceiptAmountFromChequeDivTransferDiv').style.display="table-row-group";
-                                        document.getElementById('CashAccountDivSalesReceipt').style.display="none";
-                                        document.getElementById('ChequeAccountDivSalesReceipt').style.display="inline";
-                                        //document.getElementById('CashAmountLabel').innerHTML="Cheque Amount";
-                                        document.getElementById("SalesReceiptAmountFromChequeDiv").style.display="none";
-                                        for(var ss=1;ss<=AdditionalCashAccountCount;ss++){
-                                        
-                                            $('#AdditionalCashTD'+ss).remove();
-
-                                        }
-                                        AdditionalCashAccountCount=0;
-                                        document.getElementById('additional_count_cash_account').value=AdditionalCashAccountCount;
-                                        computeoutstanding();
-                                    }
-                                }else{
-                                    //Cash
-                                    var x=document.getElementsByClassName("ChequeColumnssc");
-                                    var i;
-                                    for (i = 0; i < x.length; i++) {
-                                    x[i].style.display = "none";
-                                    } 
-                                    document.getElementById('CashAccountFirstTD').append(document.getElementById('amountreceived_sr_mask'));
-                                    document.getElementById('SalesReceiptAmountFromChequeDivTransferDiv').style.display="none";
-                                    //document.getElementById('CashAmountLabel').innerHTML="Cash Amount";
-                                    document.getElementById('NoOfChequeDivb').style.display="none";
-                                    document.getElementById("SalesReceiptAmountFromChequeDiv").style.display="none";
-                                    document.getElementById('CashAccountDivSalesReceipt').style.display="inline";
-                                    document.getElementById('ChequeAccountDivSalesReceipt').style.display="none";
-                                    //
-                                    for(var ss=1;ss<=additionalchequecount;ss++){
-                                        
-                                        $('#AdditionalChequeTRSalesReceipt'+ss).remove();
-
-                                    }
-                                    document.getElementById('BankAdditionalDiv').innerHTML="";
-                                    document.getElementById('BankChequeNoAdditionalDiv').innerHTML="";
-                                     
-                                    additionalchequecount=0;
-                                    document.getElementById('additional_count').value=additionalchequecount;
-                                    computeoutstanding();
-                                }
-                               
-                            }
+                            
                             function addCommas(nStr) {
-                                                nStr += '';
-                                                var comma = /,/g;
-                                                nStr = nStr.replace(comma,'');
-                                                x = nStr.split('.');
-                                                x1 = x[0];
-                                                x2 = x.length > 1 ? '.' + x[1] : '';
-                                                var rgx = /(\d+)(\d{3})/;
-                                                while (rgx.test(x1)) {
-                                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                                }
-                                                return x1 + x2;
-                                                }
+                                nStr += '';
+                                var comma = /,/g;
+                                nStr = nStr.replace(comma,'');
+                                x = nStr.split('.');
+                                x1 = x[0];
+                                x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+                            }
                         </script>
                         <div class="col-md-2 p-0 pr-3 " >
                             <div class="ChequeColumnssc" style="display:none;">
@@ -4029,13 +3974,13 @@ function getModal(Location,TTTTT,e,type,sales){
                         <table class="table table-light">
                             <thead class="thead-light">
                                 <tr>
-                                    <th colspan="3" style="vertical-align:middle;text-align:center;">Cash Accounts</th>
+                                    <th colspan="3" style="vertical-align:middle;text-align:center;">Accounts</th>
                                 </tr>
                                 <tr>
+                                    <th style="vertical-align:middle;text-align:center;width: 40%;">Account</th>
+                                    <th style="vertical-align:middle;text-align:center;width: 30%;border-right:1px solid #ccc;">Debit</th>
+                                    <th style="vertical-align:middle;text-align:center;width: 30%;border-right:1px solid #ccc;">Credit</th>
                                     
-                                    <th style="vertical-align:middle;text-align:center;width: 40%;border-right:1px solid #ccc;">Debit</th>
-                                    <th style="vertical-align:middle;text-align:center;width: 40%;border-right:1px solid #ccc;">Credit</th>
-                                    <th style="vertical-align:middle;text-align:center;width: 20%;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -4043,45 +3988,98 @@ function getModal(Location,TTTTT,e,type,sales){
                                     
                                     <td style="vertical-align:middle;" class="pl-0">
                                         <select class="form-control selectpicker" data-live-search="true" name="sales_receipt_account_debit_account"  id="sales_receipt_account_debit_account" required>
+                                        <option value="">--Select--</option>
                                         @foreach($c_o_a_sorted as $coa)
                                         <option value="{{$coa->id}}">{{$coa->coa_name}}</option>
                                         @endforeach
                                         </select>
                                         
                                     </td>
-                                    <td style="vertical-align:middle;" class="pr-0">
-                                        <select class="form-control" name="sales_receipt_account_credit_account"  id="sales_receipt_account_credit_account" required>
-                                        <option></option>
-                                        @foreach($c_o_a_sorted as $coa)
-                                        <option value="{{$coa->id}}">{{$coa->coa_name}}</option>
-                                        @endforeach
-                                        </select>
-                                        <script>
-                                        $(document).ready(function(){
-                                            document.getElementById('sales_receipt_account_credit_account').value="4";
-                                        })
-                                        </script>
-                                    </td>
+                                    
                                     <td style="vertical-align:middle;" id="CashAccountFirstTD" class="pr-0">
                                         <script>
                                             function computeoutstanding(){
                                                 var totalpayment=0;
                                                 var amountreceived_sr=document.getElementById('amountreceived_sr').value;
-                                                var amountreceived_sr_from_cheque=document.getElementById('amountreceived_sr_from_cheque').value;
-                                                for(var c=1;c<=additionalchequecount;c++){
-                                                    totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('amountreceived_sr_from_cheque'+c).value);
-                                                }
+                                                //var amountreceived_sr_from_cheque=document.getElementById('amountreceived_sr_from_cheque').value;
+                                                // for(var c=1;c<=additionalchequecount;c++){
+                                                //     totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('amountreceived_sr_from_cheque'+c).value);
+                                                // }
                                                 for(var c=1;c<=AdditionalCashAccountCount;c++){
                                                     totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('additionalCashAmount'+c).value);
                                                 }
                                                 
                                                 totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr);
-                                                totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr_from_cheque);
+                                                //totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr_from_cheque);
                                                 document.getElementById('sales_receiptbalance').innerHTML=number_format(totalpayment,2);
                                                 var sales_receiptbalance=$('#big_sales_receiptbalance').attr('title');
                                                 var totaloutstanding=parseFloat(sales_receiptbalance)-parseFloat(totalpayment);
                                                 document.getElementById('sales_receiptoutstandingbalance').innerHTML=number_format(totaloutstanding,2);
-                                                if(totaloutstanding<0){
+                                                document.getElementById('TotalDebitSalesReceiptTD').innerHTML='Total : '+number_format(totalpayment,2);
+                                                document.getElementById('hiddentotaldebitamountsalesreceipt').value=totalpayment;
+                                                var totalpayment=0;
+                                                var amountreceived_sr_c=document.getElementById('amountreceived_sr_c').value;
+                                                //var amountreceived_sr_from_cheque=document.getElementById('amountreceived_sr_from_cheque').value;
+                                                // for(var c=1;c<=additionalchequecount;c++){
+                                                //     totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('amountreceived_sr_from_cheque'+c).value);
+                                                // }
+                                                for(var c=1;c<=AdditionalCashAccountCount;c++){
+                                                    totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('additionalCashAmount_c'+c).value);
+                                                }
+                                                totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr_c);
+                                                var sales_receiptbalance=$('#big_sales_receiptbalance').attr('title');
+                                                var totaloutstanding2=parseFloat(sales_receiptbalance)-parseFloat(totalpayment);
+                                                document.getElementById('TotalCreditSalesReceiptTD').innerHTML='Total : '+number_format(totalpayment,2);
+                                                document.getElementById('hiddentotalcredtiamountsalesreceipt').value=totalpayment;
+                                                if(totaloutstanding<0 || totaloutstanding2<0){
+                                                    document.getElementById('salesradd').disabled=true;
+                                                    
+                                                }else{
+                                                    if(document.getElementById('hiddentotaldebitamountsalesreceipt').value==document.getElementById('hiddentotalcredtiamountsalesreceipt').value){
+                                                        document.getElementById('salesradd').disabled=false;
+                                                    }else{
+                                                        document.getElementById('salesradd').disabled=true;
+                                                    }
+                                                    
+                                                    
+                                                }
+
+                                            }
+                                            
+                                            function computeoutstanding_c(){
+                                                var totalpayment=0;
+                                                var amountreceived_sr_c=document.getElementById('amountreceived_sr_c').value;
+                                                //var amountreceived_sr_from_cheque=document.getElementById('amountreceived_sr_from_cheque').value;
+                                                // for(var c=1;c<=additionalchequecount;c++){
+                                                //     totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('amountreceived_sr_from_cheque'+c).value);
+                                                // }
+                                                for(var c=1;c<=AdditionalCashAccountCount;c++){
+                                                    totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('additionalCashAmount_c'+c).value);
+                                                }
+                                                totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr_c);
+                                                var sales_receiptbalance=$('#big_sales_receiptbalance').attr('title');
+                                                var totaloutstanding=parseFloat(sales_receiptbalance)-parseFloat(totalpayment);
+                                                document.getElementById('TotalCreditSalesReceiptTD').innerHTML='Total : '+number_format(totalpayment,2);
+                                                document.getElementById('hiddentotalcredtiamountsalesreceipt').value=totalpayment;
+                                                var totalpayment=0;
+                                                var amountreceived_sr=document.getElementById('amountreceived_sr').value;
+                                                //var amountreceived_sr_from_cheque=document.getElementById('amountreceived_sr_from_cheque').value;
+                                                // for(var c=1;c<=additionalchequecount;c++){
+                                                //     totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('amountreceived_sr_from_cheque'+c).value);
+                                                // }
+                                                for(var c=1;c<=AdditionalCashAccountCount;c++){
+                                                    totalpayment=parseFloat(totalpayment)+parseFloat(document.getElementById('additionalCashAmount'+c).value);
+                                                }
+                                                
+                                                totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr);
+                                                //totalpayment=parseFloat(totalpayment)+parseFloat(amountreceived_sr_from_cheque);
+                                                document.getElementById('sales_receiptbalance').innerHTML=number_format(totalpayment,2);
+                                                var sales_receiptbalance=$('#big_sales_receiptbalance').attr('title');
+                                                var totaloutstanding2=parseFloat(sales_receiptbalance)-parseFloat(totalpayment);
+                                                document.getElementById('sales_receiptoutstandingbalance').innerHTML=number_format(totaloutstanding,2);
+                                                document.getElementById('TotalDebitSalesReceiptTD').innerHTML='Total : '+number_format(totalpayment,2);
+                                                document.getElementById('hiddentotaldebitamountsalesreceipt').value=totalpayment;
+                                                if(totaloutstanding<0 || totaloutstanding2<0){
                                                     document.getElementById('salesradd').disabled=true;
                                                     
                                                 }else{
@@ -4093,15 +4091,15 @@ function getModal(Location,TTTTT,e,type,sales){
                                                 var textbox = '#amountreceived_sr_mask';
                                                 var hidden = '#amountreceived_sr';
                                                 
-                                                $(textbox).keyup(function () {
-                                                    $(textbox).val(this.value.match(/[0-9.,-]*/));
-                                                var num = $(textbox).val();
+                                                $('#amountreceived_sr_mask').keyup(function () {
+                                                    $('#amountreceived_sr_mask').val(this.value.match(/[0-9.,-]*/));
+                                                var num = $('#amountreceived_sr_mask').val();
                                                     var comma = /,/g;
                                                     num = num.replace(comma,'');
-                                                    $(hidden).val(num);
-                                                    $(hidden).attr('title',num);
+                                                    $('#amountreceived_sr').val(num);
+                                                    $('#amountreceived_sr').attr('title',num);
                                                     var numCommas = addCommas(num);
-                                                    $(textbox).val(numCommas);
+                                                    $('#amountreceived_sr_mask').val(numCommas);
                                                 });
                                                 function addCommas(nStr) {
                                                 nStr += '';
@@ -4116,12 +4114,34 @@ function getModal(Location,TTTTT,e,type,sales){
                                                 }
                                                 return x1 + x2;
                                                 }
+                                                var textbox2 = '#amountreceived_sr_mask_c';
+                                                var hidden2 = '#amountreceived_sr_c';
+                                                
+                                                $('#amountreceived_sr_mask_c').keyup(function () {
+                                                    $('#amountreceived_sr_mask_c').val(this.value.match(/[0-9.,-]*/));
+                                                var num = $('#amountreceived_sr_mask_c').val();
+                                                    var comma = /,/g;
+                                                    num = num.replace(comma,'');
+                                                    $('#amountreceived_sr_c').val(num);
+                                                    $('#amountreceived_sr_c').attr('title',num);
+                                                    var numCommas = addCommas(num);
+                                                    $('#amountreceived_sr_mask_c').val(numCommas);
+                                                });
                                             })
-                                            
+                                            function swap_amounts(mask,type){
+                                                console.log(mask+" "+type);
+                                                document.getElementById(mask).value="0";
+                                                document.getElementById(type).value="0";
+                                                $('#'+type).attr('title','0');
+                                               
+                                            }
                                         </script>
-                                        <input type="text" style="text-align: right;" id="amountreceived_sr_mask" class="form-control" name="amountreceived_sr_mask" onchange="computeoutstanding()" onkeyup="computeoutstanding()" placeholder="0.00" required>
-                                        <input type="hidden"  id="amountreceived_sr"  onchange="computeoutstanding()" onkeyup="computeoutstanding()" name="sr_amount_paid" placeholder="0.00" required>
-
+                                        <input type="text" style="text-align: right;" id="amountreceived_sr_mask" class="form-control" name="amountreceived_sr_mask" onchange="computeoutstanding()" onkeyup="swap_amounts('amountreceived_sr_mask_c','amountreceived_sr_c'),computeoutstanding()" placeholder="0.00" value='0' required>
+                                        <input type="hidden"  id="amountreceived_sr"  onchange="computeoutstanding()" onkeyup="computeoutstanding()" value='0' name="sr_amount_paid" placeholder="0.00" required>
+                                    </td>
+                                    <td style="vertical-align:middle;" class="pr-0">
+                                        <input type="text" style="text-align: right;" id="amountreceived_sr_mask_c" class="form-control" name="amountreceived_sr_mask_c" onchange="computeoutstanding_c()" onkeyup="swap_amounts('amountreceived_sr_mask','amountreceived_sr'),computeoutstanding_c()" placeholder="0.00" value='0' required>
+                                        <input type="hidden"  id="amountreceived_sr_c"  onchange="computeoutstanding_c()" onkeyup="computeoutstanding_c()" value='0' name="amountreceived_sr_c" placeholder="0.00" required>
                                     </td>
                                 </tr>
                                 
@@ -4131,145 +4151,23 @@ function getModal(Location,TTTTT,e,type,sales){
                             </tbody>
                             <tbody>
                                 <tr>
-                                    <td colspan="3" style="vertical-align:middle;">
-                                        <button type="button" onclick="GenerateAdditionalCashAccountsSalesReceipt()" class="btn btn-primary">Add Additional Cash Payment</button>
+                                    <td  style="vertical-align:middle;">
+                                        <input type="hidden" id="hiddentotaldebitamountsalesreceipt" name="hiddentotaldebitamountsalesreceipt">
+                                        <input type="hidden" id="hiddentotalcredtiamountsalesreceipt" name="hiddentotalcredtiamountsalesreceipt">
+                                        <button type="button" onclick="GenerateAdditionalCashAccountsSalesReceipt()" class="btn btn-primary">Add Account</button>
+                                    </td>
+                                    <td  style="vertical-align:middle;text-align:right;font-size:large;font-weight:bold;" id="TotalDebitSalesReceiptTD">
+                                        Total : 0.00
+                                    </td>
+                                    <td  style="vertical-align:middle;text-align:right;font-size:large;font-weight:bold;" id="TotalCreditSalesReceiptTD">
+                                        Total : 0.00
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
 
                     </div> 
-                    <div class="col-md-12 p-0 mt-4"  id="ChequeAccountDivSalesReceipt">
-                        <table class="table table-light">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th colspan="3" style="vertical-align:middle;text-align:center;">Cheque Accounts</th>
-                                </tr>
-                                <tr>
-                                    
-                                    <th style="vertical-align:middle;text-align:center;width: 40%;border-right:1px solid #ccc;">Debit</th>
-                                    <th style="vertical-align:middle;text-align:center;width: 40%;border-right:1px solid #ccc;">Credit</th>
-                                    <th style="vertical-align:middle;text-align:center;width: 20%;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    
-                                    <td style="vertical-align:middle;" class="pl-0">
-                                        <select class="form-control selectpicker" data-live-search="true" name="sales_receipt_account_debit_account_cheque"  id="sales_receipt_account_debit_account_cheque" required>
-                                        <?php
-                                        $a = 'Cash Clearing Account';
-                                        ?>
-                                        @foreach($c_o_a_sorted as $coa)
-                                        @if (!empty($sales_setting))
-                                            @if ($coa->id==$sales_setting->sales_sales_receipt_preferred_debit_cheque_account)
-                                            <option selected value="{{$coa->id}}">{{$coa->coa_name}}</option>     
-                                            @else
-                                            <option  value="{{$coa->id}}">{{$coa->coa_name}}</option>    
-                                            @endif
-                                        @else
-                                            @if (strpos($coa->coa_name, $a) !== false)
-                                            <option selected value="{{$coa->id}}">{{$coa->coa_name}}</option>     
-                                            @else
-                                            <option  value="{{$coa->id}}">{{$coa->coa_name}}</option>    
-                                            @endif
-                                        
-                                        @endif
-                                        
-                                        @endforeach
-                                        </select>
-                                        <script>
-                                        @if (!empty($sales_setting))
-                                        var countryVal="{{$sales_setting->sales_sales_receipt_preferred_debit_cheque_account}}";
-                                        @else
-                                        var countryVal="1";  
-                                        @endif
-                                       
-                                        $("#sales_receipt_account_debit_account_cheque").change(function() {
-                                        var newVal = $(this).val();
-                                        if (!confirm("Are you sure you want to change to another Account?")) {
-                                            $(this).val(countryVal); //set back
-                                            return;                  //abort!
-                                        }
-                                        //destroy branches
-                                        countryVal = newVal;       //store new value for next time
-                                        });
-                                        </script>
-                                    </td>
-                                    <td style="vertical-align:middle;" class="pr-0">
-                                        <select class="form-control" name="sales_receipt_account_credit_account_cheque"  id="sales_receipt_account_credit_account_cheque" required>
-                                        <option></option>
-                                        @foreach($c_o_a_sorted as $coa)
-                                        <option title="{{$coa->coa_title}}" value="{{$coa->id}}">{{$coa->coa_name}}</option>
-                                        @endforeach
-                                        </select>
-                                        
-                                    </td>
-                                    <td style="vertical-align:middle;" id="ChequeAccountFirstTD" class="pr-0 pt-4">
-                                       <table  class="table table-borderless" >
-                                        <tbody id="SalesReceiptAmountFromChequeDivTransferDiv" >
-                                            <tr>
-                                            <td style="text-align:right;vertical-align:middle;">
-                                                    <p class="text-dark font-weight-bold">Cheque Amount</p>
-                                            </td>
-                                            <td style="vertical-align:middle;" id="ChequeAccountFirstTDTransger">
-                                                
-                                            </td>
-                                            </tr>
-                                        </tbody>
-                                        <tbody id="SalesReceiptAmountFromChequeDiv" style="display:none;">                    
-                                        <tr>
-                                        <td style="text-align:right;vertical-align:middle;">
-                                                <p class="text-dark font-weight-bold">Cheque Amount</p>
-                                        </td>
-                                        <td style="vertical-align:middle;">
-                                            
-                                                    <script>
-                                                    $(document).ready(function(){
-                                                        var textbox = '#amountreceived_sr_from_cheque_mask';
-                                                        var hidden = '#amountreceived_sr_from_cheque';
-                                                        
-                                                        $(textbox).keyup(function () {
-                                                            $(textbox).val(this.value.match(/[0-9.,-]*/));
-                                                        var num = $(textbox).val();
-                                                            var comma = /,/g;
-                                                            num = num.replace(comma,'');
-                                                            $(hidden).val(num);
-                                                            $(hidden).attr('title',num);
-                                                            var numCommas = addCommas(num);
-                                                            $(textbox).val(numCommas);
-                                                        });
-                                                        function addCommas(nStr) {
-                                                        nStr += '';
-                                                        var comma = /,/g;
-                                                        nStr = nStr.replace(comma,'');
-                                                        x = nStr.split('.');
-                                                        x1 = x[0];
-                                                        x2 = x.length > 1 ? '.' + x[1] : '';
-                                                        var rgx = /(\d+)(\d{3})/;
-                                                        while (rgx.test(x1)) {
-                                                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                                        }
-                                                        return x1 + x2;
-                                                        }
-                                                    })
-                                                    </script>
-                                                    <input type="text" style="text-align: right;" id="amountreceived_sr_from_cheque_mask" onchange="computeoutstanding()" onkeyup="computeoutstanding()" name="amountreceived_sr_from_cheque_mask" class="form-control" placeholder="0.00" value="0" required>
-                                                    <input type="hidden" step="0.01"  id="amountreceived_sr_from_cheque" onchange="computeoutstanding()" onkeyup="computeoutstanding()" name="sr_amount_paid_from_cheque" placeholder="0.00" value="0" required>
-                                            
-                                        </td>
-                                        </tr>
-                                        </tbody>
-                                        <tbody id="AmountFromChequeAdditional" >
-                                            
-                                        </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                
-                            </tbody>
-                        </table>
-                    </div> 
+                    
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 pl-0">
                             <p>Message Displayed on Sales Receipt</p>
@@ -5626,7 +5524,7 @@ function getModal(Location,TTTTT,e,type,sales){
     @else
     $(document).ready(function(){
         //$("#add_supplier_credit_form :input").prop("disabled", true);
-        document.getElementById('CostCenterSupplierCredit').disabled=false;
+        //document.getElementById('CostCenterSupplierCredit').disabled=false;
         document.getElementById('suppliercreditclosemodalbutton').disabled=false;
         
     });
@@ -5662,8 +5560,84 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="my-3 p-0">
                         <div class="col-md-3 p-0  pr-3">
                             <p>Supplier Credit No.</p>
+                            <input type="hidden" name="supplier_credit_bill_no" id="supplier_credit_bill_no" oninput="fetch_bill_info()">
                             <input type="text" name="suppliers_credit_no" id="suppliers_credit_no" required class="form-control" onkeyup="setsupplier_credit_no_new()"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
                             <script>
+                                function supplier_credit_modal_open(id){
+                                    document.getElementById('supplier_credit_bill_no').value=id;
+                                    fetch_bill_info();
+                                }
+                                function fetch_bill_info(){
+                                    var supplier_credit_bill_no=document.getElementById('supplier_credit_bill_no').value;
+                                    if(supplier_credit_bill_no!=''){
+                                        document.getElementById('clear_lines_sc_account').disabled=false;
+                                        document.getElementById('clear_lines_sc_account').click();
+                                        $.ajax({
+                                            method: "POST",
+                                            headers: {
+                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                            },
+                                            url: "check_bill_no",
+                                            data: {invoice_no_field:supplier_credit_bill_no,_token: '{{csrf_token()}}'},
+                                            success: function (data) {
+                                                if(data>0){
+                                                    $.ajax({
+                                                        method: "POST",
+                                                        headers: {
+                                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                        },
+                                                        url: "get_bill_info_for_supplier_credit",
+                                                        data: {supplier_credit_bill_no:supplier_credit_bill_no,_token: '{{csrf_token()}}'},
+                                                        success: function (data) {
+                                                            console.log(data);
+                                                            document.getElementById('sc_customer').value=data['et_customer'];
+                                                            @foreach($JournalEntry as $JE)
+                                                                if("{{$JE->other_no}}"==supplier_credit_bill_no && "{{$JE->je_transaction_type}}"=="Bill"){
+                                                                    document.getElementById('CostCenterSupplierCredit').value="{{$JE->je_cost_center}}";
+                                                                }
+                                                            @endforeach
+                                                            
+                                                            document.getElementById('sc_reference_no').value=data['et_shipping_address'];
+                                                            document.getElementById('sc_reference_no_po').value=data['et_shipping_to'];
+                                                            document.getElementById('sc_reference_no_ci').value=data['et_shipping_via'];
+                                                            document.getElementById('sc_memo').value=data['et_memo'];
+                                                            document.getElementById('supplier_credit_account_debit_account').value=data['et_credit_account'];
+                                                            $.ajax({
+                                                                method: "POST",
+                                                                headers: {
+                                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                                },
+                                                                url: "get_bill_account_detail",
+                                                                data: {supplier_credit_bill_no:supplier_credit_bill_no,_token: '{{csrf_token()}}'},
+                                                                success: function (data) {
+                                                                    console.log(data);
+                                                                    for(var c=0;c<data.length;c++){
+                                                                        if(data[c]['et_ad_rate']=='1'){
+                                                                            var markup = '<tr class="sc_lines_account " id="sc_line_account'+$('#sc_account_table tr').length+'"><td class="pt-3-half" style="vertical-align:middle;text-align:center;"><input type="checkbox"  id="return_item_sc'+$('#sc_account_table tr').length+'"  name="return_item_sc[]" value="'+data[c]['et_ad_id']+'"><input type="hidden" name=hiddenet_ad_id'+$('#sc_account_table tr').length+' id=hiddenet_ad_id'+$('#sc_account_table tr').length+' value="'+data[c]['et_ad_id']+'"></td><td class="pt-3-half" id="number_tag_sc_account" contenteditable="false">'+$('#sc_account_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc selectpicker form-control" disabled data-live-search="true" id="select_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td><td class="pt-3-half"><input class="sc_data description_select_sc form-control" disabled id="select_description_sc'+$('#sc_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" onclick="this.select();" id="select_sc_amount'+$('#sc_account_table tr').length+'" style="border:0; text-align:right;"></td></tr>';
+                                                                            var rowcount=$('#sc_account_table tr').length;
+                                                                            $("#sc_account_table").append(markup);
+                                                                        }else{
+                                                                            var markup = '<tr class="sc_lines_account table-success" id="sc_line_account'+$('#sc_account_table tr').length+'"><td class="pt-3-half" style="vertical-align:middle;text-align:center;"><input style="display:none;" checked type="checkbox" id="return_item_sc'+$('#sc_account_table tr').length+'"  name="return_item_sc[]" value="'+data[c]['et_ad_id']+'"><input type="hidden" name=hiddenet_ad_id'+$('#sc_account_table tr').length+' id=hiddenet_ad_id'+$('#sc_account_table tr').length+'></td><td class="pt-3-half" id="number_tag_sc_account" contenteditable="false">'+$('#sc_account_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc selectpicker form-control" disabled data-live-search="true" id="select_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td><td class="pt-3-half"><input class="sc_data description_select_sc form-control" disabled id="select_description_sc'+$('#sc_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" onclick="this.select();" id="select_sc_amount'+$('#sc_account_table tr').length+'" style="border:0; text-align:right;"></td></tr>';
+                                                                            var rowcount=$('#sc_account_table tr').length;
+                                                                            $("#sc_account_table").append(markup);
+                                                                        }
+                                                                        
+                                                                        document.getElementById('select_account_sc'+rowcount).value=data[c]['et_ad_product'];
+                                                                        document.getElementById('select_description_sc'+rowcount).value=data[c]['et_ad_desc'];
+                                                                        document.getElementById('select_sc_amount'+rowcount).value=data[c]['et_ad_total'];
+                                                                        
+                                                                    }
+                                                                    $('#sc_customer').change();
+                                                                    refreshpicjer();
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });  
+                                    }
+                                }
                                 function setsupplier_credit_no_new(){
                                     var invoice_no_field=document.getElementById('suppliers_credit_no').value;
                                     $.ajax({
@@ -5688,14 +5662,14 @@ function getModal(Location,TTTTT,e,type,sales){
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Name</p>
-                            <select  name="sc_customer"  id="sc_customer" class="w-100 selectpicker" data-live-search="true">
-                                    <option value="">--Select Customer--</option>
-                                    {!! $customers_list_after_foreach !!}
-                                    </select>
+                            <select  name="sc_customer"  id="sc_customer" class="w-100 selectpicker" data-live-search="true" disabled>
+                            <option value="">--Select Customer--</option>
+                            {!! $customers_list_after_foreach !!}
+                            </select>
                         </div>
                         <div class="col-md-2 p-0 pr-3" style="{{!empty($numbering) && $numbering->use_cost_center=="Off"? 'display:none;' : ''}}">
                             <p>Cost Center</p>
-                            <select class="selectpicker" data-live-search="true" name="CostCenterSupplierCredit" onchange="EnableSupplierCreditInput(this)" id="CostCenterSupplierCredit" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}}>
+                            <select class="selectpicker" data-live-search="true" name="CostCenterSupplierCredit" onchange="EnableSupplierCreditInput(this)" id="CostCenterSupplierCredit" style="width:90%;" {{!empty($numbering) && $numbering->use_cost_center=="Off"? '' : 'required'}} disabled>
                                 <option value="">--Select Cost Center--</option>
                                 {!! $cc_list_after_foreach !!}
                                 </select>
@@ -5709,15 +5683,23 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="col-md-12 p-0 mt-4 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Mailing Address</p>
-                            <input type="text" name="sc_mail_address" id="sc_mail_address" class="w-100 form-control">
+                            <input type="text" name="sc_mail_address" id="sc_mail_address" class="w-100 form-control" disabled>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Payment Date</p>
                             <input type="date" name="sc_date" class="w-100 form-control">
                         </div>
                         <div class="col-md-2 p-0 pr-3">
-                            <p>Reference No. </p>
-                            <input type="text" name="sc_reference_no" class="w-100 form-control">
+                            <p>Request Form</p>
+                            <input type="text" id="sc_reference_no" name="sc_reference_no" class="w-100 form-control" disabled>
+                        </div>
+                        <div class="col-md-2 p-0 pr-3">
+                            <p>Purchase Order</p>
+                            <input type="text" name="sc_reference_no_po" id="sc_reference_no_po" class="w-100 form-control" disabled>
+                        </div>
+                        <div class="col-md-2 p-0 pr-3">
+                            <p>Charge Invoice</p>
+                            <input type="text" name="sc_reference_no_ci" id="sc_reference_no_ci" class="w-100 form-control" disabled>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1 mt-3">
@@ -5725,17 +5707,18 @@ function getModal(Location,TTTTT,e,type,sales){
                     </div>
                     <table class="table table-bordered table-responsive-md table-striped text-left font14" id="sc_account_table">
                         <tr>
+                            <th class="text-center"></th>
                             <th class="text-left">#</th>
                             <th class="text-left">ACCOUNT</th>
                             <th class="text-left">DESCRIPTION</th>
                             <th class="text-left">AMOUNT</th>
-                            <th class="text-center"></th>
+                            
                         </tr>
                     </table>
-                    <div class="col-md-12 p-0">
+                    <div class="col-md-12 p-0" style="display:none;">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_sc_account">Add Items</button>
+                                {{-- <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_sc_account">Add Items</button> --}}
                                 <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_sc_account">Clear All Items</button>
                             </div>
                         </div>
@@ -5755,7 +5738,7 @@ function getModal(Location,TTTTT,e,type,sales){
                         </tr>
                     </table>
                     <div class="col-md-12 p-0" style="display:none;">
-                        <div class="float-left">
+                        <div class="float-left" >
                             <div class="d-inline-flex">
                                 <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_sc_item">Add Items</button>
                                 <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_sc_item">Clear All Items</button>
@@ -5771,7 +5754,7 @@ function getModal(Location,TTTTT,e,type,sales){
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" name="sc_memo" class="w-100 form-control"></textarea>
+                            <textarea rows="3" name="sc_memo" id="sc_memo" class="w-100 form-control" required></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0" style="display:none;">
                             <div class="d-inline-flex">
@@ -5797,7 +5780,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                 <tr>
                                     <td style="vertical-align:middle;text-align:center;">Debit</td>
                                     <td style="vertical-align:middle;" class="pr-0">
-                                        <select class="form-control selectpicker" data-live-search="true" name="supplier_credit_account_debit_account"  id="supplier_credit_account_debit_account" required>
+                                        <select class="form-control selectpicker" data-live-search="true" name="supplier_credit_account_debit_account"  id="supplier_credit_account_debit_account" required disabled>
                                         <option value="" selected>--Select Account--</option>
                                         @foreach($c_o_a_sorted as $coa)
                                         @if ($coa->id=="3")
@@ -7051,7 +7034,7 @@ function addCardCreditedit(){
             <div class="modal-footer">
                 <button type="button" style="display:none;" id="setselectpickerbutton">
                 <button type="button" id="canceljournalentry" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-success rounded" disabled id="JournalEntrySaveButton" onclick="saveJournalEntry()">Save</button>
+                <button class="btn btn-success rounded"  id="JournalEntrySaveButton" {{$user_position->require_cost_center=='1'? '' : 'disabled'}} onclick="saveJournalEntry()">Save</button>
             </div>
         </div>
     </div>
@@ -10055,6 +10038,7 @@ function edit_journal_entries(je_no){
                 'orderable':false,
                 'className': 'dt-body-center',
                 'render': function (data, type, full, meta){
+                    console.log(data);
                     if(data=="Cancelled" || data==""){
                         return data;
                     }else{
@@ -10300,7 +10284,7 @@ function edit_journal_entries(je_no){
     function editInvoice(){
         $('#total_balance_edit').val($('#invoicetotal_edit').text());
         $(".invoice_lines_edit").each(function() {
-            $("#product_count_edit").val(parseInt($("#product_count_edit").val())+1);
+            $("#product_count_edit").val(parseFloat($("#product_count_edit").val())+1);
         });
         var counter = 0;
         var checker = 0;
@@ -10347,7 +10331,7 @@ function edit_journal_entries(je_no){
         $('#total_balance').val($('#invoicetotal').attr('title'));
            
         $(".invoice_lines").each(function() {
-            $("#product_count").val(parseInt($("#product_count").val())+1);
+            $("#product_count").val(parseFloat($("#product_count").val())+1);
         });
         
         var counter = 0;
@@ -10434,7 +10418,7 @@ function edit_journal_entries(je_no){
         $('#total_balance_estimate').val($('#estimatetotal').attr('title'));
         
         $(".estimate_lines").each(function() {
-            $("#product_count_estimate").val(parseInt($("#product_count_estimate").val())+1);
+            $("#product_count_estimate").val(parseFloat($("#product_count_estimate").val())+1);
         });
 
         var counter = 0;
@@ -10487,80 +10471,87 @@ function edit_journal_entries(je_no){
         document.getElementById('salesrcustomer').disabled=false;
         document.getElementById('CostCenterSalesReceipt').disabled=false;
         $('#total_balance_sales_receipt').val($('#sales_receipttotal').attr('title'));
-        var amountreceived_sr_from_cheque=document.getElementById('amountreceived_sr_from_cheque').value;
-        var amountreceived_sr=document.getElementById('amountreceived_sr').value;
-        var totalpayments=parseFloat(amountreceived_sr)+parseFloat(amountreceived_sr_from_cheque);
         
-        for(var c=1;c<=additionalchequecount;c++){
-            totalpayments=parseFloat(totalpayments)+parseFloat(document.getElementById('amountreceived_sr_from_cheque'+c).value);
-        }
+        var amountreceived_sr=document.getElementById('amountreceived_sr').value;
+        var totalpayments=parseFloat(amountreceived_sr);
+        
+        
         console.log(totalpayments+" "+$('#big_sales_receiptbalance').attr('title'));
         if(totalpayments<=parseFloat($('#big_sales_receiptbalance').attr('title'))){
-            console.log(totalpayments+" totalpayments");
-            $(".sales_receipt_lines").each(function() {
-                $("#product_count_sales_receipt").val(parseInt($("#product_count_sales_receipt").val())+1);
-            });
+            var sales_receipt_debit=document.getElementById('hiddentotaldebitamountsalesreceipt').value;
+            var sales_receipt_credit=document.getElementById('hiddentotalcredtiamountsalesreceipt').value;
+            if(sales_receipt_debit==sales_receipt_credit){
+                console.log(totalpayments+" totalpayments");
+                $(".sales_receipt_lines").each(function() {
+                    $("#product_count_sales_receipt").val(parseFloat($("#product_count_sales_receipt").val())+1);
+                });
 
-            
-            var counter = 0;
-            var checker = 0;
-
-            $(".sales_receipt_lines").find('.sales_receipt_data').each(function() {
-                if( typeof( $(this).attr('id') ) != 'undefined' ) {
-                var id = $(this).attr("id");
-                var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
                 
-                $(this).attr("name", name+counter);
-                
-                checker++;
-                if(checker%4==0){
-                    counter++;
-                }
-                }
-            });
-            
+                var counter = 0;
+                var checker = 0;
 
-            $.ajax({
-                method: "POST",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: "{{ route('add_sales_receipt') }}",
-                dataType: "text",
-                data: $('#add_sales_receipt_form').serialize(),
-                success: function (data) {
-                    console.log(data);
-                    document.getElementById('salesrcustomer').disabled=false;
-                    document.getElementById('CostCenterSalesReceipt').disabled=false;
-                    //swal("Done!", "Added sales receipt", "success");
-                    swal({title: "Done!", text:"Added sales receipt", type: 
-                    "success"}).then(function(){
-                   
-                    location.reload();                                    
-                    });
-                    if(document.getElementById('reload_sr').value=="1"){
-                        setSalesReceiptinJournalEntry($("#product_count_sales_receipt").val(),data,"Sales Receipt",$("#CostCenterSalesReceipt").val());
-                    }else{
-                        $("#product_count_sales_receipt").val('0');
-                        checker = 0;
-                        counter = 0;
-                        $('#add_sales_receipt_form')[0].reset();
-                        $('.sales_receipt_lines').remove();
-                        
-                        sales_table.ajax.reload();
-                        sales_table_invoice.ajax.reload();
+                $(".sales_receipt_lines").find('.sales_receipt_data').each(function() {
+                    if( typeof( $(this).attr('id') ) != 'undefined' ) {
+                    var id = $(this).attr("id");
+                    var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+                    
+                    $(this).attr("name", name+counter);
+                    
+                    checker++;
+                    if(checker%4==0){
+                        counter++;
                     }
+                    }
+                });
+                
+                
+                $.ajax({
+                    method: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{ route('add_sales_receipt') }}",
+                    dataType: "text",
+                    data: $('#add_sales_receipt_form').serialize(),
+                    success: function (data) {
+                        console.log(data);
+                        document.getElementById('salesrcustomer').disabled=false;
+                        document.getElementById('CostCenterSalesReceipt').disabled=false;
+                        //swal("Done!", "Added sales receipt", "success");
+                        swal({title: "Done!", text:"Added sales receipt", type: 
+                        "success"}).then(function(){
                     
-                    
-                },
-                error: function (data) {
-                    document.getElementById('salesrcustomer').disabled=false;
-                    document.getElementById('CostCenterSalesReceipt').disabled=false;
-                    swal("Error!", "Sales receipt failed", "error");
-                }
-            });
+                        location.reload();                                    
+                        });
+                        if(document.getElementById('reload_sr').value=="1"){
+                            setSalesReceiptinJournalEntry($("#product_count_sales_receipt").val(),data,"Sales Receipt",$("#CostCenterSalesReceipt").val());
+                        }else{
+                            $("#product_count_sales_receipt").val('0');
+                            checker = 0;
+                            counter = 0;
+                            $('#add_sales_receipt_form')[0].reset();
+                            $('.sales_receipt_lines').remove();
+                            
+                            sales_table.ajax.reload();
+                            sales_table_invoice.ajax.reload();
+                        }
+                        
+                        
+                    },
+                    error: function (data) {
+                        document.getElementById('salesrcustomer').disabled=false;
+                        document.getElementById('CostCenterSalesReceipt').disabled=false;
+                        swal("Error!", "Sales receipt failed", "error");
+                    }
+                });
+            }else{
+                swal("Error!", "Account Debit and Credit not Balanced", "error");
+            }
+            
+        
         }else{
-            alert('Amount Exceed Total Balance');
+            swal("Error!", "Amount Exceed Total Balance", "error");
+            
         }
         
 
@@ -10571,7 +10562,7 @@ function edit_journal_entries(je_no){
         $('#total_balance_refund_receipt').val($('#refund_receipttotal').text());
 
         $(".refund_receipt_lines").each(function() {
-            $("#product_count_refund_receipt").val(parseInt($("#product_count_refund_receipt").val())+1);
+            $("#product_count_refund_receipt").val(parseFloat($("#product_count_refund_receipt").val())+1);
         });
 
         var counter = 0;
@@ -10621,7 +10612,7 @@ function edit_journal_entries(je_no){
         $('#total_balance_delayed_charge').val($('#delayed_chargetotal').text());
 
         $(".delayed_charge_lines").each(function() {
-            $("#product_count_delayed_charge").val(parseInt($("#product_count_delayed_charge").val())+1);
+            $("#product_count_delayed_charge").val(parseFloat($("#product_count_delayed_charge").val())+1);
         });
 
         var counter = 0;
@@ -10671,7 +10662,7 @@ function edit_journal_entries(je_no){
     $('#total_balance_delayed_credit').val($('#delayed_credittotal').text());
 
     $(".delayed_credit_lines").each(function() {
-        $("#product_count_delayed_credit").val(parseInt($("#product_count_delayed_credit").val())+1);
+        $("#product_count_delayed_credit").val(parseFloat($("#product_count_delayed_credit").val())+1);
     });
 
     var counter = 0;
@@ -10721,7 +10712,7 @@ function edit_journal_entries(je_no){
         $('#total_balance_credit_note').val($('#credit_notetotal').attr('title'));
 
         $(".credit_note_lines").each(function() {
-            $("#product_count_credit_note").val(parseInt($("#product_count_credit_note").val())+1);
+            $("#product_count_credit_note").val(parseFloat($("#product_count_credit_note").val())+1);
         });
 
         var counter = 0;
@@ -10777,11 +10768,11 @@ function addExpense(){
     //$('#total_balance').val($('#invoicetotal').text());
     
     $(".expense_lines_item").each(function() {
-        $("#item_count_expenses").val(parseInt($("#item_count_expenses").val())+1);
+        $("#item_count_expenses").val(parseFloat($("#item_count_expenses").val())+1);
     });
 
     $(".expense_lines_account").each(function() {
-        $("#account_count_expenses_add").val(parseInt($("#account_count_expenses_add").val())+1);
+        $("#account_count_expenses_add").val(parseFloat($("#account_count_expenses_add").val())+1);
     });
 
     var counter = 0;
@@ -10851,11 +10842,11 @@ function addCheque(){
     //$('#total_balance').val($('#invoicetotal').text());
 
     $(".cheque_lines_item").each(function() {
-        $("#item_count_cheques").val(parseInt($("#item_count_cheques").val())+1);
+        $("#item_count_cheques").val(parseFloat($("#item_count_cheques").val())+1);
     });
 
     $(".cheque_lines_account").each(function() {
-        $("#account_count_cheques").val(parseInt($("#account_count_cheques").val())+1);
+        $("#account_count_cheques").val(parseFloat($("#account_count_cheques").val())+1);
     });
 
     var counter = 0;
@@ -10924,11 +10915,11 @@ function addBill(){
 //$('#total_balance').val($('#invoicetotal').text());
 
 $(".bill_lines_item").each(function() {
-    $("#item_count_bills").val(parseInt($("#item_count_bills").val())+1);
+    $("#item_count_bills").val(parseFloat($("#item_count_bills").val())+1);
 });
 
 $(".bill_lines_account").each(function() {
-    $("#account_count_bills").val(parseInt($("#account_count_bills").val())+1);
+    $("#account_count_bills").val(parseFloat($("#account_count_bills").val())+1);
 });
 
 var counter = 0;
@@ -11007,11 +10998,11 @@ function addPurchaseOrder(){
 //$('#total_balance').val($('#invoicetotal').text());
 
 $(".po_lines_item").each(function() {
-    $("#item_count_pos").val(parseInt($("#item_count_pos").val())+1);
+    $("#item_count_pos").val(parseFloat($("#item_count_pos").val())+1);
 });
 
 $(".po_lines_account").each(function() {
-    $("#account_count_pos").val(parseInt($("#account_count_pos").val())+1);
+    $("#account_count_pos").val(parseFloat($("#account_count_pos").val())+1);
 });
 
 var counter = 0;
@@ -11073,21 +11064,22 @@ $.ajax({
 }
 
 function addSupplierCredit(){
+$("#add_supplier_credit_form :input").prop("disabled", false);
 
 //$('#total_balance').val($('#invoicetotal').text());
 
 $(".sc_lines_item").each(function() {
-    $("#item_count_scs").val(parseInt($("#item_count_scs").val())+1);
+    $("#item_count_scs").val(parseFloat($("#item_count_scs").val())+1);
 });
 
 $(".sc_lines_account").each(function() {
-    $("#account_count_scs").val(parseInt($("#account_count_scs").val())+1);
+    $("#account_count_scs").val(parseFloat($("#account_count_scs").val())+1);
 });
 
 var counter = 0;
 var checker = 0;
 
-var counter1 = 0;
+var counter1 = 1;
 var checker1 = 0;
 
 $(".sc_lines_item").find('.sc_data').each(function() {
@@ -11128,18 +11120,22 @@ $.ajax({
     dataType: "text",
     data: $('#add_supplier_credit_form').serialize(),
     success: function (data) {
+        console.log(data);
+
         swal("Done!", "Added supplier credit", "success");
         //$('#Vouhcermooodall').click();
-        $("#item_count_scs").val('0');
-        $("#account_count_scs").val('0');
-        checker = 0;
-        counter = 0;
-        $('#add_supplier_credit_form')[0].reset();
-        $('.sc_lines_item').remove();
-        $('.sc_lines_account').remove();
-        sales_table.ajax.reload();
-        sales_table_invoice.ajax.reload();
+        // $("#item_count_scs").val('0');
+        // $("#account_count_scs").val('0');
+        // checker = 0;
+        // counter = 0;
+        // $('#add_supplier_credit_form')[0].reset();
+        // $('.sc_lines_item').remove();
+        // $('.sc_lines_account').remove();
+        // sales_table.ajax.reload();
+        // sales_table_invoice.ajax.reload();
         location.reload();
+        $("#add_supplier_credit_form :input").prop("disabled", true);
+        document.getElementById('sc_memo').disabled=false;
     },
     error: function (data) {
         alert(data.responseText);
@@ -11154,11 +11150,11 @@ function addCardCredit(){
 //$('#total_balance').val($('#invoicetotal').text());
 
 $(".cc_lines_item").each(function() {
-    $("#item_count_ccs").val(parseInt($("#item_count_ccs").val())+1);
+    $("#item_count_ccs").val(parseFloat($("#item_count_ccs").val())+1);
 });
 
 $(".cc_lines_account").each(function() {
-    $("#account_count_ccs").val(parseInt($("#account_count_ccs").val())+1);
+    $("#account_count_ccs").val(parseFloat($("#account_count_ccs").val())+1);
 });
 
 var counter = 0;
@@ -11224,11 +11220,11 @@ $.ajax({
 //$('#total_balance').val($('#invoicetotal').text());
 
 $(".cc_lines_item").each(function() {
-    $("#item_count_ccs").val(parseInt($("#item_count_ccs").val())+1);
+    $("#item_count_ccs").val(parseFloat($("#item_count_ccs").val())+1);
 });
 
 $(".cc_lines_account").each(function() {
-    $("#account_count_ccs").val(parseInt($("#account_count_ccs").val())+1);
+    $("#account_count_ccs").val(parseFloat($("#account_count_ccs").val())+1);
 });
 
 var counter = 0;
@@ -11533,7 +11529,7 @@ function removeComma(str){
         });
 
         Date.prototype.addDays = function(days) {
-            this.setDate(this.getDate() + parseInt(days));
+            this.setDate(this.getDate() + parseFloat(days));
             return this;
         };
 
@@ -12211,10 +12207,11 @@ function removeComma(str){
                         $('#sr_bill_address').val($('#sr_bill_address').val().replace(' null',''));
                         $('#sr_email').val(customer['email']);
                         // $('#cheque_email').val(customer['terms']);
-                        
-                        if(customer['payment_method']!=""){
-                            $('#sr_payment_method').val(customer['payment_method']);
+                        console.log(customer['payment_method']+" payment method");
+                        if(customer['payment_method']=="" || customer['payment_method']==null){
                             
+                        }else{
+                            $('#sr_payment_method').val(customer['payment_method']);
                         }
                         $('#tin_no_sr').val(customer['tin_no']);
                         $('#business_style_sr').val(customer['business_style']);

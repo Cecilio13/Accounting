@@ -287,7 +287,7 @@ class PdfController extends Controller
         $ddddd=User::find($userid_accounting);
         if(!empty($ddddd)){
             if($require_coist_center==1){
-
+                $ddddd->require_cost_center='0';
             }else{
                 $ddddd->require_cost_center='1';
             }

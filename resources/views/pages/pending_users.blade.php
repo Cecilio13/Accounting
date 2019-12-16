@@ -448,13 +448,20 @@
 										$('#sub_report_checkboxes').find('input[type=checkbox]:checked').removeAttr('checked');
 									}
 								}
-								
+								function validatecheckboxAll() {
+									if (document.getElementById('AllCheckOption').checked) {
+										checkAll();
+									}
+								}
+								function checkAll() {
+									$('#sub_report_checkboxes :checkbox:enabled').prop('checked', true);
+								}
 							  </script>
 							</div>
 							
 							<div class="checkbox" style="padding-left:20px;display:none;" id="sub_report_checkboxes" >
 								<div class="checkbox">
-								<label ><input type="checkbox" name="accesscostcenter[]" class="report_sub" value="All">All</label>
+								<label ><input type="checkbox" id="AllCheckOption" name="accesscostcenter[]" onclick="validatecheckboxAll()" class="report_sub"  value="All">All</label>
                                 </div>
                                 <?php
                                 $cc_id_count=0;

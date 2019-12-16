@@ -29,20 +29,33 @@ use App\UserAccess;
 use App\CC_Type;
 use App\ExpenseTransaction;
 use App\ExpenseTransactionNew;
+use App\EtAccountDetail;
 class GetController extends Controller
 {
-    
+    public function get_bill_info_for_supplier_credit(Request $request){
+        $supplier_credit_bill_no=$request->supplier_credit_bill_no;
+        $bill_info=ExpenseTransaction::where([
+            ['et_type','=','Bill'],
+            ['et_no','=',$supplier_credit_bill_no]
+        ])->first();
+
+        return $bill_info;
+    }
+    public function get_bill_account_detail(Request $request){
+        $supplier_credit_bill_no=$request->supplier_credit_bill_no;
+        $bill_info=EtAccountDetail::where([
+            ['et_ad_no','=',$supplier_credit_bill_no]
+        ])->get();
+
+        return $bill_info;
+    }
     public function check_supplier_credit_no(Request $request){
         $invoice_no_field=$request->invoice_no_field;
         $invoice_count=ExpenseTransaction::where([
-            ['et_type','=','Bill'],
+            ['et_type','=','Supplier credit'],
             ['et_no','=',$invoice_no_field]
         ])->count();
-        $invoice_count_new=ExpenseTransactionNew::where([
-            ['et_type','=','Bill'],
-            ['et_no','=',$invoice_no_field]
-        ])->count();
-        return $invoice_count+$invoice_count_new;
+        return $invoice_count;
     }
     public function check_bill_no(Request $request){
         $invoice_no_field=$request->invoice_no_field;
