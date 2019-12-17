@@ -951,7 +951,7 @@ class SuppliersController extends Controller
         
         
             foreach($request->return_item_sc as $checked){
-                for($x=0;$x<$request->account_count_scs;$x++){
+                for($x=0;$x<=$request->account_count_scs;$x++){
                 if($checked==$request->input('hiddenet_ad_id'.$x)){
                     //$request->hiddenet_ad_id;
                     $et_account = new EtAccountDetail;

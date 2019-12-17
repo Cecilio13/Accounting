@@ -3615,7 +3615,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                     $('#salesrcustomer').change();
                                     $('#sales_receiptbalance').html('PHP 0.00');
                                     $('#big_sales_receiptbalance').html('PHP 0.00');
-
+                                    
                                     var value=document.getElementById('invoiceno_sr').value;
                                     var location_invoice=document.getElementById('invoice_location').value;
                                     var type_invoice=document.getElementById('invoice_type').value;
