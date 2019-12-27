@@ -193,6 +193,8 @@
                     <li><a style="padding:2px 0px 2px 0px;display:none" href="expense" data-toggle="modal" data-target="#expensemodal"><i class="menu-icon fa fa-list-alt "></i> Expense</a></li>
                     <li><a style="padding:2px 0px 2px 0px;display:none" href="cheque" data-toggle="modal" data-target="#chequemodal"><i class="menu-icon fa fa-th-large "></i> Cheque</a></li>
                     @if ($UserAccessList[0]->bill=="1")
+                    
+                    <li><a style="padding:2px 0px 2px 0px;" href="#" data-toggle="modal" data-target="#import_bill_modal"><i class="menu-icon fas fa-money-bill"></i> Import Bill</a></li>
                     <li><a style="padding:2px 0px 2px 0px;" href="bill" data-toggle="modal" data-target="#billmodal"><i class="menu-icon fas fa-money-bill"></i> Bill</a></li>
                     @endif
                     @if ($UserAccessList[0]->pay_bills=="1")
@@ -200,7 +202,7 @@
                     @endif
                     <li><a style="padding:2px 0px 2px 0px;display:none;" href="purchaseorder" data-toggle="modal" data-target="#purchaseordermodal"> <i class="menu-icon fa fa-th-large "></i> Purchase Order</a></li>
                     @if ($UserAccessList[0]->supplier_credit=="1")
-                    <li><a style="padding:2px 0px 2px 0px;" href="suppliercredit" data-toggle="modal" data-target="#suppliercreditmodal"> <i class="menu-icon fas fa-money-bill"></i>Supplier Credit</a></li>
+                    <li><a style="padding:2px 0px 2px 0px;display:none;" href="suppliercredit" data-toggle="modal" data-target="#suppliercreditmodal"> <i class="menu-icon fas fa-money-bill"></i>Supplier Credit</a></li>
                     @endif
                     <li><a style="padding:2px 0px 2px 0px;display:none;" href="creditcardcredit" data-toggle="modal" data-target="#creditcardcreditmodal"><i class="menu-icon fa fa-paperclip "></i> Credit Card Credit</a></li>
                 </ul>
