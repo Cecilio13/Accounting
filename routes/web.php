@@ -311,10 +311,13 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/UploadMassJournalEntry', 'ChartofAccountsController@UploadMassJournalEntry')->name('UploadMassJournalEntry');
     Route::post('/UploadMassInvoice', 'ChartofAccountsController@UploadMassInvoice')->name('UploadMassInvoice');
     Route::post('/UploadMassBIDQuot', 'ChartofAccountsController@UploadMassBIDQuot')->name('UploadMassBIDQuot');
+    Route::post('/UploadMassBill', 'ChartofAccountsController@UploadMassBill')->name('UploadMassBill');
     
     
     Route::post('/export_ledger_to_excel', 'ChartofAccountsController@export_ledger_to_excel')->name('export_ledger_to_excel');
     Route::get('/GetInvoiceExcelTemplate', 'ChartofAccountsController@GetInvoiceExcelTemplate')->name('GetInvoiceExcelTemplate');
+    Route::get('/GetInvoiceExcelTemplateBill', 'ChartofAccountsController@GetInvoiceExcelTemplateBill')->name('GetInvoiceExcelTemplateBill');
+    
     Route::get('/GetBudgetTemplateExcel', 'ChartofAccountsController@GetBudgetTemplateExcel')->name('GetBudgetTemplateExcel');
     Route::get('/GetBudgetTemplateExcel_Bid_of_Quotation', 'ChartofAccountsController@GetBudgetTemplateExcel_Bid_of_Quotation')->name('GetBudgetTemplateExcel_Bid_of_Quotation');
     Route::get('/GetJournalEntryTemplateExcel', 'ChartofAccountsController@GetJournalEntryTemplateExcel')->name('GetJournalEntryTemplateExcel');

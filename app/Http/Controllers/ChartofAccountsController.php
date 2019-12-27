@@ -20,6 +20,9 @@ use App\Supplier;
 use App\Budgets;
 use App\BudgetsEdit;
 use App\StInvoice;
+use App\ExpenseTransactionNew;
+use App\EtAccountDetailNew;
+use App\ExpenseTransaction;
 use Illuminate\Support\Facades\Storage;
 class ChartofAccountsController extends Controller
 {
@@ -328,6 +331,75 @@ class ChartofAccountsController extends Controller
         // $AuditLog->save();
         return redirect('/accounting')->with('success','Chart of Account Deleted');
     }
+    public function GetInvoiceExcelTemplateBill(Request $request){
+        Excel::load('extra/edit_excel/bill.xlsx', function($doc) {
+            $customers = Customers::all();
+            $cost_center_list= CostCenter::where('cc_status','1')->get();
+            $COA= ChartofAccount::where('coa_active','1')->get();
+            $sheet2 = $doc->setActiveSheetIndex(1);
+            $sheet3 = $doc->setActiveSheetIndex(2);
+            $sheet4 = $doc->setActiveSheetIndex(3);
+            $sheet = $doc->setActiveSheetIndex(0);
+            $sheet->getStyle("B")
+                    ->getNumberFormat()->setFormatCode(\PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD2);
+            $sheet->getStyle("C")
+                    ->getNumberFormat()->setFormatCode(\PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD2);        
+            $cuss=0;
+            $cccc=0;
+            $oro=0;
+            foreach($customers as $cus){
+                $cuss++;
+                $sheet2->setCellValue('A'.$cuss, $cus->customer_id." -- ".($cus->display_name==""? $cus->f_name." ".$cus->l_name : $cus->display_name));
+                
+                
+            }
+            foreach($COA as $coa){
+                $oro++;
+                $sheet4->setCellValue('A'.$oro, $coa->coa_code);
+                // $sheet4->setCellValue('B'.$oro, $coa->coa_name);
+                
+            }
+            foreach($cost_center_list as $ccl){
+                $cccc++;
+                $sheet3->setCellValue('A'.$cccc, $ccl->cc_name_code);
+                //$sheet3->setCellValue('B'.$cccc, $ccl->cc_name);
+            }
+            for($c=1;$c<=$cccc+$cuss+$oro;$c++){
+                // $sheet->$doc->addNamedRange(
+                //     new \PHPExcel_NamedRange(
+                //     'Accounts', $sheet, 'L1:L'.$oro
+                //     )
+                // );
+                $cplus=$c+1;
+                $objValidation = $sheet->getCell('D'.$cplus)->getDataValidation();
+                $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+                
+                $objValidation->setShowDropDown( true );
+                $objValidation->setFormula1('CostCenter!$A:$A');
+    
+                $objValidation = $sheet->getCell('E'.$cplus)->getDataValidation();
+                $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+                
+                $objValidation->setShowDropDown( true );
+                $objValidation->setFormula1('Clients!$A:$A');
+    
+                $objValidation = $sheet->getCell('I'.$cplus)->getDataValidation();
+                $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+                
+                $objValidation->setShowDropDown( true );
+                $objValidation->setFormula1('ChartofAccounts!$A:$A');
+                $objValidation = $sheet->getCell('L'.$cplus)->getDataValidation();
+                $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+                
+                $objValidation->setShowDropDown( true );
+                $objValidation->setFormula1('ChartofAccounts!$A:$A');
+    
+                
+                
+                //$objValidation->setFormula1('Accounts'); //note this!
+            }
+            })->setFilename('Import Template for Bill '.date('m-d-Y'))->download('xlsx');
+    }
     public function GetInvoiceExcelTemplate(Request $request){
         Excel::load('extra/edit_excel/invoice.xlsx', function($doc) {
         $customers = Customers::all();
@@ -352,13 +424,13 @@ class ChartofAccountsController extends Controller
         }
         foreach($COA as $coa){
             $oro++;
-            $sheet4->setCellValue('A'.$oro, $coa->id." -- ".$coa->coa_name);
+            $sheet4->setCellValue('A'.$oro, $coa->coa_code);
             // $sheet4->setCellValue('B'.$oro, $coa->coa_name);
             
         }
         foreach($cost_center_list as $ccl){
             $cccc++;
-            $sheet3->setCellValue('A'.$cccc, $ccl->cc_no." -- ".$ccl->cc_name);
+            $sheet3->setCellValue('A'.$cccc, $ccl->cc_name_code);
             //$sheet3->setCellValue('B'.$cccc, $ccl->cc_name);
         }
         for($c=1;$c<=$cccc+$cuss+$oro;$c++){
@@ -749,6 +821,236 @@ class ChartofAccountsController extends Controller
         );
         return json_encode($data);
     }
+    public function UploadMassBill(Request $request){
+        $error_count=0;
+        $saved_count=0;
+        $countloop=0;
+        $extra="";
+        $Log="";
+        $file = $request->file('theFile');
+        $path = $file->getRealPath();
+        $data = Excel::selectSheetsByIndex(0)->load($path, function($reader) {
+        })->get();
+
+        $JournalGroup = array();
+        foreach($data as $row){
+            array_push($JournalGroup, $row->bill_group_no); 
+        }
+        $GRROUP=array_unique($JournalGroup);
+        
+        foreach($GRROUP as $unique){
+        
+            $credit=0;
+            $countloop=0;
+            $debit=0;
+            $rowcount=1;
+            $valid=0;
+            $individualcount=0;
+            foreach($data as $row){
+                $rowcount++;
+                $countloop++;
+                $extra.=$row;
+                if($row->bill_group_no==$unique){
+                    $extra.=$unique." , ";
+                    $individualcount++;
+                    if($row->bill_group_no!=""){
+                        if($row->bill_date!=""){
+                            if($row->due_date!=""){
+                                if($row->cost_center!=""){
+                                    if($row->client!=""){
+                                        if($row->rf!=""){
+                                            if($row->po!=""){
+                                                if($row->ci!=""){
+                                                    if($row->item_account!=""){
+                                                        if($row->credit_account!=""){
+                                                            $sss=explode(" -- ",$row->client);
+                                                            //check if bill no is unique
+                                                            $invoice_no_field=$unique;
+                                                            $invoice_count=ExpenseTransaction::where([
+                                                                ['et_type','=','Bill'],
+                                                                ['et_no','=',$invoice_no_field]
+                                                            ])->count();
+                                                            $invoice_count_new=ExpenseTransactionNew::where([
+                                                                ['et_type','=','Bill'],
+                                                                ['et_no','=',$invoice_no_field]
+                                                            ])->count();
+                                                            $bill_no_count=$invoice_count+$invoice_count_new;
+                                                            if($bill_no_count<1){
+                                                                $valid_coa=0;
+                                                                $valid_coa_C=0;
+                                                                $valid_cc=0;
+                                                                foreach($data as $row){
+                                                                    if($unique==$row->bill_group_no){
+                                                                        $account=$row->item_account;
+                                                                        $account2=$row->credit_account;
+                                                                        $COA= ChartofAccount::where('coa_code',$account)->first();
+                                                                        if(empty($COA)){
+                                                                            
+                                                                            $valid_coa=0;
+                                                                            break;
+                                                                        }else{
+                                                                            $valid_coa=1;
+                                                                        }
+                                                                        $COA= ChartofAccount::where('coa_code',$account2)->first();
+                                                                        if(empty($COA)){
+                                                                            
+                                                                            $valid_coa_C=0;
+                                                                            break;
+                                                                        }else{
+                                                                            $valid_coa_C=1;
+                                                                        }
+                                                                        $COA= CostCenter::where('cc_name_code',$row->cost_center)->first();
+                                                                        if(empty($COA)){
+                                                                            $valid_cc=0; 
+                                                                            break;
+                                                                        }else{
+                                                                            $valid_cc=1;     
+                                                                        }
+                                                                    }
+                                                                }
+                                                                if($valid_cc==1 && $valid_coa==1 && $valid_coa_C==1){
+                                                                    $extra.=$row->bill_group_no;
+                                                                    $expense_transaction = new ExpenseTransactionNew;
+                                                                    $expense_transaction->et_no = $row->bill_group_no;
+                                                                    $expense_transaction->et_customer = $sss[0];
+                                                                    $expense_transaction->et_bill_no =$row->bill_group_no;
+                                                                    $expense_transaction->et_date = $row->bill_date;
+                                                                    $expense_transaction->et_due_date = $row->due_date;
+                                                                    $expense_transaction->et_shipping_address = $row->rf;
+                                                                    $expense_transaction->et_shipping_to = $row->po;
+                                                                    $expense_transaction->et_shipping_via = $row->ci;
+
+                                                                    $COA= CostCenter::where('cc_name_code',$row->cost_center)->first();
+                                                                    $expense_transaction->et_debit_account=!empty($COA)? $COA->cc_no : '';
+                                                                    $COA= ChartofAccount::where('coa_code',$row->credit_account)->first();
+                                                                    $expense_transaction->et_credit_account=!empty($COA)? $COA->id : '';
+                                                                    $expense_transaction->et_type = 'Bill';
+                                                                    $expense_transaction->save();
+
+                                                                    $customer = new Customers;
+                                                                    $customer = Customers::find($sss[0]);
+                                                                    $totalamount=0;
+                                                                    foreach($data as $row2){
+                                                                        if($row2->bill_group_no==$unique){
+                                                                            if($row2->bill_group_no!=""){
+                                                                                if($row2->total_amount!=""){
+                                                                                    $et_account = new EtAccountDetailNew;
+                                                                                    $et_account->et_ad_no = $row->bill_group_no;
+                                                                                    $et_account->et_ad_product = $row->item_account;
+                                                                                    $et_account->et_ad_desc = $row->item_description;
+                                                                                    $et_account->et_ad_total = $row->total_amount;
+                                                                                    $et_account->et_ad_rate = 1;
+                                                                                    $et_account->et_ad_qty = $row->bill_group_no;
+                                                                                    $et_account->et_ad_type = "Bill";
+                                                                                    $totalamount+=$row->total_amount;
+                                                                                    $et_account->save();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    $expense_transaction =ExpenseTransactionNew::find($row->bill_group_no);
+                                                                    $expense_transaction->bill_balance=$totalamount;
+                                                                    $expense_transaction->save();
+                                                                    $saved_count++;
+                                                                }else{
+                                                                    if($valid_cc==0){
+                                                                        $valid=1; 
+                                                                        //empty first name
+                                                                        $error_count++;
+                                                                        $Log.="Cost Center on row ".$rowcount." from file.\n";  
+                                                                    }
+                                                                    if($valid_coa==0){
+                                                                        $valid=1; 
+                                                                        //empty first name
+                                                                        $error_count++;
+                                                                        $Log.="Item Account on row ".$rowcount." from file.\n";  
+                                                                    }
+                                                                    if($valid_coa_C==0){
+                                                                        $valid=1; 
+                                                                        //empty first name
+                                                                        $error_count++;
+                                                                        $Log.="Credit Account on row ".$rowcount." from file.\n";  
+                                                                    }
+                                                                }
+                                                            }else{
+                                                                $valid=1; 
+                                                                //empty first name
+                                                                $error_count++;
+                                                                $Log.="Duplicate Bill No. on row ".$rowcount." from file.\n";  
+                                                            }
+                                                        }else{
+                                                            $valid=1; 
+                                                            //empty first name
+                                                            $error_count++;
+                                                            $Log.="Empty Credit Account on row ".$rowcount." from file.\n";  
+                                                        }
+                                                    }else{
+                                                        $valid=1; 
+                                                        //empty first name
+                                                        $error_count++;
+                                                        $Log.="Empty Item Account on row ".$rowcount." from file.\n";  
+                                                    }
+                                                }else{
+                                                    $valid=1; 
+                                                    //empty first name
+                                                    $error_count++;
+                                                    $Log.="Empty CI on row ".$rowcount." from file.\n";  
+                                                }
+                                            }else{
+                                                $valid=1; 
+                                                //empty first name
+                                                $error_count++;
+                                                $Log.="Empty PO on row ".$rowcount." from file.\n";  
+                                            }
+                                        }else{
+                                            $valid=1; 
+                                            //empty first name
+                                            $error_count++;
+                                            $Log.="Empty RF on row ".$rowcount." from file.\n";  
+                                        }
+                                    }else{
+                                        $valid=1; 
+                                        //empty first name
+                                        $error_count++;
+                                        $Log.="Empty Client on row ".$rowcount." from file.\n";  
+                                    }
+                                }else{
+                                    $valid=1; 
+                                    //empty first name
+                                    $error_count++;
+                                    $Log.="Empty Cost Center on row ".$rowcount." from file.\n";  
+                                }
+                            }else{
+                                $valid=1; 
+                                //empty first name
+                                $error_count++;
+                                $Log.="Empty Due Date on row ".$rowcount." from file.\n";  
+                            }
+                        }else{
+                            $valid=1; 
+                            //empty first name
+                            $error_count++;
+                            $Log.="Empty Bill Date on row ".$rowcount." from file.\n";  
+                        }
+                    }else{
+                        $valid=1; 
+                        //empty first name
+                        $error_count++;
+                        $Log.="Empty Bill Group No on row ".$rowcount." from file.\n";  
+                    }
+                break;
+                }
+            }
+        }
+        $data = array(
+            'Success' => $saved_count,
+            'Total' => $countloop,
+            'Skiped'  => $error_count,
+            'Error_Log' =>$Log,
+            'Extra'=>$extra
+        );
+        return json_encode($data);
+    }
     public function UploadMassInvoice(Request $request){
         $error_count=0;
         $saved_count=0;
@@ -790,188 +1092,233 @@ class ChartofAccountsController extends Controller
                                                             if($row->debit_account!=""){
                                                                 if($row->credit_account!=""){
                                                                     $sss=explode(" -- ",$row->client);
-		
-		
-                                                                    $numbering = Numbering::first();
-                                                                    $sales_number=0;
-                                                                    if($row->location=="Main"){
-                                                                        if($row->invoice_type=="Sales Invoice"){
-                                                                            $sales_number = SalesTransaction::where([
-                                                                                ['st_type','=','Invoice'],
-                                                                                ['st_location', '=', 'Main'],
-                                                                                ['st_invoice_type','=','Sales Invoice']
-                                                                            ])->count() + $numbering->sales_exp_start_no;
-                                                                        }else if($row->invoice_type=="Bill Invoice"){
-                                                                            $sales_number = SalesTransaction::where([
-                                                                                ['st_type','=','Invoice'],
-                                                                                ['st_location', '=', 'Main'],
-                                                                                ['st_invoice_type','=','Bill Invoice']
-                                                                            ])->count() + $numbering->numbering_bill_invoice_main;
-                                                                        }
-                                                                    }else if($row->location=="Branch"){
-                                                                        if($row->invoice_type=="Sales Invoice"){
-                                                                            $sales_number = SalesTransaction::where([
-                                                                                ['st_type','=','Invoice'],
-                                                                                ['st_location', '=', 'Branch'],
-                                                                                ['st_invoice_type','=','Sales Invoice']
-                                                                            ])->count() + $numbering->numbering_sales_invoice_branch;
-                                                                        }else if($row->invoice_type=="Bill Invoice"){
-                                                                            $sales_number = SalesTransaction::where([
-                                                                                ['st_type','=','Invoice'],
-                                                                                ['st_location', '=', 'Branch'],
-                                                                                ['st_invoice_type','=','Bill Invoice']
-                                                                            ])->count() + $numbering->numbering_bill_invoice_branch;
-                                                                        }
-                                                                    }
-                                                                    $sales_transaction = new SalesTransaction;
-                                                                    $sales_transaction->st_no = $sales_number;
-                                                                    $sales_transaction->st_date = $row->invoice_date;
-                                                                    $sales_transaction->st_type = "Invoice";
-                                                                    $sales_transaction->st_term = "";
-                                                                    $sales_transaction->st_customer_id = $sss[0];
-                                                                    $sales_transaction->st_due_date = $row->due_date;
-                                                                    $sales_transaction->st_invoice_job_order = $row->job_order;
-                                                                    $sales_transaction->st_invoice_work_no = $row->work_no;
-                                                                    $sales_transaction->st_status = 'Open';
-                                                                    $sales_transaction->st_action = '';
-                                                                    $sales_transaction->st_email = "";
-                                                                    $sales_transaction->st_send_later = "";
-                                                                    $sales_transaction->st_bill_address = "";
-                                                                    $sales_transaction->st_note ="";
-                                                                    $sales_transaction->st_memo = "";
-                                                                    $sales_transaction->st_i_attachment = "";
-                                                                    $cre=explode(" -- ",$row->debit_account);
-                                                                    $account=$cre[0];
-                                                                    $sales_transaction->st_debit_account = $account;
-                                                                    $cre=explode(" -- ",$row->credit_account);
-                                                                    $account=$cre[0];
-                                                                    $sales_transaction->st_credit_account = $account;
-                                                                    
-                                                                    $total_balance=0;
-                                                                    $customer = new Customers;
-                                                                    $customer = Customers::find($sss[0]);
-                                                                    foreach($data as $row2){
-                                                                        if($row2->invoice_group_no==$unique){
-                                                                            if($row2->invoice_group_no!=""){
-                                                                                if($row2->location!=""){
-                                                                                    if($row2->invoice_type!=""){
-                                                                                        if($row2->invoice_date!=""){
-                                                                                           
-                                                                                               
-                                                                                                    if($row2->client!=""){
-                                                                                                        
-                                                                                                            
-                                                                                                                if($row2->total_amount!=""){
-                                                                                                                    $st_invoice = new StInvoice;
-                                                                                                                    $st_invoice->st_i_no = $sales_number;
-                                                                                                                    $st_invoice->st_i_product = $row2->productservice;
-                                                                                                                    $st_invoice->st_i_desc = $row2->description;
-                                                                                                                    $st_invoice->st_i_qty = 1;
-                                                                                                                    $st_invoice->st_i_rate = $row2->total_amount;
-                                                                                                                    $st_invoice->st_i_total = $row2->total_amount;
-                                                                                                                    $st_invoice->st_p_method = null;
-                                                                                                                    $st_invoice->st_p_reference_no = null;
-                                                                                                                    $st_invoice->st_p_deposit_to = null;
-                                                                                                                    $st_invoice->st_p_location = $row2->location;
-                                                                                                                    $st_invoice->st_p_invoice_type = $row2->invoice_type;
-                                                                                                                    $st_invoice->st_p_debit = $row2->debit_account;
-                                                                                                                    $st_invoice->st_p_credit = $row2->credit_account;
-                                                                                                                    
-                                                                                                                    $wwe=explode(" -- ",$row2->cost_center);
-                                                                                                                    // $COA= CostCenter::where('cc_name_code',$wwe[0])->get();
-                                                                                                                    $CostCenter=$wwe[0];
-                                                                                                                    
-                                                    
-                                                                                                                    $st_invoice->st_p_cost_center=$CostCenter;
-                                                                                                                    $st_invoice->save();
-                                                                                                                    $total_balance+=$row2->total_amount;
 
+                                                                    $invoice_location_top=$request->location;
+                                                                    $invoice_type_top=$request->invoice_type;
+                                                                    $invoice_no_field=$request->invoice_group_no;
+                                                                    $invoice_count=SalesTransaction::where([
+                                                                        ['st_type','=','Invoice'],
+                                                                        ['st_location', '=', $invoice_location_top],
+                                                                        ['st_invoice_type','=',$invoice_type_top],
+                                                                        ['st_no','=',$invoice_no_field]
+                                                                    ])->count();
 
-                                                                                                                    $JDate=$row->invoice_date;
-                                                                                                                    $JNo=$sales_number;
-                                                                                                                    $JMemo="";
-                                                                                                                    $cre=explode(" -- ",$row2->credit_account);
-                                                                                                                    $account=$cre[0];
-                                                                                                                    $debit= "";
-                                                                                                                    $credit= $row2->total_amount;
-                                                                                                                    $description=$row2->description;
-                                                                                                                    $name= $customer->display_name;
-                                                
-                                                                                                                    $journal_entries = new  JournalEntry;
-                                                                                                                    $jounal = DB::table('journal_entries')         ->select('je_no')         ->groupBy('je_no')         ->get();         
-                                                                                                                    $journal_entries_count=count($jounal)+1;
-                                                                                                                    $journal_entries->je_id = "1";
-                                                                                                                    $journal_entries->other_no=$JNo;
-                                                                                                                    $journal_entries->je_no=$journal_entries_count;
-                                                                                                                    $journal_entries->je_account=$account;
-                                                                                                                    $journal_entries->je_debit=$debit;
-                                                                                                                    $journal_entries->je_credit=$credit;
-                                                                                                                    $journal_entries->je_desc=$description;
-                                                                                                                    $journal_entries->je_name=$name;
-                                                                                                                    $journal_entries->je_memo=$JMemo;
-                                                                                                                    $journal_entries->created_at=$JDate;
-                                                                                                                    $journal_entries->je_attachment=$JDate;
-                                                                                                                    $journal_entries->je_attachment=$JDate;
-                                                                                                                    $journal_entries->je_transaction_type="Invoice";
-                                                                                                                    $journal_entries->je_invoice_location_and_type=$row->location." ".$row->invoice_type;
-                                                                                                                    
-                                                                                                                    $journal_entries->je_cost_center=$CostCenter;
-                                                                                                                    $journal_entries->save();
-                                                
-                                                                                                                    $JDate=$row->invoice_date;
-                                                                                                                    $JNo=$sales_number;
-                                                                                                                    $JMemo="";
-                                                                                                                    $cre=explode(" -- ",$row2->debit_account);
-                                                                                                                    $account=$cre[0];
-                                                                                                                    $debit= $row2->total_amount;
-                                                                                                                    $credit= "";
-                                                                                                                    $description=$row2->description;
-                                                                                                                    $name= $customer->display_name;
-                                                                                                                    
-                                                
-                                                                                                                    $journal_entries = new  JournalEntry;
-                                                                                                                    
-                                                                                                                    $journal_entries->je_id = "2";
-                                                                                                                    $journal_entries->other_no=$JNo;
-                                                                                                                    $journal_entries->je_no=$journal_entries_count;
-                                                                                                                    $journal_entries->je_account=$account;
-                                                                                                                    $journal_entries->je_debit=$debit;
-                                                                                                                    $journal_entries->je_credit=$credit;
-                                                                                                                    $journal_entries->je_desc=$description;
-                                                                                                                    $journal_entries->je_name=$name;
-                                                                                                                    $journal_entries->je_memo=$JMemo;
-                                                                                                                    $journal_entries->created_at=$JDate;
-                                                                                                                    $journal_entries->je_attachment=$JDate;
-                                                                                                                    $journal_entries->je_attachment=$JDate;
-                                                                                                                    $journal_entries->je_transaction_type="Invoice";
-                                                                                                                    $journal_entries->je_invoice_location_and_type=$row->location." ".$row->invoice_type;
-                                                                                                                    
-                                                                                                                    $journal_entries->je_cost_center=$CostCenter;
-                                                                                                                    $journal_entries->save();
-                                                                                                                }
-                                                                                                            
-                                                                                                        
-                                                                                                    }
-                                                                                            
-                                                                                        }
-                                                                                    }
+                                                                    if($invoice_count<1){
+                                                                        $valid_coa=0;
+                                                                        $valid_coa_C=0;
+                                                                        $valid_cc=0;
+                                                                        foreach($data as $row){
+                                                                            if($unique==$row->invoice_group_no){
+                                                                                $account=$row->debit_account;
+                                                                                $account2=$row->credit_account;
+                                                                                $COA= ChartofAccount::where('coa_code',$account)->first();
+                                                                                if(empty($COA)){
+                                                                                    
+                                                                                    $valid_coa=0;
+                                                                                    break;
+                                                                                }else{
+                                                                                    $valid_coa=1;
+                                                                                }
+                                                                                $COA= ChartofAccount::where('coa_code',$account2)->first();
+                                                                                if(empty($COA)){
+                                                                                    
+                                                                                    $valid_coa_C=0;
+                                                                                    break;
+                                                                                }else{
+                                                                                    $valid_coa_C=1;
+                                                                                }
+                                                                                $COA= CostCenter::where('cc_name_code',$row->cost_center)->first();
+                                                                                if(empty($COA)){
+                                                                                    $valid_cc=0; 
+                                                                                    break;
+                                                                                }else{
+                                                                                    $valid_cc=1;     
                                                                                 }
                                                                             }
                                                                         }
+                                                                        if($valid_cc==1 && $valid_coa==1 && $valid_coa_C==1){
+                                                                            $numbering = Numbering::first();
+                                                                            $sales_number=$row->invoice_group_no;
+                                                                            $sales_transaction = new SalesTransaction;
+                                                                            $sales_transaction->st_no = $sales_number;
+                                                                            $sales_transaction->st_date = $row->invoice_date;
+                                                                            $sales_transaction->st_type = "Invoice";
+                                                                            $sales_transaction->st_term = "";
+                                                                            $sales_transaction->st_customer_id = $sss[0];
+                                                                            $sales_transaction->st_due_date = $row->due_date;
+                                                                            $sales_transaction->st_invoice_job_order = $row->job_order;
+                                                                            $sales_transaction->st_invoice_work_no = $row->work_no;
+                                                                            $sales_transaction->st_status = 'Open';
+                                                                            $sales_transaction->st_action = '';
+                                                                            $sales_transaction->st_email = "";
+                                                                            $sales_transaction->st_send_later = "";
+                                                                            $sales_transaction->st_bill_address = "";
+                                                                            $sales_transaction->st_note ="";
+                                                                            $sales_transaction->st_memo = "";
+                                                                            $sales_transaction->st_i_attachment = "";
+                                                                            $COA= ChartofAccount::where('coa_code',$row2->debit_account)->first();
+                                                                            
+                                                                            $account=!empty($COA)? $COA->cc_no : '';
+                                                                            $sales_transaction->st_debit_account = $account;
+                                                                            
+                                                                            $COA= ChartofAccount::where('coa_code',$row2->credit_account)->first();
+                                                                            $account=!empty($COA)? $COA->cc_no : '';
+                                                                            $sales_transaction->st_credit_account = $account;
+                                                                            
+                                                                            $total_balance=0;
+                                                                            $customer = new Customers;
+                                                                            $customer = Customers::find($sss[0]);
+                                                                            foreach($data as $row2){
+                                                                                if($row2->invoice_group_no==$unique){
+                                                                                    if($row2->invoice_group_no!=""){
+                                                                                        if($row2->location!=""){
+                                                                                            if($row2->invoice_type!=""){
+                                                                                                if($row2->invoice_date!=""){
+                                                                                                   
+                                                                                                       
+                                                                                                            if($row2->client!=""){
+                                                                                                                
+                                                                                                                    
+                                                                                                                        if($row2->total_amount!=""){
+                                                                                                                            $st_invoice = new StInvoice;
+                                                                                                                            $st_invoice->st_i_no = $sales_number;
+                                                                                                                            $st_invoice->st_i_product = $row2->productservice;
+                                                                                                                            $st_invoice->st_i_desc = $row2->description;
+                                                                                                                            $st_invoice->st_i_qty = 1;
+                                                                                                                            $st_invoice->st_i_rate = $row2->total_amount;
+                                                                                                                            $st_invoice->st_i_total = $row2->total_amount;
+                                                                                                                            $st_invoice->st_p_method = null;
+                                                                                                                            $st_invoice->st_p_reference_no = null;
+                                                                                                                            $st_invoice->st_p_deposit_to = null;
+                                                                                                                            $st_invoice->st_p_location = $row2->location;
+                                                                                                                            $st_invoice->st_p_invoice_type = $row2->invoice_type;
+                                                                                                                            $st_invoice->st_p_debit = $row2->debit_account;
+                                                                                                                            $st_invoice->st_p_credit = $row2->credit_account;
+                                                                                                                            
+                                                                                                                            $CostCenter = CostCenter::where('cc_name_code',$row2->cost_center)->first();
+                                                            
+                                                                                                                            $st_invoice->st_p_cost_center=$CostCenter->cc_no;
+                                                                                                                            $st_invoice->save();
+                                                                                                                            $total_balance+=$row2->total_amount;
+        
+        
+                                                                                                                            $JDate=$row->invoice_date;
+                                                                                                                            $JNo=$sales_number;
+                                                                                                                            $JMemo="";
+                                                                                                                            $COA= ChartofAccount::where('coa_code',$row2->credit_account)->first();
+                                                                                                                            
+                                                                                                                            $account=!empty($COA)? $COA->id : '';
+                                                                                                                            $debit= "";
+                                                                                                                            $credit= $row2->total_amount;
+                                                                                                                            $description=$row2->description;
+                                                                                                                            $name= $customer->display_name;
+                                                        
+                                                                                                                            $journal_entries = new  JournalEntry;
+                                                                                                                            $jounal = DB::table('journal_entries')         ->select('je_no')         ->groupBy('je_no')         ->get();         
+                                                                                                                            $journal_entries_count=count($jounal)+1;
+                                                                                                                            $journal_entries->je_id = "1";
+                                                                                                                            $journal_entries->other_no=$JNo;
+                                                                                                                            $journal_entries->je_no=$journal_entries_count;
+                                                                                                                            $journal_entries->je_account=$account;
+                                                                                                                            $journal_entries->je_debit=$debit;
+                                                                                                                            $journal_entries->je_credit=$credit;
+                                                                                                                            $journal_entries->je_desc=$description;
+                                                                                                                            $journal_entries->je_name=$name;
+                                                                                                                            $journal_entries->je_memo=$JMemo;
+                                                                                                                            $journal_entries->created_at=$JDate;
+                                                                                                                            $journal_entries->je_attachment=$JDate;
+                                                                                                                            $journal_entries->je_attachment=$JDate;
+                                                                                                                            $journal_entries->je_transaction_type="Invoice";
+                                                                                                                            $journal_entries->je_invoice_location_and_type=$row->location." ".$row->invoice_type;
+                                                                                                                            
+                                                                                                                            $journal_entries->je_cost_center=$CostCenter->cc_no;
+                                                                                                                            $journal_entries->save();
+                                                        
+                                                                                                                            $JDate=$row->invoice_date;
+                                                                                                                            $JNo=$sales_number;
+                                                                                                                            $JMemo="";
+                                                                                                                            
+                                                                                                                            $COA= ChartofAccount::where('coa_code',$row2->debit_account)->first();
+                                                                                                                            
+                                                                                                                            $account=!empty($COA)? $COA->id : '';
+                                                                                                                            $debit= $row2->total_amount;
+                                                                                                                            $credit= "";
+                                                                                                                            $description=$row2->description;
+                                                                                                                            $name= $customer->display_name;
+                                                                                                                            
+                                                        
+                                                                                                                            $journal_entries = new  JournalEntry;
+                                                                                                                            
+                                                                                                                            $journal_entries->je_id = "2";
+                                                                                                                            $journal_entries->other_no=$JNo;
+                                                                                                                            $journal_entries->je_no=$journal_entries_count;
+                                                                                                                            $journal_entries->je_account=$account;
+                                                                                                                            $journal_entries->je_debit=$debit;
+                                                                                                                            $journal_entries->je_credit=$credit;
+                                                                                                                            $journal_entries->je_desc=$description;
+                                                                                                                            $journal_entries->je_name=$name;
+                                                                                                                            $journal_entries->je_memo=$JMemo;
+                                                                                                                            $journal_entries->created_at=$JDate;
+                                                                                                                            $journal_entries->je_attachment=$JDate;
+                                                                                                                            $journal_entries->je_attachment=$JDate;
+                                                                                                                            $journal_entries->je_transaction_type="Invoice";
+                                                                                                                            $journal_entries->je_invoice_location_and_type=$row->location." ".$row->invoice_type;
+                                                                                                                            
+                                                                                                                            $journal_entries->je_cost_center=$CostCenter->cc_noGetInvoiceExcelTemplateBill;
+                                                                                                                            $journal_entries->save();
+                                                                                                                        }
+                                                                                                                    
+                                                                                                                
+                                                                                                            }
+                                                                                                    
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                
+                                                                            }
+        
+                                                                            
+                                                                            $sales_transaction->st_balance = $total_balance;
+                
+                                                                            $sales_transaction->st_location = $row->location;
+                                                                            $sales_transaction->st_invoice_type = $row->invoice_type;
+                                                                            $sales_transaction->save();
+                
+                                                                            
+                                                                            $customer->opening_balance = $customer->opening_balance+$total_balance;
+                                                                            $customer->save();
+                                                                            $saved_count++;
+                                                                        }else{
+                                                                            if($valid_cc==0){
+                                                                                $valid=1; 
+                                                                                //empty first name
+                                                                                //$error_count++;
+                                                                                $Log.="Cost Center on row ".$rowcount." from file.\n";  
+                                                                            }
+                                                                            if($valid_coa==0){
+                                                                                $valid=1; 
+                                                                                //empty first name
+                                                                                //$error_count++;
+                                                                                $Log.="Debit Account on row ".$rowcount." from file.\n";  
+                                                                            }
+                                                                            if($valid_coa_C==0){
+                                                                                $valid=1; 
+                                                                                //empty first name
+                                                                                //$error_count++;
+                                                                                $Log.="Credit Account on row ".$rowcount." from file.\n";  
+                                                                            }
+                                                                            
+                                                                        }
                                                                         
+                                                                    }else{
+                                                                        $valid=1; 
+                                                                        //empty first name
+                                                                        //$error_count++;
+                                                                        $Log.="Duplicate Invoice No. on row ".$rowcount." from file.\n";  
                                                                     }
-
                                                                     
-                                                                    $sales_transaction->st_balance = $total_balance;
-        
-                                                                    $sales_transaction->st_location = $row->location;
-                                                                    $sales_transaction->st_invoice_type = $row->invoice_type;
-                                                                    $sales_transaction->save();
-        
-                                                                    
-                                                                    $customer->opening_balance = $customer->opening_balance+$total_balance;
-                                                                    $customer->save();
-                                                                    $saved_count++;
                                                                 }else{
                                                                     $valid=1; 
                                                                     //empty first name
