@@ -10089,33 +10089,105 @@ function edit_journal_entries(je_no){
             document.getElementById('customertable_filter').style.display="none";
             
         }
+        @if(!empty($year_beg))
+        var datasadsadasd = {'beginning':"{{$year_beg}}", 'end': "{{$year_end}}"};
+        console.log("datasadsadasd "+datasadsadasd.beginning+" "+" {{$year_end}}");
+        @else
+        var datasadsadasd = {'beginning':"{{date('Y')}}-01-01", 'end': "{{date('Y')}}-12-31"};
+        console.log("datasadsadasd else "+" {{date('Y')}}-01-01"+" "+"{{date('Y')}}-12-31");
+        @endif
         
         sales_table = $('#salestable').DataTable({
             order: [[ 0, "desc" ]],
             paging: true,
-            ajax: "{{ route('refresh_sales_table') }}",
+            ajax: {
+                "url" : "{{ route('refresh_sales_table') }}",
+                type : "GET",
+                data : datasadsadasd,
+            },
+            
             columnDefs: [{
-                'targets': 9,
+                'targets': 11,
                 'searchable':false,
                 'orderable':false,
                 'className': 'dt-body-center',
                 'render': function (data, type, full, meta){
                     console.log(data);
                     if(data=="Cancelled" || data==""){
-                        return data;
+                       
+                        if(full['st_type']=="Main Sales Invoice"){
+                            if(data=="Cancelled"){
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" >Cancelled</a></div></div>';
+                            }else{
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a></div></div>';
+                            }
+                            
+                        }
+                        else if(full['st_type']=="Main Bill Invoice"){
+                            if(data=="Cancelled"){
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" >Cancelled</a></div></div>';
+                            }else{
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a></div></div>';
+                            }
+                        }
+                        else if(full['st_type']=="Branch Sales Invoice"){
+                            if(data=="Cancelled"){
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" >Cancelled</a></div></div>';
+                            }else{
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a></div></div>';
+                            }
+                        }
+                        else if(full['st_type']=="Branch Bill Invoice"){
+                            if(data=="Cancelled"){
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" >Cancelled</a></div></div>';
+                            }else{
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a></div></div>';
+                            }
+                        }
+                        else if(full['st_type']=="Sales Receipt"){
+                            if(data=="Cancelled"){
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_payment_for']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" >Cancelled</a></div></div>';
+                            }else{
+                                return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_payment_for']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a></div></div>';
+                            }
+                        }
                     }else{
-                        if(full['st_type']=="Invoice"){
+                        if(full['st_type']=="Main Sales Invoice"){
                             @if($UserAccessList[0]->invoice=="1")
                             
-                            return '<button class="btn btn-xs btn-link" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span></button>';
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
+                            @else
+                            return "";
+                            @endif
+                        }
+                        else if(full['st_type']=="Main Bill Invoice"){
+                            @if($UserAccessList[0]->invoice=="1")
+                            
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
+                            @else
+                            return "";
+                            @endif
+                        }
+                        else if(full['st_type']=="Branch Sales Invoice"){
+                            @if($UserAccessList[0]->invoice=="1")
+                            
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
+                            @else
+                            return "";
+                            @endif
+                        }
+                        else if(full['st_type']=="Branch Bill Invoice"){
+                            @if($UserAccessList[0]->invoice=="1")
+                            
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_no']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
                             @else
                             return "";
                             @endif
                         }
                         else if(full['st_type']=="Sales Receipt"){
                             @if($UserAccessList[0]->sales_receipt=="1")
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" target="_blank" href="print_invoice_info?no='+full['st_payment_for']+'&location='+full['st_location']+'&type='+full['st_invoice_type']+'"><span class="fa fa-print"></span> Print </a><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
                             
-                            return '<button class="btn btn-xs btn-link" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span></button>';
                             @else
                             return "";
                             @endif
@@ -10123,7 +10195,7 @@ function edit_journal_entries(je_no){
                         else if(full['st_type']=="Credit Note"){
                             @if($UserAccessList[0]->credit_note=="1")
                             
-                            return '<button class="btn btn-xs btn-link" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span></button>';
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
                             @else
                             return "";
                             @endif
@@ -10131,12 +10203,12 @@ function edit_journal_entries(je_no){
                         else if(full['st_type']=="Estimate"){
                             @if($UserAccessList[0]->estimate=="1")
                             
-                            return '<button class="btn btn-xs btn-link" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span></button>';
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
                             @else
                             return "";
                             @endif
                         }else{
-                            return '<button class="btn btn-xs btn-link" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span></button>';
+                            return '<div class="btn-group"><button type="button" class="btn bg-transparent  px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-custom"><a class="dropdown-item" href="#" onclick="cancelentry('+data+')"><span class="fa fa-ban"></span> Cancel</a></div></div>';
 
                         }
                         
@@ -10146,7 +10218,7 @@ function edit_journal_entries(je_no){
                 }
             },
             {
-                'targets': 4,
+                'targets': 6,
                 'searchable':false,
                 'orderable':false,
                 'className': 'dt-body-center',
@@ -10193,6 +10265,12 @@ function edit_journal_entries(je_no){
                             data: 'st_no'
                         },
                         {
+                            data : 'cost_center_name'
+                        },
+                        {
+                            data : 'description'
+                        },
+                        {
                             data: 'customer_name'
                         },
                         {
@@ -10224,7 +10302,11 @@ function edit_journal_entries(je_no){
         sales_table_invoice = $('#salestableinvoice').DataTable({
             order: [[ 3, "desc" ]],
             paging: true,
-            ajax: "{{ route('refresh_sales_table_invoice') }}",
+            ajax: {
+                "url" : "{{ route('refresh_sales_table_invoice') }}",
+                type : "GET",
+                data : datasadsadasd,
+            },
             columnDefs: [{
                 'targets': 0,
                 'searchable':false,
@@ -11805,7 +11887,7 @@ function removeComma(str){
             markup=markup+'<td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select onchange="ChangeParticularInvoice(this)" id="ParticularInvoice'+$('#invoice_table tr').length+'" data-columncount="'+$('#invoice_table tr').length+'" class="w-100 form-control invoice_particular"><option>Cost Center</option><option>Product/Service</option></select></td>';
             
             markup=markup+'<td class="pt-3-half">';
-            markup=markup+'<div class="ProductServicesInvoiceItemDivClass" id="ProductServicesInvoiceItemDiv'+$('#invoice_table tr').length+'" style="display:none;"><select style="border:0; width:100%;" class="invoice_data product_select selectpicker" data-live-search="true" id="select_product_name'+$('#invoice_table tr').length+'"><option value=""></option>'+product_list_js+'</select></div><div id="CostCenterInvoiceItemDiv'+$('#invoice_table tr').length+'" class="CostCenterInvoiceItemDivClass"><select required name="CostCenterInvoice'+$('#invoice_table tr').length+'" class="w-100 invoice_cost_center selectpicker" data-live-search="true" id="CostCenterInvoice'+$('#invoice_table tr').length+'" ><option value="">--Select Cost Center--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select></div></td><td class="pt-3-half"><textarea class="form-control invoice_data product_description w-100" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;"></textarea></td><td class="pt-3-half"><input required type="number" class="form-control invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" min="1" value="1"></td><td class="pt-3-half">';
+            markup=markup+'<div class="ProductServicesInvoiceItemDivClass" id="ProductServicesInvoiceItemDiv'+$('#invoice_table tr').length+'" style="display:none;"><select style="border:0; width:100%;" class="invoice_data product_select selectpicker" data-live-search="true" id="select_product_name'+$('#invoice_table tr').length+'"><option value=""></option>'+product_list_js+'</select></div><div id="CostCenterInvoiceItemDiv'+$('#invoice_table tr').length+'" class="CostCenterInvoiceItemDivClass"><select required name="CostCenterInvoice'+$('#invoice_table tr').length+'" class="w-100 invoice_cost_center selectpicker" data-live-search="true" id="CostCenterInvoice'+$('#invoice_table tr').length+'" ><option value="">--Select Cost Center--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{$ccl->cc_name_code." - ".trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select></div></td><td class="pt-3-half"><textarea class="form-control invoice_data product_description w-100" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;"></textarea></td><td class="pt-3-half"><input required type="number" class="form-control invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" min="1" value="1"></td><td class="pt-3-half">';
             markup=markup+'<input type="text" class="product_rate_change form-control" value="0" id="unformated_select_sales_rate'+$('#invoice_table tr').length+'" style="border:0;text-align:right;" required>';
             markup=markup+'<input type="hidden" class="invoice_data product_rate value="0" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;">';
             markup=markup+'</td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'" title="0.00">0.00</td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';

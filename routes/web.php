@@ -15,6 +15,7 @@ Route::group(['middleware'=>['auth']], function() {
     
     
     
+    Route::get('/print_invoice_info', 'GetController@print_invoice_info');
     Route::post('/get_bill_account_detail', 'GetController@get_bill_account_detail');
     Route::post('/get_bill_info_for_supplier_credit', 'GetController@get_bill_info_for_supplier_credit');
     Route::post('/check_supplier_credit_no', 'GetController@check_supplier_credit_no');

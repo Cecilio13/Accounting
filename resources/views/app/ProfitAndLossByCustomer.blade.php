@@ -320,7 +320,13 @@
                                     <option>Last Quarter</option>
                                     <option>Last Year</option>
                                 </select>
-                                
+                                <script>
+                                    $(document).ready(function(){
+                                       document.getElementById('filtertemplate').value="This Year";
+                                       changedates(document.getElementById('filtertemplate'))
+                                       
+                                    });
+                               </script>
                                 <div id="datedivs" style="display:none;margin-top:10px;border-top:1px solid #ccc ;">
                                 <div class="form-group">
                                     <label for="Fromdate">From</label>

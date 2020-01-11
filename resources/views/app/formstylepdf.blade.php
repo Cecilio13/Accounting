@@ -249,6 +249,7 @@
                                                         $grosstotal=0;
                                                         $withholdtotal=0;
                                                         $PaymentFor="";
+                                                        $product_name="";
                                                         ?>
                                                         @foreach ($salST as $st)
                                                         @if($st->st_s_no==$receiptNo)
@@ -958,6 +959,23 @@
                                         <th style="vertical-align:middle;font-weight:bold;border-top:0px solid #ccc;"><h5>OFFICIAL RECEIPT</h5></th>
                                         <th style="vertical-align:middle;text-align:right;border-top:0px solid #ccc;"><h6>DATE:<u>{{date('m-d-Y',strtotime($sal->st_date))}}</u></h6></th>
                                     </tr>
+                                    <script>
+                                    var a = ['','one ','two ','three ','four ', 'five ','six ','seven ','eight ','nine ','ten ','eleven ','twelve ','thirteen ','fourteen ','fifteen ','sixteen ','seventeen ','eighteen ','nineteen '];
+                                    var b = ['', '', 'twenty','thirty','forty','fifty', 'sixty','seventy','eighty','ninety'];
+
+                                    function inWords (num) {
+                                        if ((num = num.toString()).length > 9) return 'overflow';
+                                        n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+                                        if (!n) return; var str = '';
+                                        str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
+                                        str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
+                                        str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
+                                        str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
+                                        str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'only ' : '';
+                                        return str;
+                                    }
+                                    
+                                    </script>
                                     <tr>
                                         <td colspan="2" style="vertical-align:middle;border-top:0px solid #ccc;padding:0px;">
                                                 <?php
@@ -968,7 +986,7 @@
                                                 $name="";
                                                 $TinNo="";
                                                 $business_style="";
-                                                $f = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+                                                
                                                 ?>
                                                 @foreach ($customers as $customer)
                                                 @if($customer->customer_id==$sal->st_customer_id)
@@ -994,9 +1012,15 @@
                                                 @endforeach
                                             <p style="text-indent: 50px;text-align: justify;">Received from <b><u>{{$name}}</u></b> with TIN <b><u>{{$output[0].'-'.$output[1].'-'.$output[2]}}</u></b> 
                                                 and address at <b><u>{{$Street." ".$City." ".$State." ".$Postal}}</u></b> engaged in the business style of <b><u>{{$business_style}}</b></u>, 
-                                                the sum of <b><u>{{ucwords($f->format($st_total))}}</u></b> pesos (P <b><u>{{number_format($st_total,2)}}</u></b>)
+                                                the sum of <b><u id="number_toword_u"></u></b> pesos (P <b><u>{{number_format($st_total,2)}}</u></b>)
                                                  In partial/full payment for <b><u>{{$PaymentFor}}</b></u></p>
                                         </td>
+                                        <script>
+                                        $(document).ready(function(){
+                                            document.getElementById('number_toword_u').innerHTML = inWords('{{$st_total}}');
+                                            $('#number_toword_u').css('textTransform', 'capitalize');
+                                        });
+                                        </script>
                                     </tr>
                                     <tr>
                                        <td colspan="2" style="vertical-align:top;border-top:0px solid #ccc;padding:0px;">

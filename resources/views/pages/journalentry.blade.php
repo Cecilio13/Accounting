@@ -91,13 +91,38 @@
 </div>
 <div class="card-body">
     <div class="row" style="">
-        <div class="col-md-12" >
+        <div class="col-md-10" >
             <div class=" mr-2 mb-5 mt-3">
                 <a href="#" class="btn btn-success" data-target='#journalentrymodal' data-toggle="modal">New Journal Entry</a>
                 <a href="#" class="btn btn-success" data-target='#ImportJournalEntryModal' data-toggle="modal">Import Journal Entry</a>
                 
             </div>
             
+        </div>
+        <div class="col-md-2">
+            <script>
+                function changeyearjournal(year){
+                    location.href="journalentry?year="+year;
+                }
+            </script>
+            <select class="form-control" style="float:right;" onchange="currentjournal_no_go()" id="yearSSSEELLEECCRTTED">
+                @for ($i = 2019; $i <= date('Y'); $i++)
+                    @if (!empty($yyyyy))
+                    @if ($i==$yyyyy)
+                        <option selected>{{$i}}</option>   
+                    @else
+                        <option>{{$i}}</option>   
+                    @endif
+                    @else
+                        @if ($i==date('Y'))
+                            <option selected>{{$i}}</option>   
+                        @else
+                            <option>{{$i}}</option>   
+                        @endif
+                    @endif
+                @endfor
+                
+            </select> 
         </div>
         <script>
             
@@ -284,49 +309,52 @@
                 </div>
                 <script>
                     function forward_currentjournal_no_go(){
+                        var yearSSSEELLEECCRTTED=document.getElementById('yearSSSEELLEECCRTTED').value;
                         var current_no="{{$JournalNoSelected}}";
                         var keywordselected="{{$keyword}}";//Citi
                         var currentjournal_no="{{($JournalNoSelected+20)+1}}";
                         var SearchFilterJournalEnties=document.getElementById('SearchFilterJournalEnties').value;//Globe
                         if(keywordselected!=SearchFilterJournalEnties){
                             //different keyword
-                            window.location="journalentry?no={{($JournalNoSelected+20)+1}}&keyword="+SearchFilterJournalEnties;
+                            window.location="journalentry?no={{($JournalNoSelected+20)+1}}&keyword="+SearchFilterJournalEnties+"&year="+yearSSSEELLEECCRTTED;
                             
                         }else{
                             if(current_no!=currentjournal_no && currentjournal_no!=""){
-                            window.location="journalentry?no="+currentjournal_no+"&keyword="+SearchFilterJournalEnties;
+                            window.location="journalentry?no="+currentjournal_no+"&keyword="+SearchFilterJournalEnties+"&year="+yearSSSEELLEECCRTTED;
                             }
                         }
                         
                     }
                     function back_currentjournal_no_go(){
+                        var yearSSSEELLEECCRTTED=document.getElementById('yearSSSEELLEECCRTTED').value;
                         var current_no="{{$JournalNoSelected}}";
                         var keywordselected="{{$keyword}}";//Citi
                         var currentjournal_no="{{$JournalNoSelected-20>-1? ($JournalNoSelected-20)+1 : 1}}";
                         var SearchFilterJournalEnties=document.getElementById('SearchFilterJournalEnties').value;//Globe
                         if(keywordselected!=SearchFilterJournalEnties){
                             //different keyword
-                            window.location="journalentry?no={{$JournalNoSelected-20>-1? ($JournalNoSelected-20)+1 : 1}}&keyword="+SearchFilterJournalEnties;
+                            window.location="journalentry?no={{$JournalNoSelected-20>-1? ($JournalNoSelected-20)+1 : 1}}&keyword="+SearchFilterJournalEnties+"&year="+yearSSSEELLEECCRTTED;
                             
                         }else{
                             if(current_no!=currentjournal_no && currentjournal_no!=""){
-                            window.location="journalentry?no="+currentjournal_no+"&keyword="+SearchFilterJournalEnties;
+                            window.location="journalentry?no="+currentjournal_no+"&keyword="+SearchFilterJournalEnties+"&year="+yearSSSEELLEECCRTTED;
                             }
                         }
                         
                     }
                 function currentjournal_no_go(){
+                    var yearSSSEELLEECCRTTED=document.getElementById('yearSSSEELLEECCRTTED').value;
                     var current_no="{{$JournalNoSelected}}";
                     var keywordselected="{{$keyword}}";//Citi
                     var currentjournal_no=document.getElementById('currentjournal_no').value;
                     var SearchFilterJournalEnties=document.getElementById('SearchFilterJournalEnties').value;//Globe
                     if(keywordselected!=SearchFilterJournalEnties){
                         //different keyword
-                        window.location="journalentry?no=1&keyword="+SearchFilterJournalEnties;
+                        window.location="journalentry?no=1&keyword="+SearchFilterJournalEnties+"&year="+yearSSSEELLEECCRTTED;
                         
                     }else{
                         if(current_no!=currentjournal_no && currentjournal_no!=""){
-                        window.location="journalentry?no="+currentjournal_no+"&keyword="+SearchFilterJournalEnties;
+                        window.location="journalentry?no="+currentjournal_no+"&keyword="+SearchFilterJournalEnties+"&year="+yearSSSEELLEECCRTTED;
                         }
                     }
                     

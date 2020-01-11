@@ -25373,9 +25373,10 @@ class ReportController extends Controller
         date_default_timezone_set('Asia/Manila');
         $date = date('l, d F Y h:i a \G\T\MO');
         $Report = Report::all();
-        $expense_transactions= DB::table('expense_transactions')
-                ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
-                ->get();
+        $expense_transactions = DB::table('expense_transactions')
+            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
+            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
+            ->get();
         $et_account_details= DB::table('et_account_details')->get();
         $VoucherCount=Voucher::count() + 1;
         if($VoucherCount<10){

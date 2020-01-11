@@ -98,22 +98,52 @@
                     <h3 class="mt-2">Sales Transactions</h3>
                     
                     <div class="mb-5 mt-3">
-                        @if ($UserAccessList[0]->invoice=="1")
-                        <a class="btn btn-success" href="#" data-toggle="modal" data-target="#import_invoice_modal">Import Invoices</a>
-                        <a class="btn btn-success" href="invoice.php" data-toggle="modal" data-target="#invoicemodal">Invoice</a>
-                        @endif
-                        @if ($UserAccessList[0]->estimate=="1")
-                        <a class="btn btn-success" href="invoice.php"  data-toggle="modal" data-target="#estimatemodal">Estimate</a>
-                        @endif
-                        @if ($UserAccessList[0]->credit_note=="1")
-                        <a class="btn btn-success" href="invoice.php" data-toggle="modal" data-target="#creditnotemodal">Credit Note</a>
-                        @endif
-                        
-                        @if ($UserAccessList[0]->sales_receipt=="1")
-                        <a class="btn btn-success" style="display:none;" href="invoice.php" data-toggle="modal" data-target="#receivepaymentmodal">Payment</a>
-                        <a class="btn btn-success" style="display:none;" href="invoice.php" data-toggle="modal" data-target="#salesreceiptmodal">Sales Receipt</a>
-                        @endif
-                        <a class="btn btn-success" style="display:none;" href="invoice.php" data-toggle="modal" data-target="#delayedchargemodal">Delayed Charge</a>  
+                        <div class="row">
+                            <div class="col-md-10">
+                                @if ($UserAccessList[0]->invoice=="1")
+                                <a class="btn btn-success" href="#" data-toggle="modal" data-target="#import_invoice_modal">Import Invoices</a>
+                                <a class="btn btn-success" href="invoice.php" data-toggle="modal" data-target="#invoicemodal">Invoice</a>
+                                @endif
+                                @if ($UserAccessList[0]->estimate=="1")
+                                <a class="btn btn-success" href="invoice.php"  data-toggle="modal" data-target="#estimatemodal">Estimate</a>
+                                @endif
+                                @if ($UserAccessList[0]->credit_note=="1")
+                                <a class="btn btn-success" href="invoice.php" data-toggle="modal" data-target="#creditnotemodal">Credit Note</a>
+                                @endif
+                                
+                                @if ($UserAccessList[0]->sales_receipt=="1")
+                                <a class="btn btn-success" style="display:none;" href="invoice.php" data-toggle="modal" data-target="#receivepaymentmodal">Payment</a>
+                                <a class="btn btn-success" style="display:none;" href="invoice.php" data-toggle="modal" data-target="#salesreceiptmodal">Sales Receipt</a>
+                                @endif
+                                <a class="btn btn-success" style="display:none;" href="invoice.php" data-toggle="modal" data-target="#delayedchargemodal">Delayed Charge</a> 
+                            </div>
+                            <div class="col-md-2">
+                                <script>
+                                    function changeyearsales(year){
+                                        location.href="sales?year="+year;
+                                    }
+                                </script>
+                                
+                                <select class="form-control" style="float:right;" onchange="changeyearsales(this.value)">
+                                    @for ($i = 2019; $i <= date('Y'); $i++)
+                                        @if (!empty($yyyyy))
+                                        @if ($i==$yyyyy)
+                                            <option selected>{{$i}}</option>   
+                                        @else
+                                            <option>{{$i}}</option>   
+                                        @endif
+                                        @else
+                                            @if ($i==date('Y'))
+                                                <option selected>{{$i}}</option>   
+                                            @else
+                                                <option>{{$i}}</option>   
+                                            @endif
+                                        @endif
+                                    @endfor
+                                    
+                                </select>  
+                            </div>
+                        </div>
                     </div>
                     <div id="table" class="table-editable">
                         <div class="col-md-12 text-white p-0 mb-5">
@@ -276,16 +306,18 @@
                         <table id="salestable" class="table table-bordered table-responsive-md table-striped text-center font14" width="100%">
                             <thead>
                                 
-                                <th class="text-center">DATE</th>
-                                <th class="text-center">TYPE</th>
-                                <th class="text-center">NO.</th>
-                                <th class="text-center">CUSTOMER</th>
-                                <th class="text-center">DUE-DATE</th>
-                                <th class="text-center">BALANCE</th>
-                                <th class="text-center">TOTAL</th>
-                                <th class="text-center">STATUS</th>
-                                <th class="text-center">ACTION</th>
-                                <th class="text-center"></th>
+                                <th class="text-center" width="8%">DATE</th>
+                                <th class="text-center" width="10%">TYPE</th>
+                                <th class="text-center" width="5%">NO.</th>
+                                <th class="text-center" width="10%">COST CENTER</th>
+                                <th class="text-center" width="10%">DESCRIPTION</th>
+                                <th class="text-center" width="10%">CUSTOMER</th>
+                                <th class="text-center" width="10%">DUE-DATE</th>
+                                <th class="text-center" width="10%">BALANCE</th>
+                                <th class="text-center" width="10%">TOTAL</th>
+                                <th class="text-center" width="10%">STATUS</th>
+                                <th class="text-center" width="10%">ACTION</th>
+                                <th class="text-center" width="5%"></th>
                             </thead>
                             
                             <!-- This is our clonable table line -->

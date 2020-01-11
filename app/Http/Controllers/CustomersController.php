@@ -1454,8 +1454,11 @@ class CustomersController extends Controller
         ->make(true);
     }
 
-    public function refresh_sales_table(){
-        $sales_transaction = SalesTransaction::all();
+    public function refresh_sales_table(Request $request){
+        $begdate=$request->beginning;
+        $enddate=$request->end;
+        $sales_transaction = DB::connection('mysql')->select("SELECT * FROM sales_transaction LEFT JOIN customers ON customers.customer_id=sales_transaction.st_customer_id WHERE st_date BETWEEN '$begdate' AND '$enddate' ");
+        
         
         return \DataTables::of($sales_transaction)
         
@@ -1557,7 +1560,7 @@ class CustomersController extends Controller
                             $s.='<form action="previewformstyle" method="GET">';
                             $s.='<input type="hidden" name="receipt" value="'.$sales_transaction->st_no.'">';
                             $s.='<input type="hidden" name="form" value="'.$formst.'">';
-                            $s.='<input type="submit" class="btn btn-link text-info" name="print_receipt" value="Print Receipt">';
+                            $s.='<input type="submit" class="btn btn-link btn-sm" name="print_receipt" value="Print Receipt">';
                             $s.='</form>';
                             return $s;
                             //return '<span class="table-add mb-3 mr-2"><a class="text-info print_receipt" href="/previewformstyle?receipt='.$sales_transaction->st_no.'"&form='.$formst.' ><i aria-hidden="true">Print Receipt</i></a></span>'; 
@@ -1579,8 +1582,138 @@ class CustomersController extends Controller
                
             }                
         })
+        
+        ->addColumn('cost_center_name', function($sales_transaction){
+            if($sales_transaction->st_type== "Sales Receipt"){
+
+                $STInvoice= STInvoice::where([
+                    ['st_i_no','=',$sales_transaction->st_payment_for],
+                    ['st_p_invoice_type','=',$sales_transaction->st_invoice_type],
+                    ['st_p_location','=',$sales_transaction->st_location]
+                ])->get();
+                $options="";
+
+                foreach($STInvoice as $sti){
+                    if($sti->st_i_total>$sti->st_p_amount){
+                        $label="";
+                        if($sti->st_p_cost_center!=""){
+                            $cost_centers= CostCenter::where([
+                                ['cc_no','=',$sti->st_p_cost_center]
+                            ])->first();
+                            $label=$cost_centers->cc_name;
+                        }
+                        $options.=$label."\n";
+                    }else{
+                        $label="";
+                        if($sti->st_p_cost_center!=""){
+                            $cost_centers= CostCenter::where([
+                                ['cc_no','=',$sti->st_p_cost_center]
+                            ])->first();
+                            $label=$cost_centers->cc_name;
+                        }
+                        $options.=$label."\n";
+                    }
+                    
+                }
+                $cost_centers=$options;
+                
+                return $cost_centers;  
+            }else if($sales_transaction->st_type=="Invoice"){
+                $STInvoice= STInvoice::where([
+                    ['st_i_no','=',$sales_transaction->st_no],
+                    ['st_p_invoice_type','=',$sales_transaction->st_invoice_type],
+                    ['st_p_location','=',$sales_transaction->st_location]
+                ])->get();
+                $options="";
+
+                foreach($STInvoice as $sti){
+                    if($sti->st_i_total>$sti->st_p_amount){
+                        $label="";
+                        if($sti->st_p_cost_center!=""){
+                            $cost_centers= CostCenter::where([
+                                ['cc_no','=',$sti->st_p_cost_center]
+                            ])->first();
+                            $label=$cost_centers->cc_name;
+                        }
+                        $options.=$label."\n";
+                    }else{
+                        $label="";
+                        if($sti->st_p_cost_center!=""){
+                            $cost_centers= CostCenter::where([
+                                ['cc_no','=',$sti->st_p_cost_center]
+                            ])->first();
+                            $label=$cost_centers->cc_name;
+                        }
+                        $options.=$label."\n";
+                    }
+                    
+                }
+                $cost_centers=$options;
+                
+                return $cost_centers;
+            }
+                       
+        })
+        ->addColumn('description', function($sales_transaction){
+            if($sales_transaction->st_type== "Sales Receipt"){
+                $STInvoice= STInvoice::where([
+                    ['st_i_no','=',$sales_transaction->st_payment_for],
+                    ['st_p_invoice_type','=',$sales_transaction->st_invoice_type],
+                    ['st_p_location','=',$sales_transaction->st_location]
+                ])->get();
+                $options="";
+    
+                foreach($STInvoice as $sti){
+                    if($sti->st_i_total>$sti->st_p_amount){
+                        $label="";
+                        if($sti->st_i_desc!=""){
+                            $label=$sti->st_i_desc;
+                        }
+                        $options.=$label."\n";
+                    }else{
+                        $label="";
+                        if($sti->st_i_desc!=""){
+                            $label=$sti->st_i_desc;
+                        }
+                        $options.=$label."\n";
+                    }
+                    
+                }
+                $cost_centers=$options;
+                
+                return $cost_centers;  
+            }else if($sales_transaction->st_type=="Invoice"){
+                $STInvoice= STInvoice::where([
+                    ['st_i_no','=',$sales_transaction->st_no],
+                    ['st_p_invoice_type','=',$sales_transaction->st_invoice_type],
+                    ['st_p_location','=',$sales_transaction->st_location]
+                ])->get();
+                $options="";
+    
+                foreach($STInvoice as $sti){
+                    if($sti->st_i_total>$sti->st_p_amount){
+                        $label="";
+                        if($sti->st_i_desc!=""){
+                            $label=$sti->st_i_desc;
+                        }
+                        $options.=$label."\n";
+                    }else{
+                        $label="";
+                        if($sti->st_i_desc!=""){
+                            $label=$sti->st_i_desc;
+                        }
+                        $options.=$label."\n";
+                    }
+                    
+                }
+                $cost_centers=$options;
+                
+                return $cost_centers;  
+            }
+                         
+        })
         ->addColumn('customer_name', function($sales_transaction){
-            return $sales_transaction->customer_info->display_name;             
+            return $sales_transaction->display_name;             
         })
         ->addColumn('customer_balance', function($sales_transaction){
             return 'PHP '.number_format($sales_transaction->st_balance, 2);             
@@ -1626,7 +1759,7 @@ class CustomersController extends Controller
             if($withpayment==0){
                 if($sales_transaction->remark==""){
                     return "'".$sales_transaction->st_type."','".$sales_transaction->st_no."','".$sales_transaction->st_location."','".$sales_transaction->st_invoice_type."'";
-                    
+                    //return "";
                 }else{
                     return $sales_transaction->remark;
                 }
