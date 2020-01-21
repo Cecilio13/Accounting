@@ -15,6 +15,7 @@ Route::group(['middleware'=>['auth']], function() {
     
     
     
+    Route::post('/get_cancel_entry_desc', 'GetController@get_cancel_entry_desc');
     Route::get('/print_invoice_info', 'GetController@print_invoice_info');
     Route::post('/get_bill_account_detail', 'GetController@get_bill_account_detail');
     Route::post('/get_bill_info_for_supplier_credit', 'GetController@get_bill_info_for_supplier_credit');
@@ -30,8 +31,12 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/get_customer_info', 'GetController@get_customer_info');
     Route::post('/get_product_info', 'GetController@get_product_info');
     
+    Route::get('/export_to_excel', 'ChartofAccountsController@export_to_excel');
     Route::post('/destroy2', 'ChartofAccountsController@destroy2');
     Route::post('/supplierdestroy', 'SuppliersController@destroy2');
+    Route::post('/submit_delete_request_supplier', 'SuppliersController@submit_delete_request_supplier');
+    Route::post('/delete_Supplier_edit', 'SuppliersController@delete_Supplier_edit');
+    
     Route::get('/dashboard', 'PagesController@dashboard');
     Route::get('/banking', 'PagesController@banking');
     Route::get('/voucher', 'PagesController@voucher');
@@ -50,9 +55,14 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/delete_overwrite_journal_entry', 'JournalEntryController@delete_overwrite_journal_entry')->name('delete_overwrite_journal_entry');
     Route::post('/getJournalEntryInfo', 'JournalEntryController@getJournalEntryInfo')->name('getJournalEntryInfo');
     Route::post('/cancel_entry', 'JournalEntryController@cancel_entry')->name('cancel_entry');
+    Route::post('/delete_cancel_entry_request', 'JournalEntryController@delete_cancel_entry_request')->name('delete_cancel_entry_request');
+    Route::post('/approve_cancel_entry_request', 'JournalEntryController@approve_cancel_entry_request')->name('approve_cancel_entry_request');
+    
     Route::post('/add_journal_entry', 'JournalEntryController@add_journal_entry')->name('add_journal_entry');
     Route::post('/get_latest_journal_no', 'JournalEntryController@get_latest_journal_no')->name('get_latest_journal_no');
     
+    
+    Route::post('/submit_delete_request_customer', 'CustomersController@submit_delete_request_customer')->name('submit_delete_request_customer');
     Route::post('/update_customer_note', 'CustomersController@update_customer_note')->name('update_customer_note');
     Route::post('/update_supplier_note', 'SuppliersController@update_supplier_note')->name('update_supplier_note');
     Route::post('/update_expenses_credit_card_charges', 'SuppliersController@update_expenses_credit_card_charges')->name('update_expenses_credit_card_charges');
@@ -154,6 +164,7 @@ Route::group(['middleware'=>['auth']], function() {
     Route::get('/delayedcharge', 'PagesController@delayedcharge');
     Route::get('/pending_user', 'PagesController@pending_user');
     
+    
     Route::get('/print_journal_entry', 'PagesController@print_journal_entry');
     Route::get('/expense', 'PagesController@expense');
     Route::get('/cheque', 'PagesController@cheque');
@@ -192,6 +203,9 @@ Route::group(['middleware'=>['auth']], function() {
     Route::get('/Open_Invoice_List', 'ReportController@Open_Invoice_List')->name('Open_Invoice_List');
     
     
+    Route::get('/SalesandBillingInvoiceReport', 'ReportController@SalesandBillingInvoiceReport')->name('SalesandBillingInvoiceReport');
+    Route::get('/monthly_expense_collection', 'ReportController@monthly_expense_collection')->name('monthly_expense_collection');
+    Route::get('/monthly_invoice_collection', 'ReportController@monthly_invoice_collection')->name('monthly_invoice_collection');
     Route::get('/Movements_in_Equity', 'ReportController@Movements_in_Equity')->name('Movements_in_Equity');
     Route::get('/VAT_List', 'ReportController@VAT_List')->name('VAT_List');
     Route::get('/sales_transaction_list', 'ReportController@sales_transaction_list')->name('sales_transaction_list');
@@ -236,10 +250,15 @@ Route::group(['middleware'=>['auth']], function() {
     Route::get('/BudgetSummaryReport', 'ReportController@BudgetSummaryReport')->name('BudgetSummaryReport');
     
     
+    Route::post('/Invoice_List_sorted_by_date', 'ReportController@Invoice_List_sorted_by_date')->name('Invoice_List_sorted_by_date');
     Route::post('/MovementinEquityByDate', 'ReportController@MovementinEquityByDate')->name('MovementinEquityByDate');
     Route::post('/favorite_report', 'ReportController@favorite_report')->name('favorite_report');
     Route::post('/VAT_List_By_Date', 'ReportController@VAT_List_By_Date')->name('VAT_List_By_Date');
     Route::post('/sales_transaction_list_by_date', 'ReportController@sales_transaction_list_by_date')->name('sales_transaction_list_by_date');
+    Route::post('/monthly_sales_transaction_list_by_date', 'ReportController@monthly_sales_transaction_list_by_date')->name('monthly_sales_transaction_list_by_date');
+    
+    
+    Route::post('/monthly_expense_by_date', 'ReportController@monthly_expense_by_date')->name('monthly_expense_by_date');
     Route::post('/expense_transaction_list_by_date', 'ReportController@expense_transaction_list_by_date')->name('expense_transaction_list_by_date');
     Route::post('/update_sales_receipt_edit', 'ReportController@update_sales_receipt_edit')->name('update_sales_receipt_edit');
     Route::post('/update_credit_note_edit', 'ReportController@update_credit_note_edit')->name('update_credit_note_edit');
@@ -299,6 +318,9 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/findInvoiceNoCu', 'CustomersController@findInvoiceNoCu')->name('findInvoiceNoCu');
     
     
+    Route::get('/exporttoexcelINVOICELIST', 'ChartofAccountsController@exporttoexcelINVOICELIST')->name('exporttoexcelINVOICELIST');
+    Route::get('/export_monthly_expense', 'ChartofAccountsController@export_monthly_expense')->name('export_monthly_expense');
+    Route::get('/export_monthly_invoice', 'ChartofAccountsController@export_monthly_invoice')->name('export_monthly_invoice');
     Route::post('/update_bid_of_quotation', 'ChartofAccountsController@update_bid_of_quotation')->name('update_bid_of_quotation');
     Route::post('/UploadMassBudget', 'ChartofAccountsController@UploadMassBudget')->name('UploadMassBudget');
     Route::post('/UploadMassCC', 'ChartofAccountsController@UploadMassCC')->name('UploadMassCC');

@@ -82,6 +82,7 @@ class SuppliersController extends Controller
                 $et_account->et_ad_rate = $ee->et_ad_rate;
                 $et_account->et_ad_qty = $ee->et_ad_qty;
                 $et_account->et_ad_type = $ee->et_ad_type;
+                $et_account->et_cost_center =$ee->et_cost_center;
                 $totalamount+=$ee->et_ad_total;
                 $et_account->save(); 
 
@@ -110,8 +111,12 @@ class SuppliersController extends Controller
                 $journal_entries->je_attachment=$JDate;
                 $journal_entries->je_transaction_type="Bill";
                 
+                if($ee->et_cost_center!=''){
+                    $journal_entries->je_cost_center=$ee->et_cost_center;
+                }else{
+                    $journal_entries->je_cost_center=$et[0]->et_debit_account;
+                }
                 
-                $journal_entries->je_cost_center=$et[0]->et_debit_account;
                 $journal_entries->save();
 
                 $JDate=$et[0]->et_date;
@@ -139,7 +144,11 @@ class SuppliersController extends Controller
                 $journal_entries->je_attachment=$JDate;
                 $journal_entries->je_transaction_type="Bill";
                 
-                $journal_entries->je_cost_center=$et[0]->et_debit_account;
+                if($ee->et_cost_center!=''){
+                    $journal_entries->je_cost_center=$ee->et_cost_center;
+                }else{
+                    $journal_entries->je_cost_center=$et[0]->et_debit_account;
+                }
                 $journal_entries->save();
                 // $customer->opening_balance = $customer->opening_balance + $request->input('product_qty'.$x) * $request->input('select_product_rate'.$x);
                 // $customer->save();
@@ -149,8 +158,8 @@ class SuppliersController extends Controller
                 ['et_type','=','Bill']
             ])->first();
             $expense_transaction->bill_balance=$totalamount;
-            $customer->opening_balance = $customer->opening_balance + $totalamount;
-            $customer->save();
+            // $customer->opening_balance = $customer->opening_balance + $totalamount;
+            // $customer->save();
             $expense_transaction->save();
             //check for error
             $customer = Customers::find($et[0]->et_customer);
@@ -192,7 +201,9 @@ class SuppliersController extends Controller
         // ])->delete();
     }
     public function getExpenses(Request $request){
-        $customers = Customers::all();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::all();
         $Supplier= Supplier::where('supplier_active', '1')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -229,7 +240,9 @@ class SuppliersController extends Controller
     }
     public function edit($id)
     {
-        $customers = Customers::all();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $supplier= Supplier::find($id);
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -266,7 +279,9 @@ class SuppliersController extends Controller
                 ['et_customer', '=', $supplier_id],
             ])
             ->get();
-            $customers = Customers::all();
+            $customers = Customers::where([
+                ['supplier_active','=','1']
+            ])->orderBy('display_name', 'ASC')->get();
         $picked = Customers::find($supplier_id);
         //$picked= Supplier::find($supplier_id);
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -329,6 +344,51 @@ class SuppliersController extends Controller
             return 0;
         }
     }
+    public function submit_delete_request_supplier(Request $request){
+        $customeredit =Customers::find($request->id);
+        $customer =CustomerEdit::find($request->id);
+        if(empty($customer)){
+            
+            $customer = new CustomerEdit;
+        }
+
+            $customer->customer_id = $customeredit->customer_id;
+            $customer->f_name = $customeredit->f_name;
+            $customer->l_name = $customeredit->l_name;
+            $customer->email = $customeredit->email;
+            $customer->company = $customeredit->company;
+            $customer->phone = $customeredit->phone;
+            $customer->mobile = $customeredit->mobile;
+            $customer->fax = $customeredit->fax;
+            $customer->display_name = $customeredit->display_name;
+            $customer->other = $customeredit->other;
+            $customer->website = $customeredit->website;
+            $customer->street = $customeredit->street;
+            $customer->city = $customeredit->city;
+            $customer->state = $customeredit->state;
+            $customer->postal_code = $customeredit->postal_code;
+            $customer->country = $customeredit->country;
+            $customer->payment_method = $customeredit->payment_method;
+            $customer->terms = $customeredit->terms;
+            $customer->opening_balance = $customeredit->opening_balance;
+            $customer->as_of_date = $customeredit->as_of_date;
+            $customer->account_no = $customeredit->account_no;
+            $customer->business_id_no = $customeredit->business_id_no;
+            $customer->notes = $customeredit->notes;
+            $customer->attachment = $customeredit->attachment;
+            $customer->tin_no=$customeredit->tin_no;
+            $customer->tax_type=$customeredit->tax_type;
+            $customer->vat_value=$customeredit->vat_value;
+            $customer->supplier_active="0";
+            $customer->account_type=$customeredit->account_type;
+            $customer->business_style=$customeredit->business_style;
+            $customer->edit_status="0";
+            if($customer->save()){
+               
+            }
+        
+        
+    }
     public function update_Supplier_edit(Request $request){
         $customeredit =CustomerEdit::find($request->id);
         $customer =Customers::find($request->id);
@@ -359,7 +419,7 @@ class SuppliersController extends Controller
             $customer->tin_no=$customeredit->tin_no;
             $customer->tax_type=$customeredit->tax_type;
             $customer->vat_value=$customeredit->vat_value;
-            $customer->supplier_active="1";
+            $customer->supplier_active=$customeredit->supplier_active;
             $customer->account_type="Supplier";
             $customer->business_style=$customeredit->business_style;
             if($customer->save()){
@@ -781,6 +841,7 @@ class SuppliersController extends Controller
 
     public function add_bill(Request $request)
     {
+        //return $request;
         $sss=explode(" - ",$request->bill_customer);
         $numbering = Numbering::first();
         
@@ -828,12 +889,14 @@ class SuppliersController extends Controller
         }
         $totalamount=0;
         for($x=0;$x<$request->account_count_bills;$x++){
+            $x2=$x+1;
             $et_account = new EtAccountDetailNew;
             $et_account->et_ad_no = $request->bill_bill_no;
             $et_account->et_ad_product = $request->input('select_account_bill'.$x);
             $et_account->et_ad_desc = $request->input('select_description_bill'.$x);
             $et_account->et_ad_total = $request->input('select_bill_amount'.$x);
             $et_account->et_ad_rate = 1;
+            $et_account->et_cost_center =$request->input('select_cost_center_bill'.$x2);
             $et_account->et_ad_qty = $request->bill_bill_no;
             $et_account->et_ad_type = "Bill";
             $totalamount+=$request->input('select_bill_amount'.$x);
@@ -958,6 +1021,7 @@ class SuppliersController extends Controller
                     $et_account->et_ad_no = $request->suppliers_credit_no;
                     $et_account->et_ad_type = "Supplier credit";
                     $et_account->et_ad_product = $request->input('select_account_sc'.$x);
+                    $et_account->et_cost_center = $request->input('select_costcenter_sc'.$x);
                     $et_account->et_ad_desc = $request->input('select_description_sc'.$x);
                     $et_account->et_ad_rate = $request->input('hiddenet_ad_id'.$x)." == ".$checked;
                     $et_account->et_ad_total = -$request->input('select_sc_amount'.$x);
@@ -996,7 +1060,13 @@ class SuppliersController extends Controller
                     $journal_entries->created_at=$JDate;
                     $journal_entries->je_attachment=$JDate;
                     $journal_entries->je_transaction_type="Supplier Credit";
-                    $wwe=explode(" - ",$request->CostCenterSupplierCredit);
+                    if($request->input('select_costcenter_sc'.$x)!=""){
+                        $wwe=explode(" - ",$request->input('select_costcenter_sc'.$x));
+                    }else{
+                        $wwe=explode(" - ",$request->CostCenterSupplierCredit);
+                        
+                    }
+                    
                     $journal_entries->je_cost_center=$wwe[0];
                     $journal_entries->save();
 
@@ -1024,7 +1094,12 @@ class SuppliersController extends Controller
                     $journal_entries->created_at=$JDate;
                     $journal_entries->je_attachment=$JDate;
                     $journal_entries->je_transaction_type="Supplier Credit";
-                    $wwe=explode(" - ",$request->CostCenterSupplierCredit);
+                    if($request->input('select_costcenter_sc'.$x)!=""){
+                        $wwe=explode(" - ",$request->input('select_costcenter_sc'.$x));
+                    }else{
+                        $wwe=explode(" - ",$request->CostCenterSupplierCredit);
+                        
+                    }
                     $journal_entries->je_cost_center=$wwe[0];
                     $journal_entries->save();
                     // $customer->opening_balance = $customer->opening_balance + $request->input('product_qty'.$x) * $request->input('select_product_rate'.$x);

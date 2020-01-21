@@ -43,6 +43,7 @@ use App\VoucherTransaction;
 use App\VoucherJournalEntry;
 use App\CC_Type;
 use App\CostCenter;
+use App\PendingCancelEntry;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -76,6 +77,10 @@ class AppServiceProvider extends ServiceProvider
                 $data->save();
             }
         }
+        
+        view()->share('PendingCancelEntry', PendingCancelEntry::where([
+            ['entry_status','=','1']
+        ])->get());
         view()->share('CC_Types_list', CC_Type::orderBy('cc_code', 'asc')->get());
         view()->share('CC_Types_list_groupped', CC_Type::groupBy('cc_type')->orderBy('cc_code', 'asc')->get());
         // //View::share('user', \Auth::user());

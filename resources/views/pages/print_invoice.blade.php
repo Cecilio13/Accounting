@@ -200,7 +200,7 @@ $(document).ready(function(){
             var myImage = canvas.toDataURL("image/png");
             var tmp = document.body.innerHTML;
 
-            document.body.innerHTML = '<table><tr><td style="vertical-align:middle;text-align:center;"><img style="width:90%" src="'+myImage+'" alt=""></td></tr></table>';
+            document.body.innerHTML = '<style type="text/css">@page { size : portrait}</style><table><tr><td style="vertical-align:middle;text-align:center;"><img style="width:90%" src="'+myImage+'" alt=""></td></tr></table>';
             setTimeout(function()
             {
                 var printWindow = window.print();
@@ -217,6 +217,6 @@ $(document).ready(function(){
 })
 </script>
 <style type="text/css" media="print">
-    @page { size: landscape; }
+    @page { size: portrait; }
   </style>
 @endsection

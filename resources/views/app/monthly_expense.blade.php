@@ -15,14 +15,11 @@
                 $("#modallike").toggle("slide");
             });
         }
-    </script>
-    <script>
         $(document).ready(function(){
-           document.getElementById('filtertemplate').value="This Year";
-           changedates(document.getElementById('filtertemplate'))
-           
-        });
-   </script>
+            setfrommonthyear();
+        })
+    </script>
+    
     <div id="">
     <div id="modallike" onclick="hidecustomizationsection()">
         
@@ -51,7 +48,14 @@
                     <div  id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                     <div class="card-body">
                     <script>
-                        
+                        $(document).ready(function(){
+                            //tablemain
+                            
+                            for(var i=9;i<13;i++){
+                                $('td:nth-child('+i+'),th:nth-child('+i+')','#tablemain ').hide();
+                            }
+                            
+                        });
                         function hideshowcolumntable(element){
                                 var el=element.value;
                                 if(element.checked){
@@ -97,15 +101,15 @@
                         <label class="custom-control-label" for="customCheck5">Open Balance</label>
                         </div>
                         <div class="custom-control custom-checkbox">
-                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" checked class="custom-control-input" value="9" id="customCheck9">
+                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" class="custom-control-input" value="9" id="customCheck9">
                         <label class="custom-control-label" for="customCheck9">Billing Address</label>
                         </div>
                         <div class="custom-control custom-checkbox">
-                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" checked class="custom-control-input" value="10" id="customCheck10">
+                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" class="custom-control-input" value="10" id="customCheck10">
                         <label class="custom-control-label" for="customCheck10">Shipping Address</label>
                         </div>
                         <div class="custom-control custom-checkbox">
-                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" checked class="custom-control-input" value="11" id="customCheck11">
+                        <input type="checkbox" onclick="hideshowcolumntable(this)" name="columnnames[]" class="custom-control-input" value="11" id="customCheck11">
                         <label class="custom-control-label" for="customCheck11">Terms</label>
                         </div>
                     </div>
@@ -124,6 +128,16 @@
                     <div class="card-body">
                         
                         <script>
+                            function export_monthly_invoice(){
+                                var filtertemplate= document.getElementById('filtertemplate').value;
+                                var FROM= document.getElementById('Fromdate').value;
+                                var TO= document.getElementById('Todate').value;
+                                var CostCenterFilter = document.getElementById('CostCenterFilter').value;
+                                window.open(
+                                'export_monthly_expense?filtertemplate='+filtertemplate+'&FROM='+FROM+'&TO='+TO+'&CostCenterFilter='+CostCenterFilter,
+                                '_blank' 
+                                );
+                            }
                             function submitdates(){
                                 var filtertemplate= document.getElementById('filtertemplate').value;
                                 var FROM= document.getElementById('Fromdate').value;
@@ -137,7 +151,7 @@
                                     //window.location.replace("/Invoice_List?date_from="+FROM+"&date_to="+TO);
                                     $.ajax({
                                         type: 'POST',
-                                        url: 'VAT_List_By_Date',                
+                                        url: 'monthly_expense_by_date',                
                                         data: {CostCenterFilter:CostCenterFilter,filtertemplate:filtertemplate,FROM:FROM,TO:TO,_token: '{{csrf_token()}}'},
                                         success: function(data) {
                                         $( "#tablemain" ).replaceWith( data);
@@ -274,7 +288,7 @@
                                         FROM.value=(d.getFullYear()-1)+"-01-01";    
                                         TO.value=(d.getFullYear()-1)+"-12-31";
                                     }
-                                    document.getElementById('datedivs').style.display="block";
+                                    //document.getElementById('datedivs').style.display="block";
                                     
                                 }
                                 submitdates();
@@ -320,7 +334,6 @@
                             </select>
                         </div>
                         </div>
-                        
                     </div>
                 </div>
             </div>
@@ -329,7 +342,7 @@
     </div>
 <div class="row">
     <div class="col-md-12">
-        <h4>TAX Report</h4>
+        <h4>Monthly Expense Report</h4>
     </div>
 </div>
 <div class="row">
@@ -357,14 +370,12 @@
             td4= tr[i].getElementsByTagName("td")[3];
             td5= tr[i].getElementsByTagName("td")[4];
             td6= tr[i].getElementsByTagName("td")[5];
-            td7= tr[i].getElementsByTagName("td")[6];
-            td8= tr[i].getElementsByTagName("td")[7];
             
             
             if (td) {
             if (td.innerHTML.toUpperCase().indexOf(filter) > -1 || td2.innerHTML.toUpperCase().indexOf(filter) > -1 
                     || td3.innerHTML.toUpperCase().indexOf(filter) > -1 || td4.innerHTML.toUpperCase().indexOf(filter) > -1 || td5.innerHTML.toUpperCase().indexOf(filter) > -1
-                    || td6.innerHTML.toUpperCase().indexOf(filter) > -1 || td7.innerHTML.toUpperCase().indexOf(filter) > -1 || td8.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    || td6.innerHTML.toUpperCase().indexOf(filter) > -1 ) {
                 tr[i].style.display = "";
             } else {
                 tr[i].style.display = "none";
@@ -376,7 +387,7 @@
         </script>
     </div>
     <div class="col-md-6" style="text-align:right;">
-        <button class="btn btn-outline-dark" onclick="showcustomizationsection()">Customize</button>
+        <button class="btn btn-outline-dark" style="display:none;" onclick="showcustomizationsection()">Customize</button>
         <button class="btn btn-success"  data-toggle="modal" data-target="#exampleModal">Save customization</button>
         
     </div>
@@ -411,43 +422,85 @@
       </div>
 </div>
 <div class="row">
-    <div class="col-md-12" style="margin-top:10px;">
-            <div class="col-md-12" style="background-color: white;padding-top:15px;padding-bottom:15px;padding-left:0px;padding-right:0px;">
-                    <div >
-                    
-                    <div class="col-md-6 ">
-                            
-                            <p>Date</p>
-                            <select class="form-control" id="filtertemplate" onchange="changedates(this)">
-                                    <option>All</option>
-                                    <option>Custom</option>
-                                    <option>This Week</option>
-                                    <option>This Month</option>
-                                    <option>This Quarter</option>
-                                    <option>This Year</option>
-                                    <option>Last Week</option>
-                                    <option>Last Month</option>
-                                    <option>Last Quarter</option>
-                                    <option>Last Year</option>
+        <div class="col-md-12" style="margin-top:10px;">
+                <div class="col-md-12" style="background-color: white;padding-top:15px;padding-bottom:15px;padding-left:0px;padding-right:0px;">
+                <div >
+                
+                <div class="col-md-6 ">
+                        
+                        <p>Date</p>
+                        <div class="form-row">
+                            <div class="col">
+                                <select class="form-control" id="month_selected" onchange="setfrommonthyear()">
+                                    <option {{date('m')=="01"? 'selected' : ''}} value="0">January</option>
+                                    <option {{date('m')=="02"? 'selected' : ''}} value="1">February</option>
+                                    <option {{date('m')=="03"? 'selected' : ''}} value="2">March</option>
+                                    <option {{date('m')=="04"? 'selected' : ''}} value="3">April</option>
+                                    <option {{date('m')=="05"? 'selected' : ''}} value="4">May</option>
+                                    <option {{date('m')=="06"? 'selected' : ''}} value="5">June</option>
+                                    <option {{date('m')=="07"? 'selected' : ''}} value="6">July</option>
+                                    <option {{date('m')=="08"? 'selected' : ''}} value="7">August</option>
+                                    <option {{date('m')=="09"? 'selected' : ''}} value="8">September</option>
+                                    <option {{date('m')=="10"? 'selected' : ''}} value="9">October</option>
+                                    <option {{date('m')=="11"? 'selected' : ''}} value="10">November</option>
+                                    <option {{date('m')=="12"? 'selected' : ''}} value="11">December</option>
                                 </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-control" id="year_selected" onchange="setfrommonthyear()">
+                                    @for ($i =date('Y') ; $i >= 2019; $i--)
+                                        <option>{{$i}}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <script>
+                                function setfrommonthyear(){
+                                    var month_selected=document.getElementById('month_selected').value;
+                                    
+                                    var year_selected=document.getElementById('year_selected').value;
+                                    var month = month_selected;
+                                    var d = new Date(year_selected, parseFloat(month) + parseFloat(1), 0);
+                                   
+                                    var month_formated=parseFloat(month) + parseFloat(1);
+                                    if(month_formated<10){
+                                        month_formated="0"+month_formated;
+                                    }
+                                    document.getElementById('Fromdate').value=year_selected+"-"+month_formated+"-01";
+                                    document.getElementById('Todate').value=year_selected+"-"+month_formated+"-"+d.getDate();
+                                    submitdates();
+                                }
+                            </script>
+                        </div>
+                        <select class="form-control" style="display:none;" id="filtertemplate" onchange="changedates(this)">
+                                <option>All</option>
+                                <option selected>Custom</option>
+                                <option>This Week</option>
+                                <option>This Month</option>
+                                <option>This Quarter</option>
+                                <option>This Year</option>
+                                <option>Last Week</option>
+                                <option>Last Month</option>
+                                <option>Last Quarter</option>
+                                <option>Last Year</option>
+                            </select>
+                            
+                            <div id="datedivs" style="display:none;margin-top:10px;border-top:1px solid #ccc ;">
+                            <div class="form-group">
+                                <label for="Fromdate">From</label>
+                                <input type="date" class="form-control" oninput="submitdates()" onkeyup="submitdates()" id="Fromdate" >
                                 
-                                <div id="datedivs" style="display:none;margin-top:10px;border-top:1px solid #ccc ;">
-                                <div class="form-group">
-                                    <label for="Fromdate">From</label>
-                                    <input type="date" class="form-control" oninput="submitdates()" onkeyup="submitdates()" id="Fromdate" >
-                                    
-                                </div>
-                                <div class="form-group">
-                                    <label for="Todate">To</label>
-                                    <input type="date" class="form-control" oninput="submitdates()" onkeyup="submitdates()" id="Todate" >
-                                    
-                                </div>
-                                </div>    
-                    </div>
-                    <div class="col-md-6 ">
-                            <p>Cost Center</p>
-                            <select class="form-control selectpicker" data-live-search="true" id="CostCenterFilter" onchange="submitdates()">
-                                @foreach ($UserAccessCostCenterList as $uaccl)
+                            </div>
+                            <div class="form-group">
+                                <label for="Todate">To</label>
+                                <input type="date" class="form-control" oninput="submitdates()" onkeyup="submitdates()" id="Todate" >
+                                
+                            </div>
+                            </div>    
+                </div>
+                <div class="col-md-6 ">
+                        <p>Cost Center</p>
+                        <select class="form-control selectpicker" data-live-search="true" id="CostCenterFilter" onchange="submitdates()">
+                            @foreach ($UserAccessCostCenterList as $uaccl)
                                 @if ("All"==$uaccl->cost_center_id)
                                     <option>All</option>
                                 <?php
@@ -469,10 +522,10 @@
                                     submitdates();
                                 })
                             </script>
-                    </div>
                 </div>
-            </div>  
-    </div>
+            </div>
+        </div> 
+    </div> 
 </div>
 <script>
     function SaveCustomReport(){
@@ -488,7 +541,7 @@
             reportsettings['ReportID']=document.getElementById('InputReportID').value;
             reportsettings['ReportHeader']=document.getElementById('report_employee_companynameheader').innerHTML;
             reportsettings['ReportTitle']=document.getElementById('report_employee_companynameheader').innerHTML;
-            reportsettings['ReportType']="TAX";
+            reportsettings['ReportType']="Monthly Expense";
             reportsettings['noteShow']=noteshow;
             reportsettings['noteContent']=document.getElementById('employeecontactnote').value;
             reportsettings['ReportSortBy']=document.getElementById('Sortbyselect').value;
@@ -504,7 +557,6 @@
             }else{
             reportsettings['report_cost_center_filter']="";
             }
-           
             $.ajax({
             type: 'POST',
             headers: {
@@ -598,13 +650,13 @@
                             </div>
                             <label for="exampleRadios1">Sort in</label>
                             <div class="form-check">
-                            <input class="form-check-input" onchange="ss()" type="radio" name="exampleRadios" id="exampleRadios1" value="asc" >
+                            <input class="form-check-input" onchange="ss()" type="radio" name="exampleRadios" id="exampleRadios1" value="asc" checked>
                             <label class="form-check-label" for="exampleRadios1">
                                 Ascending order
                             </label>
                             </div>
                             <div class="form-check">
-                            <input class="form-check-input" onchange="ss()" type="radio" name="exampleRadios" id="exampleRadios2" value="desc"checked >
+                            <input class="form-check-input" onchange="ss()" type="radio" name="exampleRadios" id="exampleRadios2" value="desc" >
                             <label class="form-check-label" for="exampleRadios2">
                                 Descending order
                             </label>
@@ -615,7 +667,7 @@
                         
                     </td>
                     <td style="vertical-align:middle;text-align:right;">
-                        <a href="#" class="btn-link btn-sm" title="Export to Excel" onclick="exporttoexcel('tablemain')"><span class="fa fa-table"></a>
+                        <a href="#" class="btn-link btn-sm" title="Export to Excel" onclick="export_monthly_invoice()"><span class="fa fa-table"></a>
                         <a href="#" style="display:none;" class="btn-link btn-sm"><span class="ti-email"></span></a>
                         <a href="#" class="btn-link btn-sm" onclick="PrintElem('printablereport_employee_contact_list')"><span class="ti-printer"></span></a>
                         <a href="#" style="display:none;" class="btn-link btn-sm"><span class="ti-export"></span></a>
@@ -627,12 +679,11 @@
                         <td id="report_employee_companynameheader" colspan="2" style="vertical-align:middle;font-size:22px;text-align:center;padding-top:30px;" contenteditable="true" >ECC</td>
                     </tr>
                     <tr>
-                        <td colspan="2" id="report_employee_title" style="vertical-align:middle;text-align:center;font-size:14px;font-weight:bold;text-transform: uppercase;" contenteditable="true" >TAX</td>
+                        <td colspan="2" id="report_employee_title" style="vertical-align:middle;text-align:center;font-size:14px;font-weight:bold;text-transform: uppercase;" contenteditable="true" >Monthly Expense</td>
                     </tr>
                     <tr>
                         <td colspan="2" style="vertical-align:middle;" >
                         <script>
-                            
                         function sortTable(n,order) {
                         var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
                         table = document.getElementById("tablemain");
@@ -694,24 +745,19 @@
                             
                             <table id="tablemain" class="table table-sm" style="text-align:left;font-size:12px;">
                                 <thead>
-                                <tr >
-                                    <th>#</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
+                                <tr>
                                     
-                                    <th>Description</th>
-                                    <th>Qty</th>
-                                    <th>Rate</th>
-                                    <th>Amount</th>
-                                    <th>VAT</th>
-                                    <th>Total</th>
-                                    <th>Withhold Tax</th>
-                                    <th>Net Amount</th>
+                                    <th>Date</th>
+                                    <th>Supplier</th>
+                                    <th>TIN</th>
+                                    <th>Receipt #</th>
+                                    <th width="15%">Description</th>
+                                    <th>Amount</th>                                   
                                 </tr>
                                 
                                 </thead>
                                 <tbody>
-                                
+                                    
                                 </tbody>
                             </table>
                         </td>

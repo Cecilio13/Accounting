@@ -231,7 +231,10 @@ class PagesController extends Controller
             return redirect()->intended('/accountsandsettings');
         }
             
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
+        
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -442,7 +445,9 @@ class PagesController extends Controller
     }
     public function print_journal_entry(Request $request){
         $Journal_no_selected= $request->no;
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -480,7 +485,9 @@ class PagesController extends Controller
         return view('pages.print_journal', compact('Journal_no_selected','numbering','st_invoice','cost_center_list','favorite_report','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','Report','customers', 'products_and_services','JournalEntry','jounalcount','VoucherCount'));
     }
     public function reports(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -520,7 +527,9 @@ class PagesController extends Controller
     public function userprofile(){
         
         
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -558,7 +567,9 @@ class PagesController extends Controller
         return view('pages.userprofile', compact('numbering','st_invoice','cost_center_list','favorite_report','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','Report','customers', 'products_and_services','JournalEntry','jounalcount','VoucherCount'));
     }
     public function voucher(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -595,7 +606,9 @@ class PagesController extends Controller
 
     }
     public function banking(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -631,7 +644,9 @@ class PagesController extends Controller
         return view('pages.banking', compact('numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount','customers','JournalEntry','products_and_services','VoucherCount'));
     }
     public function pending_user(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -677,7 +692,9 @@ class PagesController extends Controller
         return view('pages.sync');
     }
     public function approvals(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $products_and_services = ProductsAndServices::all();
         $jounal = DB::table('journal_entries')
@@ -720,9 +737,12 @@ class PagesController extends Controller
             $year_beg=$request->year.'-01-01';
             $year_end=$request->year.'-12-31';
         }
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $supplierss = Customers::where([
-            ['account_type','=','Supplier']
+            ['account_type','=','Supplier'],
+            ['supplier_active','=','1']
         ])->get();
         
         $products_and_services = ProductsAndServices::all();
@@ -751,8 +771,9 @@ class PagesController extends Controller
         WHERE et_date BETWEEN '$year_beg' AND '$year_end' ");
             $et_acc = DB::table('et_account_details')->get();
             $et_it = DB::table('et_item_details')->get();
-        $et_new=DB::connection('mysql')->select("SELECT * FROM expense_transactions_new WHERE et_date BETWEEN '$year_beg' AND '$year_end'");
-
+        $journal_total_by_name=  DB::connection('mysql')->select("SELECT *, SUM(je_debit) as total_by_name FROM `journal_entries` WHERE  (je_name!='' AND je_name IS NOT NULL ) AND (je_debit!='' AND je_debit IS NOT NULL) AND (remark='' OR remark IS NULL) GROUP BY je_name  
+        ORDER BY `journal_entries`.`cancellation_date`  DESC");
+        $et_new=DB::connection('mysql')->select("SELECT * FROM expense_transactions_new WHERE (et_status!='OK' OR et_status IS NULL) AND et_date BETWEEN '$year_beg' AND '$year_end'");
         $totalexp=0;
         foreach($expense_transactions as $et){
             if($et->remark=="" && $et->et_type==$et->et_ad_type){$totalexp=$totalexp+$et->et_ad_total;}
@@ -762,11 +783,13 @@ class PagesController extends Controller
         $numbering = Numbering::first();         $st_invoice = DB::table('st_invoice')->get();
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
         
-        return view('pages.expenses', compact('et_new','yyyyy','year_end','year_beg','supplierss','numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','et_it','et_acc','totalexp','expense_transactions','jounalcount','customers','Supplier', 'products_and_services','JournalEntry','VoucherCount'));
+        return view('pages.expenses', compact('journal_total_by_name','et_new','yyyyy','year_end','year_beg','supplierss','numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','et_it','et_acc','totalexp','expense_transactions','jounalcount','customers','Supplier', 'products_and_services','JournalEntry','VoucherCount'));
     }
    
     public function taxes(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -806,7 +829,9 @@ class PagesController extends Controller
         $chart_of_accounts = DB::table('chart_of_accounts')
                 ->where('coa_active', '1')
                  ->get();
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -924,7 +949,9 @@ class PagesController extends Controller
         $chart_of_accounts = DB::table('chart_of_accounts')
                 ->where('coa_active', '1')
                  ->get();
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1050,7 +1077,9 @@ class PagesController extends Controller
         return view('pages.salesreceipt');
     }
     public function sales(Request $request){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1179,7 +1208,9 @@ class PagesController extends Controller
         }else{
             $keyword="";
         }
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         if($keyword==""){
@@ -1231,7 +1262,9 @@ class PagesController extends Controller
     
     }
     public function checkregister(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1271,7 +1304,9 @@ class PagesController extends Controller
         return view('pages.register', compact('all_cost_center_list','deposit_records','numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount','JournalEntry','customers', 'products_and_services', 'sales_transaction','VoucherCount'));
     }
     public function statements(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1318,7 +1353,9 @@ class PagesController extends Controller
         $advance = Advance::first();
         $numbering = Numbering::first();         
         $st_invoice = DB::table('st_invoice')->get();
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -1353,7 +1390,9 @@ class PagesController extends Controller
         return view('pages.accountsandsettings', compact('numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount','JournalEntry','company', 'sales', 'expenses', 'advance', 'customers', 'products_and_services','VoucherCount'));
     }
     public function customformstyles(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1395,7 +1434,9 @@ class PagesController extends Controller
 
 
     public function alllists(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1434,7 +1475,9 @@ class PagesController extends Controller
     }
     
     public function recurringtransactions(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1471,7 +1514,9 @@ class PagesController extends Controller
         return view('pages.recurringtransactions', compact('numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount','JournalEntry','customers', 'products_and_services', 'sales_transaction','VoucherCount'));
     }
     public function attachments(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1509,7 +1554,9 @@ class PagesController extends Controller
     }
     //
     public function importdata(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1546,7 +1593,9 @@ class PagesController extends Controller
         return view('pages.importdata', compact('numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount','JournalEntry','customers', 'products_and_services', 'sales_transaction','VoucherCount'));
     }
     public function exportdata(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
@@ -1583,7 +1632,9 @@ class PagesController extends Controller
         return view('pages.exportdata', compact('numbering','st_invoice','cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','jounalcount','JournalEntry','customers', 'products_and_services', 'sales_transaction','VoucherCount'));
     }
     public function auditlog(){
-        $customers = Customers::all();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->get();
         $products_and_services = ProductsAndServices::all();
         $sales_transaction = SalesTransaction::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();

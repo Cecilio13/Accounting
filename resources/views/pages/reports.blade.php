@@ -125,26 +125,6 @@
                                                     <td style="vertical-align:middle;" colspan="2"><a class="btn btn-link" href="AuditLogs">Audit Log</a></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="BudgetSummaryReport">Budget Summary Report</a></td>
-                                                    <td style="vertical-align:middle;">
-                                                        <?php
-                                                        $report_status=0;
-                                                        ?>
-                                                        @foreach ($favorite_report as $fv)
-                                                            @if($fv->report_name=="Budget Summary Report" && $fv->report_status=='1')
-                                                            <?php
-                                                            $report_status=1;
-                                                            ?>
-                                                            @endif
-                                                        @endforeach
-                                                        @if($report_status==1)
-                                                            <button class="btn btn-link btn-sm" data-report-name="Budget Summary Report" onclick="favorite(this,1,'BudgetSummaryReport')"><i class="fas fa-star"></i></button>
-                                                            @else
-                                                            <button class="btn btn-link btn-sm" data-report-name="Budget Summary Report" onclick="favorite(this,0,'BudgetSummaryReport')"><i class="far fa-star"></i></button>
-                                                            @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
                                                     <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="BalanceSheetComparison">Balance Sheet Comparison</a></td>
                                                     <td style="vertical-align:middle;">
                                                         <?php
@@ -204,47 +184,87 @@
                                                             @endif
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="ProfitandLossasPercentageTotal">Profit and Loss as % of total income</a></td>
-                                                    <td style="vertical-align:middle;">
-                                                        <?php
-                                                        $report_status=0;
-                                                        ?>
-                                                        @foreach ($favorite_report as $fv)
-                                                            @if($fv->report_name=="Profit and Loss as % of total income" && $fv->report_status=='1')
-                                                            <?php
-                                                            $report_status=1;
-                                                            ?>
-                                                            @endif
-                                                        @endforeach
-                                                        @if($report_status==1)
-                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss as % of total income" onclick="favorite(this,1,'ProfitandLossasPercentageTotal')"><i class="fas fa-star"></i></button>
-                                                            @else
-                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss as % of total income" onclick="favorite(this,0,'ProfitandLossasPercentageTotal')"><i class="far fa-star"></i></button>
-                                                            @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="ProfitAndLostComparison">Profit and Loss Comparison</a></td>
-                                                    <td style="vertical-align:middle;">
-                                                        <?php
-                                                        $report_status=0;
-                                                        ?>
-                                                        @foreach ($favorite_report as $fv)
-                                                            @if($fv->report_name=="Profit and Loss Comparison" && $fv->report_status=='1')
-                                                            <?php
-                                                            $report_status=1;
-                                                            ?>
-                                                            @endif
-                                                        @endforeach
-                                                        @if($report_status==1)
-                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss Comparison" onclick="favorite(this,1,'ProfitAndLostComparison')"><i class="fas fa-star"></i></button>
-                                                            @else
-                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss Comparison" onclick="favorite(this,0,'ProfitAndLostComparison')"><i class="far fa-star"></i></button>
-                                                            @endif
-                                                    </td>
-                                                </tr>
                                                 
+                                                <tr>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="sales_transaction_list">Sales Transaction List</a></td>
+                                                    <td style="vertical-align:middle;">
+                                                        <?php
+                                                        $report_status=0;
+                                                        ?>
+                                                        @foreach ($favorite_report as $fv)
+                                                            @if($fv->report_name=="Sales Transaction List" && $fv->report_status=='1')
+                                                            <?php
+                                                            $report_status=1;
+                                                            ?>
+                                                            @endif
+                                                        @endforeach
+                                                        @if($report_status==1)
+                                                            <button class="btn btn-link btn-sm" data-report-name="Sales Transaction List" onclick="favorite(this,1,'sales_transaction_list')"><i class="fas fa-star"></i></button>
+                                                            @else
+                                                            <button class="btn btn-link btn-sm" data-report-name="Sales Transaction List" onclick="favorite(this,0,'sales_transaction_list')"><i class="far fa-star"></i></button>
+                                                            @endif
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="expense_transaction_list">Expenses Transaction List</a></td>
+                                                    <td style="vertical-align:middle;">
+                                                        <?php
+                                                        $report_status=0;
+                                                        ?>
+                                                        @foreach ($favorite_report as $fv)
+                                                            @if($fv->report_name=="Expenses Transaction List" && $fv->report_status=='1')
+                                                            <?php
+                                                            $report_status=1;
+                                                            ?>
+                                                            @endif
+                                                        @endforeach
+                                                        @if($report_status==1)
+                                                            <button class="btn btn-link btn-sm" data-report-name="Expenses Transaction List" onclick="favorite(this,1,'expense_transaction_list')"><i class="fas fa-star"></i></button>
+                                                            @else
+                                                            <button class="btn btn-link btn-sm" data-report-name="Expenses Transaction List" onclick="favorite(this,0,'expense_transaction_list')"><i class="far fa-star"></i></button>
+                                                            @endif
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="monthly_invoice_collection">Monthly Invoice Report</a></td>
+                                                    <td style="vertical-align:middle;">
+                                                        <?php
+                                                        $report_status=0;
+                                                        ?>
+                                                        @foreach ($favorite_report as $fv)
+                                                            @if($fv->report_name=="Monthly Invoice Report" && $fv->report_status=='1')
+                                                            <?php
+                                                            $report_status=1;
+                                                            ?>
+                                                            @endif
+                                                        @endforeach
+                                                        @if($report_status==1)
+                                                            <button class="btn btn-link btn-sm" data-report-name="Monthly Invoice Report" onclick="favorite(this,1,'monthly_invoice_collection')"><i class="fas fa-star"></i></button>
+                                                            @else
+                                                            <button class="btn btn-link btn-sm" data-report-name="Monthly Invoice Report" onclick="favorite(this,0,'monthly_invoice_collection')"><i class="far fa-star"></i></button>
+                                                            @endif
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="monthly_expense_collection">Monthly Expense Report</a></td>
+                                                    <td style="vertical-align:middle;">
+                                                        <?php
+                                                        $report_status=0;
+                                                        ?>
+                                                        @foreach ($favorite_report as $fv)
+                                                            @if($fv->report_name=="Monthly Expense Report" && $fv->report_status=='1')
+                                                            <?php
+                                                            $report_status=1;
+                                                            ?>
+                                                            @endif
+                                                        @endforeach
+                                                        @if($report_status==1)
+                                                            <button class="btn btn-link btn-sm" data-report-name="Monthly Expense Report" onclick="favorite(this,1,'monthly_expense_collection')"><i class="fas fa-star"></i></button>
+                                                            @else
+                                                            <button class="btn btn-link btn-sm" data-report-name="Monthly Expense Report" onclick="favorite(this,0,'monthly_expense_collection')"><i class="far fa-star"></i></button>
+                                                            @endif
+                                                    </td>
+                                                </tr>
                                                 <tr style="display:none;">
                                                     <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="#">Profit and Loss year-to-date comparison</a></td>
                                                     <td style="vertical-align:middle;">
@@ -271,6 +291,27 @@
                                     <div class="col-md-5">
                                         <table class="table table-hover table-sm table-report" >
                                             <tbody >
+                                                
+                                                <tr>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="BudgetSummaryReport">Budget Summary Report</a></td>
+                                                    <td style="vertical-align:middle;">
+                                                        <?php
+                                                        $report_status=0;
+                                                        ?>
+                                                        @foreach ($favorite_report as $fv)
+                                                            @if($fv->report_name=="Budget Summary Report" && $fv->report_status=='1')
+                                                            <?php
+                                                            $report_status=1;
+                                                            ?>
+                                                            @endif
+                                                        @endforeach
+                                                        @if($report_status==1)
+                                                            <button class="btn btn-link btn-sm" data-report-name="Budget Summary Report" onclick="favorite(this,1,'BudgetSummaryReport')"><i class="fas fa-star"></i></button>
+                                                            @else
+                                                            <button class="btn btn-link btn-sm" data-report-name="Budget Summary Report" onclick="favorite(this,0,'BudgetSummaryReport')"><i class="far fa-star"></i></button>
+                                                            @endif
+                                                    </td>
+                                                </tr>
                                                 <tr>
                                                     <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="ProfitAndLossByCustomer">Profit and Loss by Customer</a></td>
                                                     <td style="vertical-align:middle;">
@@ -392,42 +433,62 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="sales_transaction_list">Sales Transaction List</a></td>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="ProfitandLossasPercentageTotal">Profit and Loss as % of total income</a></td>
                                                     <td style="vertical-align:middle;">
                                                         <?php
                                                         $report_status=0;
                                                         ?>
                                                         @foreach ($favorite_report as $fv)
-                                                            @if($fv->report_name=="Sales Transaction List" && $fv->report_status=='1')
+                                                            @if($fv->report_name=="Profit and Loss as % of total income" && $fv->report_status=='1')
                                                             <?php
                                                             $report_status=1;
                                                             ?>
                                                             @endif
                                                         @endforeach
                                                         @if($report_status==1)
-                                                            <button class="btn btn-link btn-sm" data-report-name="Sales Transaction List" onclick="favorite(this,1,'sales_transaction_list')"><i class="fas fa-star"></i></button>
+                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss as % of total income" onclick="favorite(this,1,'ProfitandLossasPercentageTotal')"><i class="fas fa-star"></i></button>
                                                             @else
-                                                            <button class="btn btn-link btn-sm" data-report-name="Sales Transaction List" onclick="favorite(this,0,'sales_transaction_list')"><i class="far fa-star"></i></button>
+                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss as % of total income" onclick="favorite(this,0,'ProfitandLossasPercentageTotal')"><i class="far fa-star"></i></button>
                                                             @endif
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="expense_transaction_list">Expenses Transaction List</a></td>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="ProfitAndLostComparison">Profit and Loss Comparison</a></td>
                                                     <td style="vertical-align:middle;">
                                                         <?php
                                                         $report_status=0;
                                                         ?>
                                                         @foreach ($favorite_report as $fv)
-                                                            @if($fv->report_name=="Expenses Transaction List" && $fv->report_status=='1')
+                                                            @if($fv->report_name=="Profit and Loss Comparison" && $fv->report_status=='1')
                                                             <?php
                                                             $report_status=1;
                                                             ?>
                                                             @endif
                                                         @endforeach
                                                         @if($report_status==1)
-                                                            <button class="btn btn-link btn-sm" data-report-name="Expenses Transaction List" onclick="favorite(this,1,'expense_transaction_list')"><i class="fas fa-star"></i></button>
+                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss Comparison" onclick="favorite(this,1,'ProfitAndLostComparison')"><i class="fas fa-star"></i></button>
                                                             @else
-                                                            <button class="btn btn-link btn-sm" data-report-name="Expenses Transaction List" onclick="favorite(this,0,'expense_transaction_list')"><i class="far fa-star"></i></button>
+                                                            <button class="btn btn-link btn-sm" data-report-name="Profit and Loss Comparison" onclick="favorite(this,0,'ProfitAndLostComparison')"><i class="far fa-star"></i></button>
+                                                            @endif
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="vertical-align:middle;" colspan="1"><a class="btn btn-link" href="SalesandBillingInvoiceReport">Sales and Billing Invoice Report</a></td>
+                                                    <td style="vertical-align:middle;">
+                                                        <?php
+                                                        $report_status=0;
+                                                        ?>
+                                                        @foreach ($favorite_report as $fv)
+                                                            @if($fv->report_name=="Sales and Billing Invoice Report" && $fv->report_status=='1')
+                                                            <?php
+                                                            $report_status=1;
+                                                            ?>
+                                                            @endif
+                                                        @endforeach
+                                                        @if($report_status==1)
+                                                            <button class="btn btn-link btn-sm" data-report-name="Sales and Billing Invoice Report" onclick="favorite(this,1,'SalesandBillingInvoiceReport')"><i class="fas fa-star"></i></button>
+                                                            @else
+                                                            <button class="btn btn-link btn-sm" data-report-name="Sales and Billing Invoice Report" onclick="favorite(this,0,'SalesandBillingInvoiceReport')"><i class="far fa-star"></i></button>
                                                             @endif
                                                     </td>
                                                 </tr>

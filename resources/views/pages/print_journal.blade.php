@@ -13,7 +13,7 @@
                 <th class="text-center">CREDIT</th>
                 <th class="text-center">DESCRIPTION</th>
                 <th class="text-center">NAME</th>
-                
+                <th width="10%" class="text-center">TIN</th>
             </tr>
         </thead>
         <tbody>
@@ -29,18 +29,18 @@
                                 {{$coa->coa_code}}
                                 @else
                                 @if($je->je_cost_center!="")
-                                <?php
-                                $cost_center_code="";
-        
-                                ?>
-                                @foreach ($cost_center_list as $list)
-                                    @if($list->cc_no==$je->je_cost_center)
                                     <?php
-                                    $cost_center_code=$list->cc_name_code;
+                                    $cost_center_code="";
+            
                                     ?>
-                                    @endif
-                                @endforeach
-                                {{$cost_center_code."-".$coa->coa_code}}
+                                    @foreach ($cost_center_list as $list)
+                                        @if($list->cc_no==$je->je_cost_center)
+                                        <?php
+                                        $cost_center_code=$list->cc_name_code;
+                                        ?>
+                                        @endif
+                                    @endforeach
+                                    {{$cost_center_code."-".$coa->coa_code}}
                                 @else 
                                 {{$coa->coa_code}}
                                 @endif
@@ -69,9 +69,25 @@
                         <td style="vertical-align:middle;">{{$je->je_desc}}</td>
                         <td style="vertical-align:middle;">
                             {{$je->je_name}}
-                            
                         </td>
-                        
+                        <td style="vertical-align:middle;">
+                            @foreach ($customers as $item)
+                                @if ($je->je_name!="" && $je->je_name!=null && $je->je_name!=" ")
+                                    @if ($item->display_name==$je->je_name )
+                                        @if ($je->je_name!="" && $je->je_name!=null)
+                                        {{$item->tin_no}}
+                                        <?php break; ?>
+                                        @endif
+                                    @elseif($item->f_name." ".$item->l_name==$je->je_name)
+                                        @if ($je->je_name!="" && $je->je_name!=null)
+                                        {{$item->tin_no}}
+                                        <?php break; ?>
+                                        @endif
+                                    @endif
+                                @endif
+                                
+                            @endforeach
+                        </td>
                         </tr>  
                 @endif
                 

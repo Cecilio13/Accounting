@@ -51,6 +51,186 @@ class ReportController extends Controller
         }
         
     }
+    public function SalesandBillingInvoiceReport(Request $request){
+        $sortsetting="";
+        if($request->date_from){
+            $sortsetting="WHERE st_date BETWEEN '".$request->date_from."' AND '".$request->date_to."'";
+        }else{
+            
+        }
+        $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
+                            JOIN customers ON sales_transaction.st_customer_id=customers.customer_id
+                            ".$sortsetting." 
+                            ORDER BY st_no ASC");
+        $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
+        $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
+        $jounal = DB::table('journal_entries')
+                ->select('je_no')
+                ->groupBy('je_no')
+                ->get();
+        $jounalcount=count($jounal)+1;
+        date_default_timezone_set('Asia/Manila');
+        $date = date('l, d F Y h:i a \G\T\MO');
+        $Report = Report::all();
+        $VoucherCount=Voucher::count() + 1;
+        if($VoucherCount<10){
+            $VoucherCount="000".$VoucherCount;
+        }
+        else if($VoucherCount<100 && $VoucherCount>9 ){
+            $VoucherCount="00".$VoucherCount;
+        }
+        else if($VoucherCount<1000 && $VoucherCount>99 ){
+            $VoucherCount="0".$VoucherCount;
+        }
+        $VoucherCount=Voucher::all();
+        $expense_transactions = DB::table('expense_transactions')
+            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
+            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
+            ->get();
+            $et_acc = DB::table('et_account_details')->get();
+            $et_it = DB::table('et_item_details')->get();
+        $totalexp=0;
+        foreach($expense_transactions as $et){
+            if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
+        }
+        // $COA= ChartofAccount::where('coa_active','1')->orderBy('coa_code','ASC')->get();
+        $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
+        $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
+        $numbering = Numbering::first();
+        $st_invoice = DB::table('st_invoice')->get();
+        $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
+        return view('app.invoicelist_sorted', compact('numbering','st_invoice','cost_center_list','all_cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','VoucherCount','st_invoice','SalesTransaction','Supplier','Report','date','jounalcount','customers', 'products_and_services','JournalEntry'));
+    
+    }
+    public function monthly_expense_collection(Request $request){
+        $sortsetting="";
+        if($request->date_from){
+            $sortsetting="WHERE st_date BETWEEN '".$request->date_from."' AND '".$request->date_to."'";
+        }else{
+            
+        }
+        $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
+                            JOIN customers ON sales_transaction.st_customer_id=customers.customer_id
+                            ".$sortsetting." 
+                            ORDER BY st_no ASC");
+        $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
+        $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
+        $jounal = DB::table('journal_entries')
+                ->select('je_no')
+                ->groupBy('je_no')
+                ->get();
+        $jounalcount=count($jounal)+1;
+        date_default_timezone_set('Asia/Manila');
+        $date = date('l, d F Y h:i a \G\T\MO');
+        $Report = Report::all();
+        $VoucherCount=Voucher::count() + 1;
+        if($VoucherCount<10){
+            $VoucherCount="000".$VoucherCount;
+        }
+        else if($VoucherCount<100 && $VoucherCount>9 ){
+            $VoucherCount="00".$VoucherCount;
+        }
+        else if($VoucherCount<1000 && $VoucherCount>99 ){
+            $VoucherCount="0".$VoucherCount;
+        }
+        $VoucherCount=Voucher::all();
+        $expense_transactions = DB::table('expense_transactions')
+            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
+            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
+            ->get();
+            $et_acc = DB::table('et_account_details')->get();
+            $et_it = DB::table('et_item_details')->get();
+        $totalexp=0;
+        foreach($expense_transactions as $et){
+            if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
+        }
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
+        $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
+        $numbering = Numbering::first();
+        $st_invoice = DB::table('st_invoice')->get();
+        $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
+        return view('app.monthly_expense', compact('numbering','st_invoice','cost_center_list','all_cost_center_list','ETran','SS','COA','expense_transactions','totalexp','et_acc','et_it','VoucherCount','st_invoice','SalesTransaction','Supplier','Report','date','jounalcount','customers', 'products_and_services','JournalEntry'));
+
+    }
+    public function monthly_invoice_collection(Request $request){
+        $sortsetting="";
+        if($request->date_from){
+            $sortsetting="WHERE st_date BETWEEN '".$request->date_from."' AND '".$request->date_to."'";
+        }else{
+            
+        }
+        $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
+                            JOIN customers ON sales_transaction.st_customer_id=customers.customer_id
+                            ".$sortsetting." 
+                            ORDER BY st_no ASC");
+        $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
+        $st_credit_notes= DB::connection('mysql')->select("SELECT * FROM st_credit_notes");
+        $st_estimates= DB::connection('mysql')->select("SELECT * FROM st_estimates");
+        $st_delayed_charges= DB::connection('mysql')->select("SELECT * FROM st_delayed_charges");
+        $st_delayed_credit= DB::connection('mysql')->select("SELECT * FROM st_delayed_credits");
+        $st_refund_receipts= DB::connection('mysql')->select("SELECT * FROM st_refund_receipts");
+        $st_sales_receipts= DB::connection('mysql')->select("SELECT * FROM st_sales_receipts");
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
+        $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
+        $jounal = DB::table('journal_entries')
+                ->select('je_no')
+                ->groupBy('je_no')
+                ->get();
+        $jounalcount=count($jounal)+1;
+        date_default_timezone_set('Asia/Manila');
+        $date = date('l, d F Y h:i a \G\T\MO');
+        $Report = Report::all();
+        $VoucherCount=Voucher::count() + 1;
+        
+        if($VoucherCount<10){
+            $VoucherCount="000".$VoucherCount;
+        }
+        else if($VoucherCount<100 && $VoucherCount>9 ){
+            $VoucherCount="00".$VoucherCount;
+        }
+        else if($VoucherCount<1000 && $VoucherCount>99 ){
+            $VoucherCount="0".$VoucherCount;
+        }
+        $VoucherCount=Voucher::all();
+        $expense_transactions = DB::table('expense_transactions')
+            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
+            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
+            ->get();
+            $et_acc = DB::table('et_account_details')->get();
+            $et_it = DB::table('et_item_details')->get();
+        $totalexp=0;
+        foreach($expense_transactions as $et){
+            if($et->remark==""){$totalexp=$totalexp+$et->et_ad_total;}
+        }
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
+        $SS=SalesTransaction::all();$ETran = DB::table('expense_transactions')->get();
+        $numbering = Numbering::first();
+        $st_invoice = DB::table('st_invoice')->get();
+        $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
+        $all_cost_center_list= CostCenter::all();
+        return view('app.monthly_invoice_collection', compact('numbering','st_invoice','cost_center_list','all_cost_center_list','ETran','SS','st_estimates','st_delayed_charges','st_delayed_credit','st_refund_receipts','st_sales_receipts','st_credit_notes','COA','expense_transactions','totalexp','et_acc','et_it','VoucherCount','st_invoice','SalesTransaction','Supplier','Report','date','jounalcount','customers', 'products_and_services','JournalEntry'));
+    
+    }
     public function Movements_in_Equity(Request $request){
         $sortsetting="";
         if($request->date_from){
@@ -69,8 +249,12 @@ class ReportController extends Controller
         $st_delayed_credit= DB::connection('mysql')->select("SELECT * FROM st_delayed_credits");
         $st_refund_receipts= DB::connection('mysql')->select("SELECT * FROM st_refund_receipts");
         $st_sales_receipts= DB::connection('mysql')->select("SELECT * FROM st_sales_receipts");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -162,8 +346,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntryOpeningBalance= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournalob.$sortjournalob." 
@@ -540,8 +728,12 @@ class ReportController extends Controller
         $st_delayed_credit= DB::connection('mysql')->select("SELECT * FROM st_delayed_credits");
         $st_refund_receipts= DB::connection('mysql')->select("SELECT * FROM st_refund_receipts");
         $st_sales_receipts= DB::connection('mysql')->select("SELECT * FROM st_sales_receipts");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -621,8 +813,12 @@ class ReportController extends Controller
         $st_delayed_credit= DB::connection('mysql')->select("SELECT * FROM st_delayed_credits");
         $st_refund_receipts= DB::connection('mysql')->select("SELECT * FROM st_refund_receipts");
         $st_sales_receipts= DB::connection('mysql')->select("SELECT * FROM st_sales_receipts");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $expense_transactions = DB::table('expense_transactions')
             ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
@@ -1332,8 +1528,12 @@ class ReportController extends Controller
         $st_delayed_credit= DB::connection('mysql')->select("SELECT * FROM st_delayed_credits");
         $st_refund_receipts= DB::connection('mysql')->select("SELECT * FROM st_refund_receipts");
         $st_sales_receipts= DB::connection('mysql')->select("SELECT * FROM st_sales_receipts");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -1459,7 +1659,7 @@ class ReportController extends Controller
                         if($ST->st_type == "Invoice"){
                             $invoice_total=0;
                             foreach ($st_invoice as $invoice){
-                                if($ST->st_no==$invoice->st_i_no){
+                                if($ST->st_no==$invoice->st_i_no && $ST->st_i_attachment==$invoice->st_p_reference_no){
                                     $invoice_total=$invoice_total+$invoice->st_i_total;
             
                                 }
@@ -1598,7 +1798,7 @@ class ReportController extends Controller
                                         if($ST->st_type == "Invoice"){
                                             $invoice_total=0;
                                             foreach ($st_invoice as $invoice){
-                                                if($ST->st_no==$invoice->st_i_no){
+                                                if($ST->st_no==$invoice->st_i_no && $ST->st_i_attachment==$invoice->st_p_reference_no){
                                                     $invoice_total=$invoice_total+$invoice->st_i_total;
                             
                                                 }
@@ -1734,7 +1934,7 @@ class ReportController extends Controller
                                 if($ST->st_type == "Invoice"){
                                     $invoice_total=0;
                                     foreach ($st_invoice as $invoice){
-                                        if($ST->st_no==$invoice->st_i_no){
+                                        if($ST->st_no==$invoice->st_i_no && $ST->st_i_attachment==$invoice->st_p_reference_no){
                                             $invoice_total=$invoice_total+$invoice->st_i_total;
                     
                                         }
@@ -1826,6 +2026,292 @@ class ReportController extends Controller
         return $table;
 
     }
+    public function monthly_sales_transaction_list_by_date(Request $request){
+        $FROM=$request->FROM;
+        $TO=$request->TO;
+        $filtertemplate=$request->filtertemplate;
+        $CostCenterFilter=$request->CostCenterFilter;
+        $sortsetting="WHERE st_date BETWEEN '".$FROM."' AND '".$TO."' AND st_type='Invoice' AND (st_status='PAID' OR st_status='Partially Paid')";
+        $sortsettingjournal="WHERE created_at BETWEEN '".$FROM."' AND '".$TO."' AND";
+        if($filtertemplate=="All"){
+            $sortsetting="WHERE st_type='Invoice' AND (st_status='PAID' OR st_status='Partially Paid')";
+            $sortsettingjournal="";
+        }
+        if($sortsettingjournal==""){
+            $sortjournal=" WHERE je_cost_center='".$CostCenterFilter."'";
+        }else{
+            $sortjournal=" WHERE je_cost_center='".$CostCenterFilter."'";
+        }
+        if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+            $sortjournal="";
+            $sortsettingjournal="WHERE created_at BETWEEN '".$FROM."' AND '".$TO."' AND (st_status='PAID' OR st_status='Partially Paid')";
+            if($filtertemplate=="All"){
+                $sortsetting="WHERE st_type='Invoice' AND (st_status='PAID' OR st_status='Partially Paid')";
+                $sortsettingjournal="";
+            }
+        }
+        $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortjournal." 
+                            ORDER BY created_at ASC");
+        $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
+                            JOIN customers ON sales_transaction.st_customer_id=customers.customer_id
+                            ".$sortsetting." 
+                            ORDER BY st_no ASC");
+        $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
+        $st_credit_notes= DB::connection('mysql')->select("SELECT * FROM st_credit_notes");
+        $st_estimates= DB::connection('mysql')->select("SELECT * FROM st_estimates");
+        $st_delayed_charges= DB::connection('mysql')->select("SELECT * FROM st_delayed_charges");
+        $st_delayed_credit= DB::connection('mysql')->select("SELECT * FROM st_delayed_credits");
+        $st_refund_receipts= DB::connection('mysql')->select("SELECT * FROM st_refund_receipts");
+        $st_sales_receipts= DB::connection('mysql')->select("SELECT * FROM st_sales_receipts");
+        $expense_transactions = DB::table('expense_transactions')
+            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
+            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
+            ->whereBetween('et_date', [$FROM, $TO])
+            ->get();
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
+        $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
+        $tablecontent="";
+        if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+            if($CostCenterFilter=="All"){
+                foreach ($SalesTransaction as $ST){
+                    if($ST->remark!="Cancelled"){
+                        $payment_for_id=$ST->st_no;
+                        
+                        $st_location=$ST->st_location;
+                        $st_invoice_type=$ST->st_invoice_type;
+                        $sales_receipts = DB::connection('mysql')->select("SELECT * FROM sales_transaction  WHERE st_type='Sales Receipt' AND st_payment_for='$payment_for_id' AND st_location='$st_location' AND st_invoice_type='$st_invoice_type'");
+                        $tablecontent.='<tr>';  
+                        $tablecontent.='<td style="vertical-align:middle;">';  
+                        $tablecontent.=$ST->created_at!=""?date('m-d-Y',strtotime($ST->created_at)) : '';  
+                        $tablecontent.='</td>'; 
+                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                        $tablecontent.=$ST->display_name!=""? $ST->display_name : $ST->f_name." ".$ST->l_name;  
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                        $tablecontent.=$ST->tin_no; 
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                        if($ST->cancellation_reason==NULL){
+                            foreach($sales_receipts as $sal){
+                                $tablecontent.=$sal->st_no."<br>"; 
+                            }
+                        }
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        if($ST->cancellation_reason==NULL){
+                            foreach($sales_receipts as $sal){
+                                $tablecontent.=($sal->st_date!=""? date('m-d-Y',strtotime($sal->st_date)) : '')."<br>"; 
+                            }
+                        }
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        $tablecontent.=$ST->st_no; 
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                        $tablecontent.=$ST->st_date!=""?date('m-d-Y',strtotime($ST->st_date)) : '';
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                        if($ST->st_type == "Invoice"){
+                            $invoice_total=0;
+                            foreach ($st_invoice as $invoice){
+                                if($ST->st_no==$invoice->st_i_no && $ST->st_location==$invoice->st_p_location && $ST->st_invoice_type==$invoice->st_p_invoice_type && $ST->st_i_attachment==$invoice->st_p_reference_no){
+                                    $invoice_total=$invoice_total+$invoice->st_i_total;
+            
+                                }
+            
+                            }
+                            $tablecontent.=number_format($invoice_total,2);
+                        }
+                        $tablecontent.='</td>';
+                        
+                        $tablecontent.='</tr>'; 
+                    }
+                     
+        
+                }
+            }else if($CostCenterFilter=="By Cost Center"){
+                foreach($cost_center_list as $ccl){
+                    $sortjournal="WHERE je_cost_center='".$ccl->cc_no."' ";
+                    if($sortsettingjournal==""){
+                    $sortjournal="WHERE je_cost_center='".$ccl->cc_no."' ";
+                    }else{
+                    $sortjournal="WHERE je_cost_center='".$ccl->cc_no."' ";
+                    }
+                    $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                    ".$sortjournal." AND (je_transaction_type='Invoice' OR je_transaction_type='Credit Note'  )
+                    ORDER BY created_at ASC");
+                    if(count($JournalEntry)!=0 ){
+                        $tablecontent.="<tr>";
+                        $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+                        $tablecontent.="</tr>";
+                        $tablecontent.="<tr>";
+                        $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;text-align:center;">';
+                        
+                        $tablecontent.=$ccl->cc_name;
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.="</tr>";
+                        $tablecontent.="<tr>";
+                        $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+                        $tablecontent.="</tr>";
+		
+                    }
+                    
+                    
+                    foreach ($SalesTransaction as $ST){
+                        if($ST->remark!="Cancelled"){
+                            foreach($JournalEntry as $JJJJ){
+                                if($JJJJ->je_cost_center==$ccl->cc_no){
+                                    if($JJJJ->other_no==$ST->st_no && ($JJJJ->je_transaction_type=="Invoice" || $JJJJ->je_transaction_type=="Credit Note" ) && $JJJJ->je_credit!=""){
+                                        $tablecontent.='<tr>';  
+                                        $tablecontent.='<td style="vertical-align:middle;">';  
+                                        $tablecontent.=$ST->created_at!=""?date('m-d-Y',strtotime($ST->created_at)) : '';  
+                                        $tablecontent.='</td>'; 
+                                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                                        $tablecontent.=$ST->display_name!=""? $ST->display_name : $ST->f_name." ".$ST->l_name;  
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                                        $tablecontent.=$ST->tin_no; 
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                                        $tablecontent.=""; 
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;">';
+                                        $tablecontent.=$ST->st_no; 
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                                        $tablecontent.=$ST->st_date!=""?date('m-d-Y',strtotime($ST->st_date)) : '';
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;">'; 
+                                        if($ST->st_type == "Invoice"){
+                                            $invoice_total=0;
+                                            foreach ($st_invoice as $invoice){
+                                                if($ST->st_no==$invoice->st_i_no && $ST->st_location==$invoice->st_p_location && $ST->st_invoice_type==$invoice->st_p_invoice_type){
+                                                    $invoice_total=$invoice_total+$invoice->st_i_total;
+                            
+                                                }
+                            
+                                            }
+                                            $tablecontent.=number_format($invoice_total,2);
+                                        }
+                                        $tablecontent.='</td>';
+                                        
+                                        $tablecontent.='</tr>'; 
+                                    }
+                                    
+                                }
+                                
+                            }
+                            
+                        }
+                         
+            
+                    }
+                }
+            }
+        }else{
+            //sales transaction by individual cost center
+            $tablecontent.="<tr>";
+            $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+            $tablecontent.="</tr>";
+            $tablecontent.="<tr>";
+            $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;text-align:center;">';
+            foreach($cost_center_list as $ccl){
+                if($ccl->cc_no==$CostCenterFilter){
+                    $tablecontent.=$ccl->cc_name;
+                }
+            }
+            $tablecontent.='</td>';
+            $tablecontent.="</tr>";
+            $tablecontent.="<tr>";
+            $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+            $tablecontent.="</tr>";
+            
+            foreach ($SalesTransaction as $ST){
+                if($ST->remark!="Cancelled"){
+                    foreach($JournalEntry as $JJJJ){
+                        if($JJJJ->je_cost_center==$CostCenterFilter){
+                            if($JJJJ->other_no==$ST->st_no && ($JJJJ->je_transaction_type=="Invoice" || $JJJJ->je_transaction_type=="Credit Note" ) && $JJJJ->je_credit!=""){
+                                $payment_for_id=$ST->st_no;
+                                $st_location=$ST->st_location;
+                                $st_invoice_type=$ST->st_invoice_type;
+                                $sales_receipts = DB::connection('mysql')->select("SELECT * FROM sales_transaction  WHERE st_type='Sales Receipt' AND st_payment_for='$payment_for_id' AND st_location='$st_location' AND st_invoice_type='$st_invoice_type'");
+                                $tablecontent.='<tr>';  
+                                $tablecontent.='<td style="vertical-align:middle;">';  
+                                $tablecontent.=$ST->created_at!=""?date('m-d-Y',strtotime($ST->created_at)) : '';  
+                                $tablecontent.='</td>'; 
+                                $tablecontent.='<td style="vertical-align:middle;">'; 
+                                $tablecontent.=$ST->display_name!=""? $ST->display_name : $ST->f_name." ".$ST->l_name;  
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">'; 
+                                $tablecontent.=$ST->tin_no; 
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">'; 
+                                if($ST->cancellation_reason==NULL){
+                                    foreach($sales_receipts as $sal){
+                                        $tablecontent.=$sal->st_no."<br>"; 
+                                    }
+                                }
+                                
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">';
+                                if($ST->cancellation_reason==NULL){
+                                    foreach($sales_receipts as $sal){
+                                        $tablecontent.=($sal->st_date!=""? date('m-d-Y',strtotime($sal->st_date)) : '')."<br>"; 
+                                    }
+                                }
+                                
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">';
+                                $tablecontent.=$ST->st_no; 
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">'; 
+                                $tablecontent.=$ST->st_date!=""?date('m-d-Y',strtotime($ST->st_date)) : '';
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">'; 
+                                if($ST->st_type == "Invoice"){
+                                    $invoice_total=0;
+                                    foreach ($st_invoice as $invoice){
+                                        if($ST->st_no==$invoice->st_i_no && $ST->st_location==$invoice->st_p_location && $ST->st_invoice_type==$invoice->st_p_invoice_type  && $ST->st_i_attachment==$invoice->st_p_reference_no){
+                                            $invoice_total=$invoice_total+$invoice->st_i_total;
+                    
+                                        }
+                    
+                                    }
+                                    $tablecontent.=number_format($invoice_total,2);
+                                }
+                                $tablecontent.='</td>';
+                                
+                                $tablecontent.='</tr>'; 
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+                 
+    
+            }
+        }
+        
+
+
+        $table='<table id="tablemain" class="table table-sm" style="text-align:left;font-size:12px;">'
+                .'<thead><tr>'
+                .'<th>Date</th><th>Customer</th><th>TIN</th><th>OR No</th>><th>OR Date</th><th>Billing Invoice</th><th>BI Date</th>
+                <th>Amount</th>'
+                .'</tr></thead>'
+                .'<tbody>'.
+                $tablecontent
+                .'</tbody>'
+                .'</table>';
+        return $table;
+
+    }
     public function expense_transaction_list(Request $request){
         $sortsetting="";
         if($request->date_from){
@@ -1838,8 +2324,12 @@ class ReportController extends Controller
                             ".$sortsetting." 
                             ORDER BY st_no ASC");
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -2183,6 +2673,215 @@ class ReportController extends Controller
                 .'</table>';
         return $table;
     }
+    public function monthly_expense_by_date(Request $request){
+        $FROM=$request->FROM;
+        $TO=$request->TO;
+        $filtertemplate=$request->filtertemplate;
+        $CostCenterFilter=$request->CostCenterFilter;
+        $sortsettingex="WHERE et_date BETWEEN '".$FROM."' AND '".$TO."' AND et_type='Bill'";
+        $sortsetting="WHERE st_date BETWEEN '".$FROM."' AND '".$TO."'";
+        $sortsettingjournal="WHERE created_at BETWEEN '".$FROM."' AND '".$TO."' AND";
+        if($filtertemplate=="All"){
+            $sortsetting="";
+            $sortsettingjournal="";
+            $sortsettingex="WHERE et_type='Bill'";
+        }
+        if($sortsettingjournal==""){
+            $sortjournal="WHERE je_cost_center='".$CostCenterFilter."'";
+        }else{
+            $sortjournal="WHERE je_cost_center='".$CostCenterFilter."'";
+        }
+        
+        if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+            $sortjournal="";
+            $sortsettingjournal="WHERE created_at BETWEEN '".$FROM."' AND '".$TO."'";
+            if($filtertemplate=="All"){
+                $sortsetting="";
+                $sortsettingex="WHERE et_type='Bill'";
+                $sortsettingjournal="";
+            }
+        }
+        $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
+        ".$sortjournal." 
+        ORDER BY created_at ASC");
+        $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
+                            JOIN customers ON sales_transaction.st_customer_id=customers.customer_id
+                            ".$sortsetting." 
+                            ORDER BY st_no ASC");
+        $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
+        $expense_transactions = DB::table('expense_transactions')
+            ->join('et_account_details', 'expense_transactions.et_no', '=', 'et_account_details.et_ad_no')
+            ->join('customers', 'customers.customer_id', '=', 'expense_transactions.et_customer')
+            ->whereBetween('et_date', [$FROM, $TO])
+            ->get();
+        $expense_transactions= DB::connection('mysql')->select("SELECT * FROM expense_transactions
+                            JOIN customers ON expense_transactions.et_customer=customers.customer_id
+                            JOIN et_account_details ON expense_transactions.et_no=et_account_details.et_ad_no
+                            ".$sortsettingex." 
+                            ORDER BY et_no ASC");
+                $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
+        $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
+        $tablecontent="";
+        $PaymentFor="";
+        if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+            if($CostCenterFilter=="All"){
+                foreach($expense_transactions as $et){
+                    if($et->remark!="Cancelled"){
+                        $tablecontent.='<tr>';
+                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                        
+                        $tablecontent.=date('m-d-Y',strtotime($et->et_date));
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">'.($et->display_name!=""? $et->display_name : $et->f_name." ".$et->l_name).'</td>';
+                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                        $tablecontent.=$et->tin_no;
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                        $tablecontent.="";
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                        $tablecontent.=$et->et_ad_desc;
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                        $tablecontent.='PHP '.number_format($et->et_ad_total,2);
+                        $tablecontent.='</td>';
+                        $tablecontent.='</tr>'; 
+                    }
+                    
+                }
+            }else if($CostCenterFilter=="By Cost Center"){
+                foreach($cost_center_list as $ccl){
+                    $sortjournal="WHERE je_cost_center='".$ccl->cc_no."' AND (je_transaction_type='Bill' OR je_transaction_type='Supplier Credit' OR je_transaction_type='Expense' OR je_transaction_type='Cheque' OR je_transaction_type='Credit card credit')";
+                    if($sortsettingjournal==""){
+                    $sortjournal="WHERE je_cost_center='".$ccl->cc_no."' AND (je_transaction_type='Bill' OR je_transaction_type='Supplier Credit' OR je_transaction_type='Expense' OR je_transaction_type='Cheque' OR je_transaction_type='Credit card credit')";
+                    }else{
+                    $sortjournal="WHERE je_cost_center='".$ccl->cc_no."' AND (je_transaction_type='Bill' OR je_transaction_type='Supplier Credit' OR je_transaction_type='Expense' OR je_transaction_type='Cheque' OR je_transaction_type='Credit card credit')";
+                    }
+                    $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                    ".$sortjournal." 
+                    ORDER BY created_at ASC");
+                    if(count($JournalEntry)!=0){
+		
+                        $tablecontent.="<tr>";
+                        $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+                        $tablecontent.="</tr>";
+                        $tablecontent.="<tr>";
+                        $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;text-align:center;">';
+                        $tablecontent.=$ccl->cc_name;
+                        $tablecontent.='</td>';
+                        $tablecontent.="</tr>";
+                        $tablecontent.="<tr>";
+                        $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+                        $tablecontent.="</tr>";
+                    }
+                    
+                    foreach($expense_transactions as $et){
+                
+                        if($et->remark!="Cancelled"){
+                            foreach($JournalEntry as $JJJJ){
+                                if($JJJJ->je_cost_center==$ccl->cc_no){
+                                    if($JJJJ->other_no==$et->et_no && ($JJJJ->je_transaction_type=="Expense" || $JJJJ->je_transaction_type=="Bill" || $JJJJ->je_transaction_type=="Cheque" || $JJJJ->je_transaction_type=="Supplier Credit" || $JJJJ->je_transaction_type=="Credit card credit") && $JJJJ->je_credit!=""){
+                                        $tablecontent.='<tr>';
+                                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                                        
+                                        $tablecontent.=date('m-d-Y',strtotime($et->et_date));
+                                        
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;">'.($et->display_name!=""? $et->display_name : $et->f_name." ".$et->l_name).'</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                                        $tablecontent.=$et->tin_no;
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                                        $tablecontent.="";
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                                        $tablecontent.=$et->et_ad_desc;
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='<td style="vertical-align:middle;"> ';
+                                        $tablecontent.='PHP '.number_format($et->et_ad_total,2);
+                                        $tablecontent.='</td>';
+                                        $tablecontent.='</tr>'; 
+                                    }
+                                    
+                                }
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            }
+        }else{
+            $tablecontent.="<tr>";
+            $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+            $tablecontent.="</tr>";
+            $tablecontent.="<tr>";
+            $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;text-align:center;">';
+            foreach($cost_center_list as $ccl){
+                if($ccl->cc_no==$CostCenterFilter){
+                    $tablecontent.=$ccl->cc_name;
+                }
+            }
+            $tablecontent.='</td>';
+            $tablecontent.="</tr>";
+            $tablecontent.="<tr>";
+            $tablecontent.='<td colspan="8" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
+            $tablecontent.="</tr>";
+            
+            foreach($expense_transactions as $et){
+                
+                if($et->remark!="Cancelled"){
+                    foreach($JournalEntry as $JJJJ){
+                        if($JJJJ->je_cost_center==$CostCenterFilter){
+                            if($JJJJ->other_no==$et->et_no && ($JJJJ->je_transaction_type=="Expense" || $JJJJ->je_transaction_type=="Bill" || $JJJJ->je_transaction_type=="Cheque" || $JJJJ->je_transaction_type=="Supplier Credit" || $JJJJ->je_transaction_type=="Credit card credit") && $JJJJ->je_credit!=""){
+                                $tablecontent.='<tr>';
+                                $tablecontent.='<td style="vertical-align:middle;"> ';
+                                
+                                $tablecontent.=date('m-d-Y',strtotime($et->et_date));
+                                
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;">'.($et->display_name!=""? $et->display_name : $et->f_name." ".$et->l_name).'</td>';
+                                $tablecontent.='<td style="vertical-align:middle;"> ';
+                                $tablecontent.=$et->tin_no;
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;"> ';
+                                $tablecontent.="";
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;"> ';
+                                $tablecontent.=$et->et_ad_desc;
+                                $tablecontent.='</td>';
+                                $tablecontent.='<td style="vertical-align:middle;"> ';
+                                $tablecontent.='PHP '.number_format($et->et_ad_total,2);
+                                $tablecontent.='</td>';
+                                $tablecontent.='</tr>'; 
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+        }
+        
+        $table='<table id="tablemain" class="table table-sm" style="text-align:left;font-size:12px;">'
+                .'<thead><tr>'
+                .' <th>Date</th>
+                <th>Supplier</th>
+                <th>TIN</th>
+                <th>Receipt #</th>
+                <th width="15%">Description</th>
+                <th>Amount</th>'
+                .'</tr></thead>'
+                .'<tbody>'.
+                $tablecontent
+                .'</tbody>'
+                .'</table>';
+        return $table;
+    }
     public function ledgerforcoadesc_sub(Request $request){
         if($request->has('desc')){
            
@@ -2203,8 +2902,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -2337,8 +3040,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers = Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -3686,8 +4393,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -3815,8 +4526,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortjournal." 
@@ -4361,8 +5076,12 @@ class ReportController extends Controller
         $ETran = DB::connection('mysql')->select("SELECT * FROM expense_transactions
                 ".$sortsettingex);
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortjournal." 
@@ -6243,7 +6962,9 @@ class ReportController extends Controller
         }else{
             
         }
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -6296,7 +7017,9 @@ class ReportController extends Controller
         }else{
             
         }
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -6349,7 +7072,9 @@ class ReportController extends Controller
         }else{
             
         }
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -6406,8 +7131,12 @@ class ReportController extends Controller
                         ->get();
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -6511,8 +7240,12 @@ class ReportController extends Controller
         
         
         
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -6570,8 +7303,12 @@ class ReportController extends Controller
                         ->get();
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -6630,8 +7367,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -6740,8 +7481,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -6850,8 +7595,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         
@@ -6961,8 +7710,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -7059,8 +7812,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -7156,8 +7913,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -7261,8 +8022,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -7320,8 +8085,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -7379,8 +8148,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -7466,8 +8239,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $sortsettingjournalssss=" WHERE je_cost_center='".$CostCenterFilter."' ";
         if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
@@ -7558,6 +8335,60 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
+                                //check if account payable account type
+                                if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    foreach($JournalEntryformpast as $past){
+                                        if($past->je_credit!='' && $past->je_credit!=NULL){
+                                            $coa_name_total+=$past->je_credit;
+                                        }
+                                    }
+                                }
+                                //end of checking payable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -7602,6 +8433,60 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
+                                //check if account payable account type
+                                if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    foreach($JournalEntryformpast as $past){
+                                        if($past->je_credit!='' && $past->je_credit!=NULL){
+                                            $coa_name_total+=$past->je_credit;
+                                        }
+                                    }
+                                }
+                                //end of checking payable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -7646,6 +8531,39 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->remark=='' || $past->remark==NULL){
+                                            if($past->je_debit!='' && $past->je_debit!=NULL){
+                                                $coa_name_total+=$past->je_debit;
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                                //end of checking receivable account type
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -7690,6 +8608,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -7734,6 +8653,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -7785,6 +8705,7 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        
                         $coa_name_total+=$Coa->coa_balance;
                         if (strpos($Coa->coa_name, 'Accumulated Depreciation') !== false) {
                             $IncomeTotal-=$coa_name_total;
@@ -7830,6 +8751,7 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -7876,6 +8798,64 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        // //check if account receivable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                        //     $coa_re_no=$Coa->id;
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                        //     }
+                            
+                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpast="";
+                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
+                        //     ORDER BY created_at ASC");
+                            
+                        //     foreach($JournalEntryformpast as $past){
+                        //         $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                        //         if($past->je_debit!='' && $past->je_debit!=NULL){
+                        //             $coa_name_total+=$past->je_debit;
+                                    
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking receivable account type
+                        // //check if account payable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                        //     $coa_re_no=$Coa->id;
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                        //     }
+                            
+                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpast="";
+                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
+                        //     ORDER BY created_at ASC");
+                        //     foreach($JournalEntryformpast as $past){
+                        //         if($past->remark=='' || $past->remark=NULL){
+                        //             if($past->je_credit!='' && $past->je_credit!=NULL){
+                        //                 $coa_name_total+=$past->je_credit;
+                        //                 $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                        //             }
+                        //         }
+                                
+                        //     }
+                        // }
+                        // //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -7916,6 +8896,60 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account receivable account type
+                        if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            
+                            foreach($JournalEntryformpast as $past){
+                                $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                if($past->je_debit!='' && $past->je_debit!=NULL){
+                                    $coa_name_total+=$past->je_debit;
+                                    
+                                }
+                            }
+                        }
+                        //end of checking receivable account type
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->je_credit!='' && $past->je_credit!=NULL){
+                                    $coa_name_total+=$past->je_credit;
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -8194,6 +9228,60 @@ class ReportController extends Controller
                                             }
                                         }
                                     }
+                                    //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
+                                //check if account payable account type
+                                if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    foreach($JournalEntryformpast as $past){
+                                        if($past->je_credit!='' && $past->je_credit!=NULL){
+                                            $coa_name_total+=$past->je_credit;
+                                        }
+                                    }
+                                }
+                                //end of checking payable account type
                                     $coa_name_total+=$Coa->coa_balance;
                                     $IncomeTotal+=$coa_name_total;
                                     $tablecontent.=number_format($coa_name_total,2);
@@ -8238,6 +9326,60 @@ class ReportController extends Controller
                                             }
                                         }
                                     }
+                                    //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
+                                //check if account payable account type
+                                if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    foreach($JournalEntryformpast as $past){
+                                        if($past->je_credit!='' && $past->je_credit!=NULL){
+                                            $coa_name_total+=$past->je_credit;
+                                        }
+                                    }
+                                }
+                                //end of checking payable account type
                                     $coa_name_total+=$Coa->coa_balance;
                                     $IncomeTotal+=$coa_name_total;
                                     $tablecontent.=number_format($coa_name_total,2);
@@ -8282,6 +9424,60 @@ class ReportController extends Controller
                                             }
                                         }
                                     }
+                                    //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
+                                //check if account payable account type
+                                if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    foreach($JournalEntryformpast as $past){
+                                        if($past->je_credit!='' && $past->je_credit!=NULL){
+                                            $coa_name_total+=$past->je_credit;
+                                        }
+                                    }
+                                }
+                                //end of checking payable account type
                                     $coa_name_total+=$Coa->coa_balance;
                                     $IncomeTotal+=$coa_name_total;
                                     $tablecontent.=number_format($coa_name_total,2);
@@ -8370,6 +9566,60 @@ class ReportController extends Controller
                                             }
                                         }
                                     }
+                                    //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
+                                //check if account payable account type
+                                if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    foreach($JournalEntryformpast as $past){
+                                        if($past->je_credit!='' && $past->je_credit!=NULL){
+                                            $coa_name_total+=$past->je_credit;
+                                        }
+                                    }
+                                }
+                                //end of checking payable account type
                                     $coa_name_total+=$Coa->coa_balance;
                                     $IncomeTotal+=$coa_name_total;
                                     $tablecontent.=number_format($coa_name_total,2);
@@ -8421,6 +9671,60 @@ class ReportController extends Controller
                                     }
                                 }
                             }
+                            //check if account receivable account type
+                            if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                
+                                foreach($JournalEntryformpast as $past){
+                                    $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                    if($past->je_debit!='' && $past->je_debit!=NULL){
+                                        $coa_name_total+=$past->je_debit;
+                                        
+                                    }
+                                }
+                            }
+                            //end of checking receivable account type
+                            //check if account payable account type
+                            if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                foreach($JournalEntryformpast as $past){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                    }
+                                }
+                            }
+                            //end of checking payable account type
                             $coa_name_total+=$Coa->coa_balance;
                             if (strpos($Coa->coa_name, 'Accumulated Depreciation') !== false) {
                                 $IncomeTotal-=$coa_name_total;
@@ -8464,6 +9768,60 @@ class ReportController extends Controller
                                     }
                                 }
                             }
+                            //check if account receivable account type
+                            if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                
+                                foreach($JournalEntryformpast as $past){
+                                    $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                    if($past->je_debit!='' && $past->je_debit!=NULL){
+                                        $coa_name_total+=$past->je_debit;
+                                        
+                                    }
+                                }
+                            }
+                            //end of checking receivable account type
+                            //check if account payable account type
+                            if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                foreach($JournalEntryformpast as $past){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                    }
+                                }
+                            }
+                            //end of checking payable account type
                             $coa_name_total+=$Coa->coa_balance;
                             $IncomeTotal+=$coa_name_total;
                             $tablecontent.=number_format($coa_name_total,2);
@@ -8510,6 +9868,60 @@ class ReportController extends Controller
                                     }
                                 }
                             }
+                            //check if account receivable account type
+                            if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                
+                                foreach($JournalEntryformpast as $past){
+                                    $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                    if($past->je_debit!='' && $past->je_debit!=NULL){
+                                        $coa_name_total+=$past->je_debit;
+                                        
+                                    }
+                                }
+                            }
+                            //end of checking receivable account type
+                            //check if account payable account type
+                            if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                foreach($JournalEntryformpast as $past){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                    }
+                                }
+                            }
+                            //end of checking payable account type
                             $coa_name_total+=$Coa->coa_balance;
                             $IncomeTotal+=$coa_name_total;
                             $tablecontent.=number_format($coa_name_total,2);
@@ -8550,6 +9962,60 @@ class ReportController extends Controller
                                     }
                                 }
                             }
+                            //check if account receivable account type
+                            if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                
+                                foreach($JournalEntryformpast as $past){
+                                    $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                    if($past->je_debit!='' && $past->je_debit!=NULL){
+                                        $coa_name_total+=$past->je_debit;
+                                        
+                                    }
+                                }
+                            }
+                            //end of checking receivable account type
+                            //check if account payable account type
+                            if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                                $coa_re_no=$Coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                foreach($JournalEntryformpast as $past){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                    }
+                                }
+                            }
+                            //end of checking payable account type
                             $coa_name_total+=$Coa->coa_balance;
                             $IncomeTotal+=$coa_name_total;
                             $tablecontent.=number_format($coa_name_total,2);
@@ -8790,6 +10256,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -8834,6 +10301,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -8878,6 +10346,38 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->remark=='' || $past->remark==NULL){
+                                            if($past->je_debit!='' && $past->je_debit!=NULL){
+                                                $coa_name_total+=$past->je_debit;
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                                //end of checking receivable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -8922,6 +10422,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -8966,6 +10467,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -9017,6 +10519,7 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        
                         $coa_name_total+=$Coa->coa_balance;
                         if (strpos($Coa->coa_name, 'Accumulated Depreciation') !== false) {
                             $IncomeTotal-=$coa_name_total;
@@ -9106,6 +10609,60 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        // //check if account receivable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                    
+                        //     $coa_re_no=$Coa->id;
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                        //     }
+                            
+                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpast="";
+                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
+                        //     ORDER BY created_at ASC");
+                            
+                        //     foreach($JournalEntryformpast as $past){
+                        //         $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                        //         if($past->je_debit!='' && $past->je_debit!=NULL){
+                        //             $coa_name_total+=$past->je_debit;
+                                    
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking receivable account type
+                        // //check if account payable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                        //     $coa_re_no=$Coa->id;
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                        //     }
+                            
+                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpast="";
+                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
+                        //     ORDER BY created_at ASC");
+                        //     foreach($JournalEntryformpast as $past){
+                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
+                        //             $coa_name_total+=$past->je_credit;
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -9146,6 +10703,7 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -9466,8 +11024,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -9571,6 +11133,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -9588,6 +11151,7 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                
                                 $coa_name_totalpv+=$Coa->coa_balance;
                                 $IncomeTotalpv+=$coa_name_totalpv;
                                 $tablecontent.=number_format($coa_name_totalpv,2);
@@ -9697,6 +11261,51 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                            
+                                    $coa_re_no=$Coa->id;
+                                    $sortsettingjournalpast="WHERE created_at < '".$FROM."' AND";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }else{
+                                        if($PeriodComparison=="Last Month"){
+                                            $FROMpv=strtotime($request->FROM.' -1 month');
+                                            $TOpv=strtotime($request->FROM.' -1 month');
+                                        }else{
+                                            $FROMpv=strtotime($request->FROM.' -1 year');
+                                            $TOpv=strtotime($request->TO.' -1 year');
+                                        }
+                                        $FROMpv=date('Y-m-d', $FROMpv);
+                                        $TOpv=date('Y-m-d', $TOpv);
+                                        
+                                        $sortsettingjournalpast="WHERE created_at < '".$FROM."' AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->remark=='' || $past->remark==NULL){
+                                            if($past->je_debit!='' && $past->je_debit!=NULL){
+                                                $coa_name_total+=$past->je_debit;
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                                //end of checking receivable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -9712,6 +11321,50 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                            
+                                    $coa_re_no=$Coa->id;
+                                    $sortsettingjournalpast="WHERE created_at < '".$FROMpv."' AND";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }else{
+                                        if($PeriodComparison=="Last Month"){
+                                            $FROMpv=strtotime($request->FROM.' -1 month');
+                                            $TOpv=strtotime($request->FROM.' -1 month');
+                                        }else{
+                                            $FROMpv=strtotime($request->FROM.' -1 year');
+                                            $TOpv=strtotime($request->TO.' -1 year');
+                                        }
+                                        $FROMpv=date('Y-m-d', $FROMpv);
+                                        $TOpv=date('Y-m-d', $TOpv);
+                                        
+                                        $sortsettingjournalpast="WHERE created_at < '".$FROMpv."' AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROMpv."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->remark=='' || $past->remark==NULL){
+                                            if($past->je_debit!='' && $past->je_debit!=NULL){
+                                                $coa_name_totalpv+=$past->je_debit;
+                                                
+                                            }
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
                                 $coa_name_totalpv+=$Coa->coa_balance;
                                 $IncomeTotalpv+=$coa_name_totalpv;
                                 $tablecontent.=number_format($coa_name_totalpv,2);
@@ -10024,6 +11677,46 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        // //check if account payable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                        //     $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                        //     $coa_re_no=$Coa->id;
+                        //     $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                        //     }else{
+                        //         if($PeriodComparison=="Last Month"){
+                        //             $FROMpv=strtotime($request->FROM.' -1 month');
+                        //             $TOpv=strtotime($request->FROM.' -1 month');
+                        //         }else{
+                        //             $FROMpv=strtotime($request->FROM.' -1 year');
+                        //             $TOpv=strtotime($request->TO.' -1 year');
+                        //         }
+                        //         $FROMpv=date('Y-m-d', $FROMpv);
+                        //         $TOpv=date('Y-m-d', $TOpv);
+                                
+                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                        //     }
+                            
+                        //     $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpvpast="";
+                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                        //     ORDER BY created_at ASC");
+                        //     foreach($JournalEntryformpastpv as $past){
+                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
+                        //             $coa_name_total+=$past->je_credit;
+                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -10039,6 +11732,46 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        // //check if account payable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                        //     $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                        //     $coa_re_no=$Coa->id;
+                        //     $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                        //     }else{
+                        //         if($PeriodComparison=="Last Month"){
+                        //             $FROMpv=strtotime($request->FROM.' -1 month');
+                        //             $TOpv=strtotime($request->FROM.' -1 month');
+                        //         }else{
+                        //             $FROMpv=strtotime($request->FROM.' -1 year');
+                        //             $TOpv=strtotime($request->TO.' -1 year');
+                        //         }
+                        //         $FROMpv=date('Y-m-d', $FROMpv);
+                        //         $TOpv=date('Y-m-d', $TOpv);
+                                
+                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                        //     }
+                            
+                        //     $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpvpast="";
+                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                        //     ORDER BY created_at ASC");
+                        //     foreach($JournalEntryformpastpv as $past){
+                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
+                        //             $coa_name_totalpv+=$past->je_credit;
+                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking payable account type
                         $coa_name_totalpv+=$Coa->coa_balance;
                         $IncomeTotalpv+=$coa_name_totalpv;
                         $tablecontent.=number_format($coa_name_totalpv,2);
@@ -11504,6 +13237,48 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                            
+                                    $coa_re_no=$Coa->id;
+                                    $sortsettingjournalpast="WHERE created_at < '".$FROM."' AND";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }else{
+                                        if($PeriodComparison=="Last Month"){
+                                            $FROMpv=strtotime($request->FROM.' -1 month');
+                                            $TOpv=strtotime($request->FROM.' -1 month');
+                                        }else{
+                                            $FROMpv=strtotime($request->FROM.' -1 year');
+                                            $TOpv=strtotime($request->TO.' -1 year');
+                                        }
+                                        $FROMpv=date('Y-m-d', $FROMpv);
+                                        $TOpv=date('Y-m-d', $TOpv);
+                                        
+                                        $sortsettingjournalpast="WHERE created_at < '".$FROM."' AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -11846,6 +13621,45 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        // //check if account payable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                        //     $coa_re_no=$Coa->id;
+                        //     $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                        //     }else{
+                        //         if($PeriodComparison=="Last Month"){
+                        //             $FROMpv=strtotime($request->FROM.' -1 month');
+                        //             $TOpv=strtotime($request->FROM.' -1 month');
+                        //         }else{
+                        //             $FROMpv=strtotime($request->FROM.' -1 year');
+                        //             $TOpv=strtotime($request->TO.' -1 year');
+                        //         }
+                        //         $FROMpv=date('Y-m-d', $FROMpv);
+                        //         $TOpv=date('Y-m-d', $TOpv);
+                                
+                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                        //     }
+                            
+                        //     $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpvpast="";
+                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                        //     ORDER BY created_at ASC");
+                        //     foreach($JournalEntryformpastpv as $past){
+                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
+                        //             $coa_name_totalpv+=$past->je_credit;
+                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking payable account type
                         $coa_name_totalpv+=$Coa->coa_balance;
                         $IncomeTotalpv+=$coa_name_totalpv;
                         $tablecontent.=number_format($coa_name_totalpv,2);
@@ -12271,8 +14085,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -12358,8 +14176,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntryformpast= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournalpast.$sortjournalpast." 
@@ -12595,6 +14417,37 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                            
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->remark=='' || $past->remark==NULL){
+                                            if($past->je_debit!='' && $past->je_debit!=NULL){
+                                                $coa_name_total+=$past->je_debit;
+                                                
+                                            }
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -12978,6 +14831,32 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        // //check if account payable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                        //     $coa_re_no=$Coa->id;
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                        //     }
+                            
+                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpast="";
+                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
+                        //     ORDER BY created_at ASC");
+                        //     foreach($JournalEntryformpast as $past){
+                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
+                        //             $coa_name_total+=$past->je_credit;
+                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -15110,8 +16989,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -15270,8 +17153,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -17236,8 +19123,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17298,8 +19189,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17440,8 +19335,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17502,8 +19401,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17563,8 +19466,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17624,8 +19531,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17685,8 +19596,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -17952,8 +19867,12 @@ class ReportController extends Controller
                             ->get();
             
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
             $jounal = DB::table('journal_entries')
@@ -18152,8 +20071,12 @@ class ReportController extends Controller
                             ->get();
             $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
             $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-            $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-            $customers = Customers::orderBy('display_name', 'ASC')->get();
+            $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+            $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
             $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
             $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                                 ".$sortsettingjournal.$sortjournal." 
@@ -20766,8 +22689,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -20964,8 +22891,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -22544,8 +24475,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -22656,8 +24591,12 @@ class ReportController extends Controller
                         ->get();
                 $COA= DB::connection('mysql')->select("SELECT * FROM chart_of_accounts WHERE coa_active='1' ORDER BY coa_code+0 ASC");
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -23468,8 +25407,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortjournal." 
@@ -23762,8 +25705,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -24405,8 +26352,12 @@ class ReportController extends Controller
                         ->get();
         $coa_account_type=ChartofAccount::groupBy('coa_account_type')->orderBy('coa_detail_type','ASC')->get();
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -25225,8 +27176,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -25299,8 +27254,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -25361,8 +27320,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -25417,8 +27380,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -25477,8 +27444,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -25555,8 +27526,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $cost_center_list=CostCenter::all();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
@@ -26008,8 +27983,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $cost_center_list=CostCenter::all();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
@@ -26460,8 +28439,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortjournal." 
@@ -26844,8 +28827,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -26924,8 +28911,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortjournal." 
@@ -27233,8 +29224,12 @@ class ReportController extends Controller
                         ->get();
                         //whereBetween('created_at', [$FROM, $TO])
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -27577,8 +29572,12 @@ class ReportController extends Controller
                         ->get();
         
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $jounal = DB::table('journal_entries')
@@ -27655,7 +29654,9 @@ class ReportController extends Controller
                             ".$sortsetting." GROUP BY  bill_no");
         $PayBill= DB::connection('mysql')->select("SELECT * FROM pay_bill
                             ".$sortsetting."");
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $et_account_details= DB::table('et_account_details')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('created_at','ASC')->get();
         $tablecontent='';
@@ -27940,8 +29941,12 @@ class ReportController extends Controller
                         ->get();
                         //whereBetween('created_at', [$FROM, $TO])
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
                             ".$sortsettingjournal.$sortjournal." 
@@ -27994,12 +29999,28 @@ class ReportController extends Controller
                         $tablecontent.='<td style="vertical-align:middle;"></td>';
                         $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
                         $tablecontent.='<td style="vertical-align:middle;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                        
+                        if($RetainedEarningsSubs<0){
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                            $tablecontent.='<td style="vertical-align:middle;"></td>';
+                            
+                        }else{
+                            $tablecontent.='<td style="vertical-align:middle;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                        }
+                        
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                        
+                        if($RetainedEarningsSubs<0){
+                            
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                        }else{
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                        }
+                        
                         $tablecontent.='</tr>'; 
                     } 
                     $coa_name_total=0;
@@ -28052,10 +30073,44 @@ class ReportController extends Controller
                         $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_code.'</td>';  
                         $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_name.'</td>';  
                         $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_account_type.'</td>'; 
+                        $coa_name_total_from_the_past=0;
                         if($coa->normal_balance=="Debit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance,2).'</td>';  
+                            //check if account receivable account type
+                            
+                            if(strpos($coa->coa_name, 'Accounts Receivable') !== false || strpos($coa->coa_name, 'Accounts Receivables') !== false || strpos($coa->coa_name, 'Account Receivable') !== false ||strpos($coa->coa_name, 'Account Receivables') !== false){
+                                    
+                                $coa_re_no=$coa->id;
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                }
+                                
+                                $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                    $sortjournalpast="";
+                                    $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                    }
+                                }
+                                $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                ".$sortsettingjournalpast.$sortjournalpast ." 
+                                ORDER BY created_at ASC");
+                                
+                                foreach($JournalEntryformpast as $past){
+                                    $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                    if($past->remark=='' || $past->remark==NULL){
+                                        if($past->je_debit!='' && $past->je_debit!=NULL){
+                                            $coa_name_total_from_the_past+=$past->je_debit;
+                                            
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                            //end of checking receivable account type
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$coa_name_total_from_the_past,2).'</td>';  
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>'; 
-                            $beginningbalance_total_d+=$coa->coa_balance;
+                            $beginningbalance_total_d+=$coa->coa_balance+$coa_name_total_from_the_past;
                         }
                         else if($coa->normal_balance=="Credit"){
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';  
@@ -28066,14 +30121,14 @@ class ReportController extends Controller
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($debit!=""? number_format($debit,2) : '').'</td>';  
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($credit!=""? number_format($credit,2): '').'</td>';
                         if($coa->normal_balance=="Debit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance,2).'</td>'; 
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past,2).'</td>'; 
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
-                            $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance; 
+                            $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past; 
                         }
                         else if($coa->normal_balance=="Credit"){
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)-$coa->coa_balance,2).'</td>'; 
-                            $totaltotalssasdasd+=($debit_validated-$credit_validated)-$coa->coa_balance; 
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past,2).'</td>'; 
+                            $totaltotalssasdasd+=($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past; 
                         }
                         $tablecontent.='</tr>';  
                     }
@@ -28090,22 +30145,48 @@ class ReportController extends Controller
                     $tablecontent.='<td style="vertical-align:middle;"></td>';
                     $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
                     $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                    if($RetainedEarningsSubs<0){
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                        $tablecontent.='<td style="vertical-align:middle;"></td>';
+                        
+                    }else{
+                        $tablecontent.='<td style="vertical-align:middle;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                    }
+                    
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                    
+                    if($RetainedEarningsSubs<0){
+                        
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format($RetainedEarningsSubs,2).'</td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                    }else{
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
+                    }
                     $tablecontent.='</tr>'; 
                 }
                 $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
-                $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';  
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total+$RetainedEarningsSubs,2).'</td>';
+                $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';
+                if($RetainedEarningsSubs<0){
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d-$RetainedEarningsSubs,2).'</td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total,2).'</td>';
+                }else{
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total+$RetainedEarningsSubs,2).'</td>';
+                }
+                
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totaldebit,2).'</td>'; 
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totalcredit,2).'</td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d,2).'</td>';  
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd-$RetainedEarningsSubs,2).'</td>';  
+                if($RetainedEarningsSubs<0){
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d-$RetainedEarningsSubs,2).'</td>';  
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd,2).'</td>';  
+                }else{
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d,2).'</td>';  
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd-$RetainedEarningsSubs,2).'</td>';  
+                }
+                
                 $tablecontent.='</tr>';  
             }else if($CostCenterFilter=="By Cost Center"){
                 foreach($cost_center_list as $ccl){
@@ -28423,8 +30504,12 @@ class ReportController extends Controller
                         ->get();
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -28471,7 +30556,9 @@ class ReportController extends Controller
         }else{
             
         }
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -28523,8 +30610,12 @@ class ReportController extends Controller
                             ".$sortsetting." 
                             ORDER BY st_no ASC");
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -28571,8 +30662,12 @@ class ReportController extends Controller
         }else{
             
         }
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -28689,7 +30784,7 @@ class ReportController extends Controller
                         $tablecontent.='<td style="vertical-align:middle;">';
                         $total=0;
                         foreach($st_invoice as $st_i){
-                            if($st_i->st_i_no==$emp->st_no){
+                            if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                 $total=$total+$st_i->st_i_total;
                             }
                         }
@@ -28789,7 +30884,7 @@ class ReportController extends Controller
                             $tablecontent.='<td style="vertical-align:middle;">';
                             $total=0;
                             foreach($st_invoice as $st_i){
-                                if($st_i->st_i_no==$emp->st_no){
+                                if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                     $total=$total+$st_i->st_i_total;
                                 }
                             }
@@ -28884,8 +30979,8 @@ class ReportController extends Controller
                     $tablecontent.='</td>';
                     $tablecontent.='<td style="vertical-align:middle;">';
                     $total=0;
-                    foreach($st_invoice as $st_i){
-                        if($st_i->st_i_no==$emp->st_no){
+                    foreach($st_invoice as $st_i ){
+                        if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                             $total=$total+$st_i->st_i_total;
                         }
                     }
@@ -28914,6 +31009,163 @@ class ReportController extends Controller
         $table='<table id="tablemain" class="table table-sm" style="text-align:left;font-size:12px;">'
                 .'<thead><tr>'
                 .'<th>Date</th><th>Transaction Type</th><th>No.</th><th>Name</th><th>Memo</th><th>Due Date</th><th>Amount</th><th>Open Balance</th><th>Billing Address</th><th>Shipping Address</th><th>Terms</th>'
+                .'</tr></thead>'
+                .'<tbody>'.
+                $tablecontent
+                .'</tbody>'
+                .'</table>';
+        return $table;
+    }
+    public function Invoice_List_sorted_by_date(Request $request){
+        $FROM=$request->FROM;
+        $TO=$request->TO;
+        $InvoiceTYPE=$request->InvoiceTYPE;
+        $CostCenterFilter=$request->CostCenterFilter;
+        $filtertemplate=$request->filtertemplate;
+        $sortsetting="WHERE st_date BETWEEN '".$FROM."' AND '".$TO."'";
+        $sortsettingjournal="WHERE created_at BETWEEN '".$FROM."' AND '".$TO."' AND";
+        if($filtertemplate=="All"){
+            $sortsetting="";
+            $sortsettingjournal="";
+        }
+        if($sortsettingjournal==""){
+            $sortjournal="WHERE je_cost_center='".$CostCenterFilter."'";
+        }else{
+            $sortjournal=" WHERE je_cost_center='".$CostCenterFilter."'";
+        }
+        
+        if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+            $sortjournal="";
+            $sortsettingjournal="WHERE created_at BETWEEN '".$FROM."' AND '".$TO."'";
+            if($filtertemplate=="All"){
+                $sortsetting="";
+                $sortsettingjournal="";
+            }
+        }
+        $SalesTransaction= DB::connection('mysql')->select("SELECT * FROM sales_transaction
+                            JOIN customers ON sales_transaction.st_customer_id=customers.customer_id
+                            ".$sortsetting."
+                            ORDER BY st_no ASC");
+        $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice LEFT JOIN cost_center ON cost_center.cc_no=st_invoice.st_p_cost_center");
+        $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();
+        $JournalEntry= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortjournal." 
+                            ORDER BY created_at ASC");
+        $tablecontent="";
+        if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+            if($CostCenterFilter=="All"){
+                foreach($SalesTransaction as $emp){
+                    if($emp->st_type=="Invoice" && $InvoiceTYPE==$emp->st_location." ".$emp->st_invoice_type){
+                        $tablecontent.='<tr style="border-bottom:1px solid #ccc;" '.($emp->remark=="Cancelled"? 'class="table-danger"' : '').'>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        $tablecontent.=$emp->st_no;
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        $tablecontent.=$emp->st_date!=""? date('m-d-Y',strtotime($emp->st_date)) : "";
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        foreach($st_invoice as $st_i){
+                            if($st_i->st_i_no==$emp->st_no && $st_i->st_p_cost_center!='' && $st_i->st_p_reference_no==$emp->st_i_attachment){
+                                $tablecontent.=$st_i->cc_name."<br>";
+                            }
+                        }
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        foreach($st_invoice as $st_i){
+                            if($st_i->st_i_no==$emp->st_no && $st_i->st_i_desc!='' && $st_i->st_p_reference_no==$emp->st_i_attachment){
+                                $tablecontent.=$st_i->st_i_desc."<br>";
+                            }
+                        }
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        if($emp->display_name!=""){
+                        $tablecontent.=$emp->display_name;
+                        }else{
+                        $tablecontent.=$emp->f_name." ".$emp->l_name;
+                        }
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        if($emp->st_due_date!=""){
+                            $date1=date_create(date('Y-m-d'));
+                            $date2=date_create($emp->st_due_date);
+                            $diff=date_diff($date1,$date2);
+                            if(($diff->format("%R")=="-" || ($diff->format("%R")=="+" && $diff->format("%a")=="0")) && ($emp->st_status=="Open" || $emp->st_status=="Partially paid" )){
+                                $tablecontent.='<span title="overdue" style="color:red;">'; 
+                                $tablecontent.=$emp->st_due_date!=""? date('m-d-Y',strtotime($emp->st_due_date)) : ""; 
+                                $tablecontent.='</span>'; 
+                            }else{
+                                $tablecontent.=$emp->st_due_date!=""? date('m-d-Y',strtotime($emp->st_due_date)) : ""; 
+                            }
+                        }
+                        
+                        $tablecontent.='</td>';
+                        
+                        $total=0;
+                        foreach($st_invoice as $st_i){
+                            if($st_i->st_i_no==$emp->st_no && $st_i->st_p_reference_no==$emp->st_i_attachment){
+                                $total=$total+$st_i->st_i_total;
+                            }
+                        }
+                        $payment_for_id=$emp->st_no;
+                        $st_location=$emp->st_location;
+                        $st_invoice_type=$emp->st_invoice_type;
+                        $sales_receipts = DB::connection('mysql')->select("SELECT * FROM sales_transaction  WHERE st_type='Sales Receipt' AND st_payment_for='$payment_for_id' AND st_location='$st_location' AND st_invoice_type='$st_invoice_type'");
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        if($emp->cancellation_reason==NULL){
+                            foreach($sales_receipts as $sal){
+                            
+                                $tablecontent.=$sal->st_no."<br>";
+                            }
+                            
+                        }
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        if($emp->cancellation_reason==NULL){
+                            foreach($sales_receipts as $sal){
+                                
+                                $tablecontent.=($sal->st_date!=""? date('m-d-Y',strtotime($sal->st_date)) : '')."<br>";
+                            }
+                        }
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        $tablecontent.=number_format($emp->st_balance,2);
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        $tablecontent.=number_format($total,2);
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;">';
+                        $tablecontent.=$emp->st_status;
+                        $tablecontent.='</td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:center">';
+                        if($emp->remark=="Cancelled"){
+                            $tablecontent.=$emp->remark;
+                        }else{
+                            $tablecontent.='<button class="btn btn-sm btn-danger" title="cancel this Transaction" onclick="cancelentry(\''.$emp->st_type.'\',\''.$emp->st_no.'\',\''.$emp->st_location.'\',\''.$emp->st_invoice_type.'\',)"><span class="fa fa-times"></span></button>'; 
+                        }
+                        
+                        $tablecontent.='</td>';
+                        $tablecontent.='</tr>';
+                        
+                    }
+                }
+            }
+            
+        }
+        $no_header="";
+        if($InvoiceTYPE=="Main Sales Invoice"){
+            $no_header="Sales Invoice no";
+        }else if($InvoiceTYPE=="Main Bill Invoice"){
+            $no_header="Billing Invoice no";
+        }else if($InvoiceTYPE=="Branch Sales Invoice"){
+            $no_header="Sales Invoice no";
+        }else if($InvoiceTYPE=="Branch Bill Invoice"){
+            $no_header="Billing Invoice no";
+        }
+        $table='<table id="tablemain" class="table table-sm" style="text-align:left;font-size:12px;">'
+                .'<thead><tr>'
+                .'<th>'.$no_header.'</th><th>Date</th><th>Cost Center</th><th>Description</th><th>Customer</th><th>Due Date</th><th>OR No</th><th>OR Date</th><th>Balance</th><th>Total</th><th>Status</th><th></th>'
                 .'</tr></thead>'
                 .'<tbody>'.
                 $tablecontent
@@ -29017,7 +31269,7 @@ class ReportController extends Controller
                                 $tablecontent.='<td style="vertical-align:middle;">';
                                 $total=0;
                                 foreach($st_invoice as $st_i){
-                                    if($st_i->st_i_no==$emp->st_no){
+                                    if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                         $total=$total+$st_i->st_i_total;
                                     }
                                 }
@@ -29143,7 +31395,7 @@ class ReportController extends Controller
                                         $tablecontent.='<td style="vertical-align:middle;">';
                                         $total=0;
                                         foreach($st_invoice as $st_i){
-                                            if($st_i->st_i_no==$emp->st_no){
+                                            if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                                 $total=$total+$st_i->st_i_total;
                                             }
                                         }
@@ -29268,7 +31520,7 @@ class ReportController extends Controller
                             $tablecontent.='<td style="vertical-align:middle;">';
                             $total=0;
                             foreach($st_invoice as $st_i){
-                                if($st_i->st_i_no==$emp->st_no){
+                                if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                     $total=$total+$st_i->st_i_total;
                                 }
                             }
@@ -31494,8 +33746,12 @@ class ReportController extends Controller
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
         $st_estimates= DB::connection('mysql')->select("SELECT * FROM st_estimates");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -31547,8 +33803,12 @@ class ReportController extends Controller
                             ".$sortsetting." 
                             ORDER BY st_no ASC");
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -31606,8 +33866,12 @@ class ReportController extends Controller
                         ->get();
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -31686,7 +33950,9 @@ class ReportController extends Controller
                 ->get();
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
         $cost_center_list=CostCenter::all();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $tablecontent='';
         
         if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
@@ -32114,8 +34380,12 @@ class ReportController extends Controller
                         ->get();
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $saletransaction = DB::table('sales_transaction')
@@ -32179,8 +34449,12 @@ class ReportController extends Controller
             
         $st_invoice= DB::connection('mysql')->select("SELECT * FROM st_invoice");
         $st_estimates= DB::connection('mysql')->select("SELECT * FROM st_estimates");
-        $Supplier= Supplier::orderBy('display_name', 'ASC')->get();
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $Supplier= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $products_and_services = ProductsAndServices::orderBy('product_name', 'ASC')->get();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
         $jounal = DB::table('journal_entries')
@@ -32305,7 +34579,9 @@ class ReportController extends Controller
         $Type=$request->type;
         $Location=$request->Location;
         $TTTT=$request->TTTTT;
-        $customers = Customers::orderBy('display_name', 'ASC')->get();
+        $customers= Customers::where([
+            ['supplier_active','=','1']
+        ])->orderBy('display_name', 'ASC')->get();
         $numbering = Numbering::first();
         $cost_center_list= CostCenter::where('cc_status','1')->orderBy('cc_type_code', 'asc')->get();         $all_cost_center_list= CostCenter::all();
         $JournalEntry = JournalEntry::where([['remark','!=','NULLED']])->orWhereNull('remark')->orderBy('je_no','DESC')->get();
