@@ -83,6 +83,7 @@ class SuppliersController extends Controller
                 $et_account->et_ad_qty = $ee->et_ad_qty;
                 $et_account->et_ad_type = $ee->et_ad_type;
                 $et_account->et_cost_center =$ee->et_cost_center;
+                $et_account->et_credit_account=$ee->et_credit_account;
                 $totalamount+=$ee->et_ad_total;
                 $et_account->save(); 
 
@@ -122,7 +123,12 @@ class SuppliersController extends Controller
                 $JDate=$et[0]->et_date;
                 $JNo=$et[0]->et_no;
                 $JMemo=$et[0]->et_memo;
-                $account=$et[0]->et_credit_account;
+                if($ee->et_credit_account!=''){
+                    $account=$ee->et_credit_account;
+                }else{
+                    $account=$et[0]->et_credit_account;
+                }
+                
                 $debit= "";
                 $credit= $ee->et_ad_total;
                 $description=$ee->et_ad_desc;
@@ -894,9 +900,10 @@ class SuppliersController extends Controller
             $et_account->et_ad_no = $request->bill_bill_no;
             $et_account->et_ad_product = $request->input('select_account_bill'.$x);
             $et_account->et_ad_desc = $request->input('select_description_bill'.$x);
+            $et_account->et_credit_account= $request->input('et_credit_account'.$x);
             $et_account->et_ad_total = $request->input('select_bill_amount'.$x);
             $et_account->et_ad_rate = 1;
-            $et_account->et_cost_center =$request->input('select_cost_center_bill'.$x2);
+            $et_account->et_cost_center =$request->input('select_cost_center_bill'.$x);
             $et_account->et_ad_qty = $request->bill_bill_no;
             $et_account->et_ad_type = "Bill";
             $totalamount+=$request->input('select_bill_amount'.$x);
@@ -1015,17 +1022,20 @@ class SuppliersController extends Controller
         
             foreach($request->return_item_sc as $checked){
                 for($x=0;$x<=$request->account_count_scs;$x++){
-                if($checked==$request->input('hiddenet_ad_id'.$x)){
+                $x2=$x+1;
+                if($checked==$request->input('hiddenet_ad_id'.$x2)){
                     //$request->hiddenet_ad_id;
                     $et_account = new EtAccountDetail;
                     $et_account->et_ad_no = $request->suppliers_credit_no;
                     $et_account->et_ad_type = "Supplier credit";
-                    $et_account->et_ad_product = $request->input('select_account_sc'.$x);
-                    $et_account->et_cost_center = $request->input('select_costcenter_sc'.$x);
-                    $et_account->et_ad_desc = $request->input('select_description_sc'.$x);
-                    $et_account->et_ad_rate = $request->input('hiddenet_ad_id'.$x)." == ".$checked;
-                    $et_account->et_ad_total = -$request->input('select_sc_amount'.$x);
-                    $totalamount-=$request->input('select_sc_amount'.$x);
+                    $et_account->et_ad_product = $request->input('select_account_sc'.$x2);
+                    $et_account->et_cost_center = $request->input('select_costcenter_sc'.$x2);
+                    $et_account->et_credit_account = $request->input('select_credit_account_sc'.$x2);
+                    
+                    $et_account->et_ad_desc = $request->input('select_description_sc'.$x2);
+                    $et_account->et_ad_rate = $request->input('hiddenet_ad_id'.$x2)." == ".$checked;
+                    $et_account->et_ad_total = -$request->input('select_sc_amount'.$x2);
+                    $totalamount-=$request->input('select_sc_amount'.$x2);
                     $et_account->save();
 
                     $et=EtAccountDetail::find($checked);
@@ -1033,16 +1043,21 @@ class SuppliersController extends Controller
                     $et->save();
 
                     $stew = ExpenseTransaction::find($request->supplier_credit_bill_no);
-                    $stew->bill_balance=$stew->bill_balance-$request->input('select_sc_amount'.$x);
+                    $stew->bill_balance=$stew->bill_balance-$request->input('select_sc_amount'.$x2);
                     $stew->save();
 
                     $JDate=$request->sc_date;
                     $JNo=$request->suppliers_credit_no;
                     $JMemo=$request->sc_memo;
-                    $account=$request->supplier_credit_account_debit_account;
-                    $debit= -$request->input('select_sc_amount'.$x);
+                    if($request->input('select_credit_account_sc'.$x2)!=''){
+                        $account=$request->input('select_credit_account_sc'.$x2);
+                    }else{
+                        $account=$request->supplier_credit_account_debit_account;
+                    }
+                    
+                    $debit= -$request->input('select_sc_amount'.$x2);
                     $credit= "";
-                    $description=$request->input('select_description_sc'.$x);
+                    $description=$request->input('select_description_sc'.$x2);
                     $name="";
 
                     $journal_entries = new  JournalEntry;
@@ -1060,8 +1075,8 @@ class SuppliersController extends Controller
                     $journal_entries->created_at=$JDate;
                     $journal_entries->je_attachment=$JDate;
                     $journal_entries->je_transaction_type="Supplier Credit";
-                    if($request->input('select_costcenter_sc'.$x)!=""){
-                        $wwe=explode(" - ",$request->input('select_costcenter_sc'.$x));
+                    if($request->input('select_costcenter_sc'.$x2)!=""){
+                        $wwe=explode(" - ",$request->input('select_costcenter_sc'.$x2));
                     }else{
                         $wwe=explode(" - ",$request->CostCenterSupplierCredit);
                         
@@ -1073,10 +1088,10 @@ class SuppliersController extends Controller
                     $JDate=$request->sc_date;
                     $JNo=$request->suppliers_credit_no;
                     $JMemo=$request->sc_memo;
-                    $account=$request->input('select_account_sc'.$x);
+                    $account=$request->input('select_account_sc'.$x2);
                     $debit= "";
-                    $credit=-$request->input('select_sc_amount'.$x);
-                    $description=$request->input('select_description_sc'.$x);
+                    $credit=-$request->input('select_sc_amount'.$x2);
+                    $description=$request->input('select_description_sc'.$x2);
                     $name="";
                         
 
@@ -1094,8 +1109,8 @@ class SuppliersController extends Controller
                     $journal_entries->created_at=$JDate;
                     $journal_entries->je_attachment=$JDate;
                     $journal_entries->je_transaction_type="Supplier Credit";
-                    if($request->input('select_costcenter_sc'.$x)!=""){
-                        $wwe=explode(" - ",$request->input('select_costcenter_sc'.$x));
+                    if($request->input('select_costcenter_sc'.$x2)!=""){
+                        $wwe=explode(" - ",$request->input('select_costcenter_sc'.$x2));
                     }else{
                         $wwe=explode(" - ",$request->CostCenterSupplierCredit);
                         

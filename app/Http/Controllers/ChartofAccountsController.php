@@ -101,7 +101,7 @@ class ChartofAccountsController extends Controller
                             $sheet->setCellValue('C'.$cuss, $emp->st_date!=""? date('m-d-Y',strtotime($emp->st_date)) : "");
                             $cost_center="";
                             foreach($st_invoice as $st_i){
-                                if($st_i->st_i_no==$emp->st_no && $st_i->st_p_cost_center!='' && $emp->st_i_attachment==$ST->st_p_reference_no){
+                                if($st_i->st_i_no==$emp->st_no && $st_i->st_p_cost_center!='' && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                     $cost_center.=$st_i->cc_name."\n";
                                 }
                             }
@@ -110,7 +110,7 @@ class ChartofAccountsController extends Controller
                             $sheet->getStyle('H5')->getAlignment()->setWrapText(true);
                             $cost_center="";
                             foreach($st_invoice as $st_i){
-                                if($st_i->st_i_no==$emp->st_no && $st_i->st_i_desc!='' && $emp->st_i_attachment==$ST->st_p_reference_no){
+                                if($st_i->st_i_no==$emp->st_no && $st_i->st_i_desc!='' && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                     $cost_center.=$st_i->st_i_desc."\n";
                                 }
                             }
@@ -142,7 +142,7 @@ class ChartofAccountsController extends Controller
                             $sheet->setCellValue('I'.$cuss, $sr_nos2);
                             $total=0;
                             foreach($st_invoice as $st_i){
-                                if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$ST->st_p_reference_no){
+                                if($st_i->st_i_no==$emp->st_no && $emp->st_i_attachment==$st_i->st_p_reference_no){
                                     $total=$total+$st_i->st_i_total;
                                 }
                             }
@@ -319,7 +319,7 @@ class ChartofAccountsController extends Controller
                             $payment_for_id=$ST->st_no;
                             $st_location=$ST->st_location;
                             $st_invoice_type=$ST->st_invoice_type;
-                            $sales_receipts = DB::connection('mysql')->select("SELECT * FROM sales_transaction  WHERE st_type='Sales Receipt' AND st_payment_for='$payment_for_id' AND st_location='$st_location' ND st_invoice_type='$st_invoice_type'");
+                            $sales_receipts = DB::connection('mysql')->select("SELECT * FROM sales_transaction  WHERE st_type='Sales Receipt' AND st_payment_for='$payment_for_id' AND st_location='$st_location' AND st_invoice_type='$st_invoice_type'");
                             $sheet->setCellValue('B'.$cuss, $ST->created_at!=""?date('m-d-Y',strtotime($ST->created_at)) : '');
                             $sheet->setCellValue('C'.$cuss, $ST->display_name!=""? $ST->display_name : $ST->f_name." ".$ST->l_name);
                             $sheet->setCellValue('D'.$cuss, $ST->tin_no);

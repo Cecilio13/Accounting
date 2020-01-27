@@ -279,7 +279,7 @@
                                         
                                         @endif
                                     @endif
-                                <tr {{$overduetransaction==1? 'class=table-danger' : ''}}>
+                                <tr {{$et->remark=="" || $et->remark==NULL? ($overduetransaction==1?  'class=table-danger' : '') : 'class=table-warning'  }}>
                                     
                                     <td class="pt-3-half" style="vertical-align:middle;">{{date('m-d-Y',strtotime($et->et_date))}}</td>
                                     <td class="pt-3-half"  style="vertical-align:middle;">{{$et->et_type}}</td>
@@ -349,16 +349,21 @@
                                     <td class="pt-3-half"  style="vertical-align:middle;">{{$et->et_memo}}</td>
                                     <td class="pt-3-half" style="vertical-align:middle;" >PHP {{number_format($et->et_ad_total,2)}}</td>
                                     <td>
-                                        @if ($et->et_type=="Bill" && $et->et_ad_rate=="1")
-                                            @if ($et->et_bil_status=="Paid")
-                                                Paid
-                                            @else
-                                            <button class="btn btn-link" title="Supplier Credit" onclick="supplier_credit_modal_open('{{$et->et_no}}')" data-toggle="modal" data-target="#suppliercreditmodal"><span class="fa fa-history"></span></button>
-                                            @endif
-                                        
-                                        @else
+                                        @if($et->remark=="" || $et->remark==NULL)
+                                            @if ($et->et_type=="Bill" && $et->et_ad_rate=="1")
+                                                @if ($et->et_bil_status=="Paid")
+                                                    Paid
+                                                @else
+                                                <button class="btn btn-link" title="Supplier Credit" onclick="supplier_credit_modal_open('{{$et->et_no}}')" data-toggle="modal" data-target="#suppliercreditmodal"><span class="fa fa-history"></span></button>
+                                                @endif
                                             
+                                            @else
+                                                
+                                            @endif
+                                        @else
+                                            {{'Cancelled'}}
                                         @endif
+                                        
                                         
                                     </td>
                                 </tr>

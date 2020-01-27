@@ -7967,6 +7967,7 @@ class ReportController extends Controller
             }
         }
         foreach($JournalEntry as $J){
+            
             if($J->je_credit!=""){
                 $Cash=$Cash+$J->je_credit;
             }
@@ -7976,6 +7977,7 @@ class ReportController extends Controller
             
             
         }
+        
         $VoucherCount=Voucher::count() + 1;
         if($VoucherCount<10){
             $VoucherCount="000".$VoucherCount;
@@ -8827,35 +8829,35 @@ class ReportController extends Controller
                         //     }
                         // }
                         // //end of checking receivable account type
-                        // //check if account payable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
-                        //     $coa_re_no=$Coa->id;
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
-                        //     }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
                             
-                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpast="";
-                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
-                        //     ORDER BY created_at ASC");
-                        //     foreach($JournalEntryformpast as $past){
-                        //         if($past->remark=='' || $past->remark=NULL){
-                        //             if($past->je_credit!='' && $past->je_credit!=NULL){
-                        //                 $coa_name_total+=$past->je_credit;
-                        //                 $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
-                        //             }
-                        //         }
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
                                 
-                        //     }
-                        // }
-                        // //end of checking payable account type
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -8896,35 +8898,35 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        //check if account receivable account type
-                        if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                        // //check if account receivable account type
+                        // if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
                                     
-                            $coa_re_no=$Coa->id;
-                            if($filtertemplate=="All"){
-                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
-                            }
+                        //     $coa_re_no=$Coa->id;
+                        //     if($filtertemplate=="All"){
+                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                        //     }
                             
-                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
-                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                                $sortjournalpast="";
-                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
-                                if($filtertemplate=="All"){
-                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
-                                }
-                            }
-                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
-                            ".$sortsettingjournalpast.$sortjournalpast ." 
-                            ORDER BY created_at ASC");
+                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                        //         $sortjournalpast="";
+                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                        //         if($filtertemplate=="All"){
+                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                        //         }
+                        //     }
+                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
+                        //     ORDER BY created_at ASC");
                             
-                            foreach($JournalEntryformpast as $past){
-                                $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
-                                if($past->je_debit!='' && $past->je_debit!=NULL){
-                                    $coa_name_total+=$past->je_debit;
+                        //     foreach($JournalEntryformpast as $past){
+                        //         $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                        //         if($past->je_debit!='' && $past->je_debit!=NULL){
+                        //             $coa_name_total+=$past->je_debit;
                                     
-                                }
-                            }
-                        }
-                        //end of checking receivable account type
+                        //         }
+                        //     }
+                        // }
+                        // //end of checking receivable account type
                         //check if account payable account type
                         if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
                             $coa_re_no=$Coa->id;
@@ -8944,9 +8946,13 @@ class ReportController extends Controller
                             ".$sortsettingjournalpast.$sortjournalpast ." 
                             ORDER BY created_at ASC");
                             foreach($JournalEntryformpast as $past){
-                                if($past->je_credit!='' && $past->je_credit!=NULL){
-                                    $coa_name_total+=$past->je_credit;
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
                                 }
+                                
                             }
                         }
                         //end of checking payable account type
@@ -9048,24 +9054,33 @@ class ReportController extends Controller
                     //         }
                     //     }
                     // }
-                    // if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
-                        
-                    //     foreach ($JournalEntryformpast as $JE){
-                    //         //$tablecontent.=$JE->je_no."\n";
-                    //         if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
                                 
-                    //             if ($JE->je_credit!=""){
-                    //                 $RetainedEarningsSubs-=$JE->je_credit;
-                    //                 //$tablecontent.=$RetainedEarningsSubs." c";
-                    //             }else{
-                    //                 $RetainedEarningsSubs+=$JE->je_debit;
-                    //                 //$tablecontent.=$RetainedEarningsSubs." d";
-                    //             }
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
                                 
-                    //         }
-                    //     }
-                        
-                    // }
+                        //     }
+                        // }
+                        foreach ($JournalEntry as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubs+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
                 }
                 $tablecontent.=number_format($RetainedEarningsSubs+($CustomerTotalRE-$CustomerTotal2RE),2);
                 $RetainedEarnings=$RetainedEarningsSubs+($CustomerTotalRE-$CustomerTotal2RE);
@@ -10609,60 +10624,35 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        // //check if account receivable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
-                                    
-                        //     $coa_re_no=$Coa->id;
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
-                        //     }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
                             
-                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpast="";
-                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
-                        //     ORDER BY created_at ASC");
-                            
-                        //     foreach($JournalEntryformpast as $past){
-                        //         $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
-                        //         if($past->je_debit!='' && $past->je_debit!=NULL){
-                        //             $coa_name_total+=$past->je_debit;
-                                    
-                        //         }
-                        //     }
-                        // }
-                        // //end of checking receivable account type
-                        // //check if account payable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
-                        //     $coa_re_no=$Coa->id;
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
-                        //     }
-                            
-                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpast="";
-                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
-                        //     ORDER BY created_at ASC");
-                        //     foreach($JournalEntryformpast as $past){
-                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
-                        //             $coa_name_total+=$past->je_credit;
-                        //         }
-                        //     }
-                        // }
-                        // //end of checking payable account type
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -10703,7 +10693,35 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -10817,6 +10835,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntry as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubs+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubs+($CustomerTotalRE-$CustomerTotal2RE),2);
                 $RetainedEarnings=$RetainedEarningsSubs+($CustomerTotalRE-$CustomerTotal2RE);
                 $tablecontent.='</td>';
@@ -11677,46 +11724,50 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        // //check if account payable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
-                        //     $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
-                        //     $coa_re_no=$Coa->id;
-                        //     $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
-                        //     }else{
-                        //         if($PeriodComparison=="Last Month"){
-                        //             $FROMpv=strtotime($request->FROM.' -1 month');
-                        //             $TOpv=strtotime($request->FROM.' -1 month');
-                        //         }else{
-                        //             $FROMpv=strtotime($request->FROM.' -1 year');
-                        //             $TOpv=strtotime($request->TO.' -1 year');
-                        //         }
-                        //         $FROMpv=date('Y-m-d', $FROMpv);
-                        //         $TOpv=date('Y-m-d', $TOpv);
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
                                 
-                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
-                        //     }
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            }
                             
-                        //     $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpvpast="";
-                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROM."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpastpv.$sortjournalpvpast." 
-                        //     ORDER BY created_at ASC");
-                        //     foreach($JournalEntryformpastpv as $past){
-                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
-                        //             $coa_name_total+=$past->je_credit;
-                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
-                        //         }
-                        //     }
-                        // }
-                        // //end of checking payable account type
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking payable account type
+                        
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -11732,46 +11783,48 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        // //check if account payable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
-                        //     $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
-                        //     $coa_re_no=$Coa->id;
-                        //     $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
-                        //     }else{
-                        //         if($PeriodComparison=="Last Month"){
-                        //             $FROMpv=strtotime($request->FROM.' -1 month');
-                        //             $TOpv=strtotime($request->FROM.' -1 month');
-                        //         }else{
-                        //             $FROMpv=strtotime($request->FROM.' -1 year');
-                        //             $TOpv=strtotime($request->TO.' -1 year');
-                        //         }
-                        //         $FROMpv=date('Y-m-d', $FROMpv);
-                        //         $TOpv=date('Y-m-d', $TOpv);
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
                                 
-                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
-                        //     }
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            }
                             
-                        //     $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpvpast="";
-                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpastpv.$sortjournalpvpast." 
-                        //     ORDER BY created_at ASC");
-                        //     foreach($JournalEntryformpastpv as $past){
-                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
-                        //             $coa_name_totalpv+=$past->je_credit;
-                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
-                        //         }
-                        //     }
-                        // }
-                        // //end of checking payable account type
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_totalpv+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_totalpv+=$Coa->coa_balance;
                         $IncomeTotalpv+=$coa_name_totalpv;
                         $tablecontent.=number_format($coa_name_totalpv,2);
@@ -11815,6 +11868,49 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
+                                
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            }
+                            
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -11830,6 +11926,48 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
+                                
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            }
+                            
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_totalpv+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_totalpv+=$Coa->coa_balance;
                         $IncomeTotalpv+=$coa_name_totalpv;
                         $tablecontent.=number_format($coa_name_totalpv,2);
@@ -11952,6 +12090,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntryformpast as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubs+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2),2);
                 $tablecontent.='</td>';
                 $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;text-align:right;">';
@@ -12000,6 +12167,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntryformpastpv as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubspv+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubspv+($CustomerTotalpv-$CustomerTotal2pv),2);
                 $RetainedEarnings=$RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2);
                 $RetainedEarningspv=$RetainedEarningsSubspv+($CustomerTotalpv-$CustomerTotal2pv);
@@ -13540,6 +13736,49 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
+                                
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            }
+                            
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -13555,6 +13794,48 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
+                                
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            }
+                            
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_totalpv+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_totalpv+=$Coa->coa_balance;
                         $IncomeTotalpv+=$coa_name_totalpv;
                         $tablecontent.=number_format($coa_name_totalpv,2);
@@ -13606,6 +13887,49 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
+                                
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."' AND";
+                            }
+                            
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_total+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -13621,45 +13945,48 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        // //check if account payable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
-                        //     $coa_re_no=$Coa->id;
-                        //     $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
-                        //     }else{
-                        //         if($PeriodComparison=="Last Month"){
-                        //             $FROMpv=strtotime($request->FROM.' -1 month');
-                        //             $TOpv=strtotime($request->FROM.' -1 month');
-                        //         }else{
-                        //             $FROMpv=strtotime($request->FROM.' -1 year');
-                        //             $TOpv=strtotime($request->TO.' -1 year');
-                        //         }
-                        //         $FROMpv=date('Y-m-d', $FROMpv);
-                        //         $TOpv=date('Y-m-d', $TOpv);
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $tablecontent.='<script>console.log(\''.$Coa->coa_name." asdasd".'\')</script>';
+                            $coa_re_no=$Coa->id;
+                            $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpastpv="WHERE created_at = '' AND je_account='$coa_re_no'  AND";
+                            }else{
+                                if($PeriodComparison=="Last Month"){
+                                    $FROMpv=strtotime($request->FROM.' -1 month');
+                                    $TOpv=strtotime($request->FROM.' -1 month');
+                                }else{
+                                    $FROMpv=strtotime($request->FROM.' -1 year');
+                                    $TOpv=strtotime($request->TO.' -1 year');
+                                }
+                                $FROMpv=date('Y-m-d', $FROMpv);
+                                $TOpv=date('Y-m-d', $TOpv);
                                 
-                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
-                        //     }
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."' AND";
+                            }
                             
-                        //     $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpvpast="";
-                        //         $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpastpv.$sortjournalpvpast." 
-                        //     ORDER BY created_at ASC");
-                        //     foreach($JournalEntryformpastpv as $past){
-                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
-                        //             $coa_name_totalpv+=$past->je_credit;
-                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
-                        //         }
-                        //     }
-                        // }
-                        // //end of checking payable account type
+                            $sortjournalpvpast="  je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpvpast="";
+                                $sortsettingjournalpastpv="WHERE created_at < '".$FROMpv."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpastpv="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpastpv= DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpastpv.$sortjournalpvpast." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpastpv as $past){
+                                if($past->remark=='' || $past->remark=NULL){
+                                    if($past->je_credit!='' && $past->je_credit!=NULL){
+                                        $coa_name_totalpv+=$past->je_credit;
+                                        $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                    }
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_totalpv+=$Coa->coa_balance;
                         $IncomeTotalpv+=$coa_name_totalpv;
                         $tablecontent.=number_format($coa_name_totalpv,2);
@@ -13838,6 +14165,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntryformpast as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubs+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2),2);
                 $tablecontent.='</td>';
                 $tablecontent.='<td class="dottedborder" style="vertical-align:middle;font-size:11px;text-align:right;">';
@@ -13886,6 +14242,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntryformpastpv as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubspv+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubspv+($CustomerTotalpv-$CustomerTotal2pv),2);
                 $RetainedEarnings=$RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2);
                 $RetainedEarningspv=$RetainedEarningsSubs+($CustomerTotalpv-$CustomerTotal2pv);
@@ -14831,32 +15216,32 @@ class ReportController extends Controller
                                 }
                             }
                         }
-                        // //check if account payable account type
-                        // if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
-                        //     $coa_re_no=$Coa->id;
-                        //     if($filtertemplate=="All"){
-                        //         $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
-                        //     }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
                             
-                        //     $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
-                        //     if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
-                        //         $sortjournalpast="";
-                        //         $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
-                        //         if($filtertemplate=="All"){
-                        //             $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
-                        //         }
-                        //     }
-                        //     $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
-                        //     ".$sortsettingjournalpast.$sortjournalpast ." 
-                        //     ORDER BY created_at ASC");
-                        //     foreach($JournalEntryformpast as $past){
-                        //         if($past->je_credit!='' && $past->je_credit!=NULL){
-                        //             $coa_name_total+=$past->je_credit;
-                        //             $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
-                        //         }
-                        //     }
-                        // }
-                        // //end of checking payable account type
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->je_credit!='' && $past->je_credit!=NULL){
+                                    $coa_name_total+=$past->je_credit;
+                                    $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -14928,6 +15313,32 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->je_credit!='' && $past->je_credit!=NULL){
+                                    $coa_name_total+=$past->je_credit;
+                                    $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -15072,6 +15483,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntry as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubs+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2),2);
                 $RetainedEarnings=$RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2);
                 $tablecontent.='</td>';
@@ -16259,6 +16699,37 @@ class ReportController extends Controller
                                         }
                                     }
                                 }
+                                //check if account receivable account type
+                                if(strpos($Coa->coa_name, 'Accounts Receivable') !== false || strpos($Coa->coa_name, 'Accounts Receivables') !== false || strpos($Coa->coa_name, 'Account Receivable') !== false ||strpos($Coa->coa_name, 'Account Receivables') !== false){
+                                            
+                                    $coa_re_no=$Coa->id;
+                                    if($filtertemplate=="All"){
+                                        $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                                    }
+                                    
+                                    $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                                    if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                        $sortjournalpast="";
+                                        $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                        if($filtertemplate=="All"){
+                                            $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                        }
+                                    }
+                                    $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                                    ".$sortsettingjournalpast.$sortjournalpast ." 
+                                    ORDER BY created_at ASC");
+                                    
+                                    foreach($JournalEntryformpast as $past){
+                                        $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                        if($past->remark=='' || $past->remark==NULL){
+                                            if($past->je_debit!='' && $past->je_debit!=NULL){
+                                                $coa_name_total+=$past->je_debit;
+                                                
+                                            }
+                                        }
+                                    }
+                                }
+                                //end of checking receivable account type
                                 $coa_name_total+=$Coa->coa_balance;
                                 $IncomeTotal+=$coa_name_total;
                                 $tablecontent.=number_format($coa_name_total,2);
@@ -16642,6 +17113,32 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->je_credit!='' && $past->je_credit!=NULL){
+                                    $coa_name_total+=$past->je_credit;
+                                    $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -16713,6 +17210,32 @@ class ReportController extends Controller
                                 }
                             }
                         }
+                        //check if account payable account type
+                        if(strpos($Coa->coa_name, 'Accounts Payable') !== false || strpos($Coa->coa_name, 'Accounts Payables') !== false || strpos($Coa->coa_name, 'Account Payable') !== false ||strpos($Coa->coa_name, 'Account Payables') !== false){
+                            $coa_re_no=$Coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            foreach($JournalEntryformpast as $past){
+                                if($past->je_credit!='' && $past->je_credit!=NULL){
+                                    $coa_name_total+=$past->je_credit;
+                                    $tablecontent.='<script>console.log(\''.$past->je_no.' with amount of'.$past->je_credit.'\')</script>';
+                                }
+                            }
+                        }
+                        //end of checking payable account type
                         $coa_name_total+=$Coa->coa_balance;
                         $IncomeTotal+=$coa_name_total;
                         $tablecontent.=number_format($coa_name_total,2);
@@ -16857,6 +17380,35 @@ class ReportController extends Controller
                 //         }
                 //     }
                 // }
+                foreach($COA as $coa){
+                    if ($coa->coa_account_type=="Equity" && ($coa->coa_detail_type=="Retained Earnings" || $coa->coa_detail_type=="Retained Earning")){
+                        $RetainedEarningsSubs+=$coa->coa_balance;
+                        // foreach ($JournalEntryformpast as $JE){
+                           
+                        //     //$tablecontent.=$JE->je_no."\n";
+                        //     if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                
+                        //         if ($JE->je_credit!=""){
+                        //             //$RetainedEarningsSubs-=$JE->je_credit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." c";
+                        //         }else{
+                        //             $RetainedEarningsSubs+=$JE->je_debit;
+                        //             //$tablecontent.=$RetainedEarningsSubs." d";
+                        //         }
+                                
+                        //     }
+                        // }
+                        foreach ($JournalEntry as $JE){
+                            if ($JE->je_account==$Coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
+                                if ($JE->je_credit!=""){
+                                   
+                                }else{
+                                    $RetainedEarningsSubs+=$JE->je_debit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $tablecontent.=number_format($RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2),2);
                 $RetainedEarnings=$RetainedEarningsSubs+($CustomerTotal-$CustomerTotal2);
                 $tablecontent.='</td>';
@@ -29987,42 +30539,10 @@ class ReportController extends Controller
                 $beginningbalance_total_d=0;
                 $retaunbedearnings=0;
                 $LandImprovements=0;
+                $RetainedEarningsReaming=0;
                 foreach ($COA as $coa){
-                    if($coa->coa_name=='Arkcons, Capital'){
-                        $retaunbedearnings=1;
-                        $RetainedEarningsSubs=0;
-                        $data=Advance::first();
-                        if(!empty($data)){
-                            $RetainedEarningsSubs+=$data->advance_beginning_balance;
-                        }
-                        $tablecontent.='<tr>';  
-                        $tablecontent.='<td style="vertical-align:middle;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
-                        $tablecontent.='<td style="vertical-align:middle;"></td>';
-                        
-                        if($RetainedEarningsSubs<0){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                            $tablecontent.='<td style="vertical-align:middle;"></td>';
-                            
-                        }else{
-                            $tablecontent.='<td style="vertical-align:middle;"></td>';
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                        }
-                        
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                        
-                        if($RetainedEarningsSubs<0){
-                            
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                        }else{
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
-                        }
-                        
-                        $tablecontent.='</tr>'; 
-                    } 
+                    $RetainedEarningsSubs=0;
+                    
                     $coa_name_total=0;
                     $coa_name_totalc=0;
                     $coa_name_totald=0;
@@ -30108,68 +30628,64 @@ class ReportController extends Controller
                                 }
                             }
                             //end of checking receivable account type
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$coa_name_total_from_the_past,2).'</td>';  
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>'; 
-                            $beginningbalance_total_d+=$coa->coa_balance+$coa_name_total_from_the_past;
+                            if(strpos($coa->coa_name, 'Retained Earnings') !== false || strpos($coa->coa_name, 'Retained Earning') !== false){
+                                $data=Advance::first();
+                                if(!empty($data)){
+                                    $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                                    $RetainedEarningsReaming=$RetainedEarningsSubs;
+                                }
+                            }
+                            if($RetainedEarningsSubs<0){
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs,2).'</td>';  
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>'; 
+                                $beginningbalance_total_d+=$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs;
+                            }else{
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs,2).'</td>';  
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>'; 
+                                $beginningbalance_total_d+=$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs;
+                            }
+                            
                         }
                         else if($coa->normal_balance=="Credit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';  
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance,2).'</td>'; 
-                            $beginningbalance_total+=$coa->coa_balance;
+                            if(strpos($coa->coa_name, 'Retained Earnings') !== false || strpos($coa->coa_name, 'Retained Earning') !== false){
+                                $data=Advance::first();
+                                if(!empty($data)){
+                                    $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                                    $RetainedEarningsReaming=$RetainedEarningsSubs;
+                                }
+                            }
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$RetainedEarningsSubs,2).'</td>'; 
+                            $beginningbalance_total+=$coa->coa_balance+$RetainedEarningsSubs;
                         } 
                         
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($debit!=""? number_format($debit,2) : '').'</td>';  
                         $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($credit!=""? number_format($credit,2): '').'</td>';
                         if($coa->normal_balance=="Debit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past,2).'</td>'; 
+                            if($RetainedEarningsSubs<0){
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs,2).'</td>'; 
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
-                            $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past; 
+                            $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs; 
+                            }else{
+                                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs,2).'</td>'; 
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
+                            $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs; 
+                            }
+                            
                         }
                         else if($coa->normal_balance=="Credit"){
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past,2).'</td>'; 
-                            $totaltotalssasdasd+=($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past; 
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs,2).'</td>'; 
+                            $totaltotalssasdasd+=($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs;
                         }
                         $tablecontent.='</tr>';  
                     }
                     $coa_name_totaldebit+=$coa_name_totald;
                     $coa_name_totalcredit+=$coa_name_totalc;
                 }
-                if($retaunbedearnings==0){
-                    $RetainedEarningsSubs=0;
-                    $data=Advance::first();
-                    if(!empty($data)){
-                        $RetainedEarningsSubs+=$data->advance_beginning_balance;
-                    }
-                    $tablecontent.='<tr>';  
-                    $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
-                    $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    if($RetainedEarningsSubs<0){
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                        $tablecontent.='<td style="vertical-align:middle;"></td>';
-                        
-                    }else{
-                        $tablecontent.='<td style="vertical-align:middle;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                    }
-                    
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                    
-                    if($RetainedEarningsSubs<0){
-                        
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                    }else{
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
-                    }
-                    $tablecontent.='</tr>'; 
-                }
                 $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
                 $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';
-                if($RetainedEarningsSubs<0){
+                if($RetainedEarningsReaming<0){
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d-$RetainedEarningsSubs,2).'</td>';
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total,2).'</td>';
                 }else{
@@ -30179,7 +30695,7 @@ class ReportController extends Controller
                 
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totaldebit,2).'</td>'; 
                 $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totalcredit,2).'</td>';
-                if($RetainedEarningsSubs<0){
+                if($RetainedEarningsReaming<0){
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d-$RetainedEarningsSubs,2).'</td>';  
                     $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd,2).'</td>';  
                 }else{
@@ -30329,54 +30845,24 @@ class ReportController extends Controller
             }
         }
         }else{
-            
-            $tablecontent.="<tr>";
-            $tablecontent.='<td colspan="6" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
-            $tablecontent.="</tr>";
-            $tablecontent.="<tr>";
-            $tablecontent.='<td colspan="6" style="vertical-align:middle;font-weight:bold;font-size:14px;text-align:center;">';
-            foreach($cost_center_list as $ccl){
-                if($ccl->cc_no==$CostCenterFilter){
-                    $tablecontent.=$ccl->cc_name;
-                }
-            }
-            $tablecontent.='</td>';
-            $tablecontent.="</tr>";
-            $tablecontent.="<tr>";
-            $tablecontent.='<td colspan="6" style="vertical-align:middle;font-weight:bold;font-size:14px;"></td>';
-            $tablecontent.="</tr>";
             $coa_name_totaldebit=0;
             $coa_name_totalcredit=0;
             $totaltotalssasdasd=0;
             $totaltotalssasdasd_d=0;
+            $beginningbalance_total=0;
+            $beginningbalance_total_d=0;
             $retaunbedearnings=0;
+            $LandImprovements=0;
+            $RetainedEarningsReaming=0;
             foreach ($COA as $coa){
-                if($coa->coa_name=='Arkcons, Capital'){
-                    $retaunbedearnings=1;
-                    $RetainedEarningsSubs=0;
-                    $data=Advance::first();
-                    if(!empty($data)){
-                        $RetainedEarningsSubs+=$data->advance_beginning_balance;
-                    }
-                    $tablecontent.='<tr>';  
-                    $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
-                    $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                    $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
-                    $tablecontent.='</tr>'; 
-                } 
-                $beginningbalance_total=0;
-                $beginningbalance_total_d=0;
+                $RetainedEarningsSubs=0;
+                
                 $coa_name_total=0;
                 $coa_name_totalc=0;
                 $coa_name_totald=0;
+                
                 foreach ($JournalEntry as $JE){
-                    if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED' && $JE->je_cost_center==$CostCenterFilter){
+                    if ($JE->je_account==$coa->id && $JE->remark!='Cancelled' && $JE->remark!='NULLED'){
                         if ($JE->je_credit!=""){
                             $coa_name_totalc+=$JE->je_credit;
                             $coa_name_total+=$JE->je_credit;
@@ -30386,9 +30872,20 @@ class ReportController extends Controller
                         }
                     }
                 }
-                 //if ("$coa_name_totalc!=0 || $coa_name_totald!=0"){
-                    if(""==""){
-                    //$coa_name_totald+=$coa->coa_balance;
+                if($coa->coa_name=='Land Improvements'){
+                    
+                }
+                //if ("$coa_name_totalc!=0 || $coa_name_totald!=0"){
+                if(""==""){
+                    
+                    // if($coa->normal_balance=="Debit"){
+                    //     $coa_name_totald+=$coa->coa_balance;
+                    // }
+                    // else if($coa->normal_balance=="Credit"){
+                    //     $coa_name_totalc+=$coa->coa_balance;
+                    // }
+                    
+
                     $debit=0;
                     $credit=0;
                     if($coa_name_totalc<$coa_name_totald){
@@ -30407,66 +30904,112 @@ class ReportController extends Controller
                     $credit_validated=$credit!=""? $credit : 0;
                     $debit_validated=$debit!=""? $debit : 0;
                     $tablecontent.='<tr>';  
-                        $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_code.'</td>';  
-                        $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_name.'</td>';  
-                        $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_account_type.'</td>'; 
-                        if($coa->normal_balance=="Debit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance,2).'</td>';  
+                    $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_code.'</td>';  
+                    $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_name.'</td>';  
+                    $tablecontent.='<td style="vertical-align:middle;">'.$coa->coa_account_type.'</td>'; 
+                    $coa_name_total_from_the_past=0;
+                    if($coa->normal_balance=="Debit"){
+                        //check if account receivable account type
+                        
+                        if(strpos($coa->coa_name, 'Accounts Receivable') !== false || strpos($coa->coa_name, 'Accounts Receivables') !== false || strpos($coa->coa_name, 'Account Receivable') !== false ||strpos($coa->coa_name, 'Account Receivables') !== false){
+                                
+                            $coa_re_no=$coa->id;
+                            if($filtertemplate=="All"){
+                                $sortsettingjournalpast="WHERE created_at ='' AND je_account='$coa_re_no'  AND";
+                            }
+                            
+                            $sortjournalpast=" je_cost_center='".$CostCenterFilter."'";
+                            if($CostCenterFilter=="All" || $CostCenterFilter=="By Cost Center"){
+                                $sortjournalpast="";
+                                $sortsettingjournalpast="WHERE created_at <'".$FROM."'  AND je_account='$coa_re_no'";
+                                if($filtertemplate=="All"){
+                                    $sortsettingjournalpast="WHERE created_at =''  AND je_account='$coa_re_no'";
+                                }
+                            }
+                            $JournalEntryformpast=DB::connection('mysql')->select("SELECT * FROM journal_entries
+                            ".$sortsettingjournalpast.$sortjournalpast ." 
+                            ORDER BY created_at ASC");
+                            
+                            foreach($JournalEntryformpast as $past){
+                                $tablecontent.='<script>console.log(\''.$past->je_debit.'\')</script>';
+                                if($past->remark=='' || $past->remark==NULL){
+                                    if($past->je_debit!='' && $past->je_debit!=NULL){
+                                        $coa_name_total_from_the_past+=$past->je_debit;
+                                        
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //end of checking receivable account type
+                        if(strpos($coa->coa_name, 'Retained Earnings') !== false || strpos($coa->coa_name, 'Retained Earning') !== false){
+                            $data=Advance::first();
+                            if(!empty($data)){
+                                $RetainedEarningsSubs+=$data->advance_beginning_balance;
+                                $RetainedEarningsReaming=$RetainedEarningsSubs;
+                            }
+                        }
+                        if($RetainedEarningsSubs<0){
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs,2).'</td>';  
                             $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>'; 
-                            $beginningbalance_total_d+=$coa->coa_balance;
+                            $beginningbalance_total_d+=$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs;
+                        }else{
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs,2).'</td>';  
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>'; 
+                            $beginningbalance_total_d+=$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs;
                         }
-                        else if($coa->normal_balance=="Credit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';  
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance,2).'</td>'; 
-                            $beginningbalance_total+=$coa->coa_balance;
-                        } 
                         
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($debit!=""? number_format($debit,2) : '').'</td>';  
-                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($credit!=""? number_format($credit,2): '').'</td>';
-                        if($coa->normal_balance=="Debit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance,2).'</td>'; 
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
-                            $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance; 
+                    }
+                    else if($coa->normal_balance=="Credit"){
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa->coa_balance,2).'</td>'; 
+                        $beginningbalance_total+=$coa->coa_balance;
+                    } 
+                    
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($debit!=""? number_format($debit,2) : '').'</td>';  
+                    $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.($credit!=""? number_format($credit,2): '').'</td>';
+                    if($coa->normal_balance=="Debit"){
+                        if($RetainedEarningsSubs<0){
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs,2).'</td>'; 
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
+                        $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past-$RetainedEarningsSubs; 
+                        }else{
+                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs,2).'</td>'; 
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
+                        $totaltotalssasdasd_d+=($debit_validated-$credit_validated)+$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs; 
                         }
-                        else if($coa->normal_balance=="Credit"){
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
-                            $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)-$coa->coa_balance,2).'</td>'; 
-                            $totaltotalssasdasd+=($debit_validated-$credit_validated)-$coa->coa_balance; 
-                        }   
                         
-                        
-                        
-                        $tablecontent.='</tr>'; 
+                    }
+                    else if($coa->normal_balance=="Credit"){
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>'; 
+                        $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs,2).'</td>'; 
+                        $totaltotalssasdasd+=($debit_validated-$credit_validated)-$coa->coa_balance+$coa_name_total_from_the_past+$RetainedEarningsSubs; 
+                    }
+                    $tablecontent.='</tr>';  
                 }
                 $coa_name_totaldebit+=$coa_name_totald;
                 $coa_name_totalcredit+=$coa_name_totalc;
             }
-            if($retaunbedearnings==0){
-                $RetainedEarningsSubs=0;
-                $data=Advance::first();
-                if(!empty($data)){
-                    $RetainedEarningsSubs+=$data->advance_beginning_balance;
-                }
-                $tablecontent.='<tr>';  
-                $tablecontent.='<td style="vertical-align:middle;"></td>';
-                $tablecontent.='<td style="vertical-align:middle;">Retained Earnings</td>';
-                $tablecontent.='<td style="vertical-align:middle;"></td>';
-                $tablecontent.='<td style="vertical-align:middle;"></td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($RetainedEarningsSubs,2).'</td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;"></td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;"></td>';
-                $tablecontent.='<td style="vertical-align:middle;text-align:right;font-weight:bold;">'.number_format(-$RetainedEarningsSubs,2).'</td>';
-                $tablecontent.='</tr>'; 
-            } 
             $tablecontent.='<tr style="background-color: #eaf0f7;border-top:1px solid #ccc;border-bottom:1px solid #ccc;font-weight:bold;">';  
-            $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';  
-            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
-            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total,2).'</td>';
+            $tablecontent.='<td colspan="3" style="vertical-align:middle;">Total</td>';
+            if($RetainedEarningsReaming<0){
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d-$RetainedEarningsSubs,2).'</td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total,2).'</td>';
+            }else{
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total_d,2).'</td>';
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($beginningbalance_total+$RetainedEarningsSubs,2).'</td>';
+            }
+            
             $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totaldebit,2).'</td>'; 
             $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($coa_name_totalcredit,2).'</td>';
-            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d,2).'</td>';  
-            $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd,2).'</td>'; 
+            if($RetainedEarningsReaming<0){
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d-$RetainedEarningsSubs,2).'</td>';  
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd,2).'</td>';  
+            }else{
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd_d,2).'</td>';  
+                $tablecontent.='<td style="vertical-align:middle;text-align:right;">'.number_format($totaltotalssasdasd-$RetainedEarningsSubs,2).'</td>';  
+            }
+            
             $tablecontent.='</tr>';  
         }
         
@@ -31142,7 +31685,10 @@ class ReportController extends Controller
                         if($emp->remark=="Cancelled"){
                             $tablecontent.=$emp->remark;
                         }else{
-                            $tablecontent.='<button class="btn btn-sm btn-danger" title="cancel this Transaction" onclick="cancelentry(\''.$emp->st_type.'\',\''.$emp->st_no.'\',\''.$emp->st_location.'\',\''.$emp->st_invoice_type.'\',)"><span class="fa fa-times"></span></button>'; 
+                            if($emp->st_balance==$total){
+                                $tablecontent.='<button class="btn btn-sm btn-danger" title="cancel this Transaction" onclick="cancelentry(\''.$emp->st_type.'\',\''.$emp->st_no.'\',\''.$emp->st_location.'\',\''.$emp->st_invoice_type.'\',)"><span class="fa fa-times"></span></button>'; 
+                            }
+                            
                         }
                         
                         $tablecontent.='</td>';

@@ -3564,11 +3564,14 @@ function getModal(Location,TTTTT,e,type,sales){
                                             document.getElementById('sales_receipttotal').innerHTML=number_format(totalamount,2);
                                             
                                             $('#sales_receipttotal').attr('title',totalamount);
+                                            $('#amountreceived_sr').attr('title',totalamount);
+                                            $('#amountreceived_sr_mask').attr('title',totalamount);
                                             
                                             }										 
                                         });
                                     }
                                     document.getElementById('setselectpickerbutton').click();
+                                    computeoutstanding();
                                 }
                             </script>
                         </div>
@@ -5114,8 +5117,9 @@ function getModal(Location,TTTTT,e,type,sales){
                     <table class="table table-bordered table-responsive-md table-striped text-left font14 table-sm" id="bill_account_table" style="table-layout:fixed;">
                         <tr>
                             <th class="text-left" width="5%">#</th>
-                            <th class="text-left" width="20%">ACCOUNT</th>
-                            <th class="text-left" width="20%">COST CENTER</th>
+                            <th class="text-left" width="15%">DEBIT ACCOUNT</th>
+                            <th class="text-left" width="15%">CREDIT ACCOUNT</th>
+                            <th class="text-left" width="15%">COST CENTER</th>
                             <th class="text-left">DESCRIPTION</th>
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center" width="5%"></th>
@@ -5175,7 +5179,7 @@ function getModal(Location,TTTTT,e,type,sales){
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 p-0 mt-4">
+                    <div class="col-md-4 p-0 mt-4" style="display:none;">
                         <table class="table table-light">
                             <thead class="thead-light">
                                 <tr>
@@ -5186,7 +5190,7 @@ function getModal(Location,TTTTT,e,type,sales){
                                 <tr>
                                     <td style="vertical-align:middle;text-align:center;">Credit</td>
                                     <td style="vertical-align:middle;" class="pr-0">
-                                        <select class="form-control selectpicker" data-live-search="true" name="bill_account_credit_account"  id="bill_account_credit_account" required>
+                                        <select class="form-control selectpicker" name="bill_account_credit_account"  id="bill_account_credit_account" >
                                         <option value="">--Select Account--</option>
                                         @foreach($c_o_a_sorted as $coa)
                                         @if ($coa->id=="3")
@@ -5456,21 +5460,27 @@ function getModal(Location,TTTTT,e,type,sales){
                                                                     console.log(data);
                                                                     for(var c=0;c<data.length;c++){
                                                                         if(data[c]['et_ad_rate']=='1'){
-                                                                            var markup = '<tr class="sc_lines_account " id="sc_line_account'+$('#sc_account_table tr').length+'"><td class="pt-3-half" style="vertical-align:middle;text-align:center;"><input type="checkbox"  id="return_item_sc'+$('#sc_account_table tr').length+'"  name="return_item_sc[]" value="'+data[c]['et_ad_id']+'"><input type="hidden" name=hiddenet_ad_id'+$('#sc_account_table tr').length+' id=hiddenet_ad_id'+$('#sc_account_table tr').length+' value="'+data[c]['et_ad_id']+'"></td><td class="pt-3-half" id="number_tag_sc_account" contenteditable="false">'+$('#sc_account_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc selectpicker form-control" disabled data-live-search="true" id="select_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
-                                                                            markup=markup+'<td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="selectpicker form-control" disabled data-live-search="true" id="select_costcenter_sc'+$('#sc_account_table tr').length+'" name="select_costcenter_sc'+$('#sc_account_table tr').length+'" ><option value="">--Select Account--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{$ccl->cc_name_code." - ".trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select>';
-                                                                            markup=markup+'<td class="pt-3-half"><input class="sc_data description_select_sc form-control" disabled id="select_description_sc'+$('#sc_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" onclick="this.select();" id="select_sc_amount'+$('#sc_account_table tr').length+'" style="border:0; text-align:right;"></td></tr>';
+                                                                            var markup = '<tr class="sc_lines_account " id="sc_line_account'+$('#sc_account_table tr').length+'"><td class="pt-3-half" style="vertical-align:middle;text-align:center;"><input type="checkbox"  id="return_item_sc'+$('#sc_account_table tr').length+'"  name="return_item_sc[]" value="'+data[c]['et_ad_id']+'"><input type="hidden" name=hiddenet_ad_id'+$('#sc_account_table tr').length+' id=hiddenet_ad_id'+$('#sc_account_table tr').length+' value="'+data[c]['et_ad_id']+'"></td><td class="pt-3-half" id="number_tag_sc_account" contenteditable="false">'+$('#sc_account_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc selectpicker form-control" disabled data-live-search="true" id="select_account_sc'+$('#sc_account_table tr').length+'" name="select_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
+
+                                                                            markup=markup+'<td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc  form-control" disabled data-live-search="true" id="select_credit_account_sc'+$('#sc_account_table tr').length+'" name="select_credit_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
+
+                                                                            markup=markup+'<td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="selectpicker form-control" disabled data-live-search="true" id="select_costcenter_sc'+$('#sc_account_table tr').length+'" name="select_costcenter_sc'+$('#sc_account_table tr').length+'" ><option value="">--Select Account--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{$ccl->cc_name_code." - ".trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select></td>';
+                                                                            markup=markup+'<td class="pt-3-half"><input class="sc_data description_select_sc form-control" disabled id="select_description_sc'+$('#sc_account_table tr').length+'" name="select_description_sc'+$('#sc_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" onclick="this.select();" id="select_sc_amount'+$('#sc_account_table tr').length+'" name="select_sc_amount'+$('#sc_account_table tr').length+'" style="border:0; text-align:right;"></td></tr>';
                                                                             var rowcount=$('#sc_account_table tr').length;
                                                                             $("#sc_account_table").append(markup);
                                                                         }else{
-                                                                            var markup = '<tr class="sc_lines_account table-success" id="sc_line_account'+$('#sc_account_table tr').length+'"><td class="pt-3-half" style="vertical-align:middle;text-align:center;"><input style="display:none;" checked type="checkbox" id="return_item_sc'+$('#sc_account_table tr').length+'"  name="return_item_sc[]" value="'+data[c]['et_ad_id']+'"><input type="hidden" name=hiddenet_ad_id'+$('#sc_account_table tr').length+' id=hiddenet_ad_id'+$('#sc_account_table tr').length+'></td><td class="pt-3-half" id="number_tag_sc_account" contenteditable="false">'+$('#sc_account_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc selectpicker form-control" disabled data-live-search="true" id="select_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
+                                                                            var markup = '<tr class="sc_lines_account table-success" id="sc_line_account'+$('#sc_account_table tr').length+'"><td class="pt-3-half" style="vertical-align:middle;text-align:center;"><input style="display:none;" checked type="checkbox" id="return_item_sc'+$('#sc_account_table tr').length+'"  name="return_item_sc[]" value="'+data[c]['et_ad_id']+'"><input type="hidden" name=hiddenet_ad_id'+$('#sc_account_table tr').length+' id=hiddenet_ad_id'+$('#sc_account_table tr').length+'></td><td class="pt-3-half" id="number_tag_sc_account" contenteditable="false">'+$('#sc_account_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data account_select_sc selectpicker form-control" disabled data-live-search="true" id="select_account_sc'+$('#sc_account_table tr').length+'" name="select_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
+                                                                            markup=markup+'<td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="sc_data  selectpicker form-control" disabled data-live-search="true" id="select_credit_account_sc'+$('#sc_account_table tr').length+'" name="select_credit_account_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
                                                                             markup=markup+'<td class="pt-3-half"><select style="border:0; width:100%;" list="account_expenses" class="selectpicker form-control" disabled data-live-search="true" id="select_costcenter_sc'+$('#sc_account_table tr').length+'" name="select_costcenter_sc'+$('#sc_account_table tr').length+'"><option value="">--Select Account--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{$ccl->cc_name_code." - ".trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select>';
-                                                                            markup=markup+'<td class="pt-3-half"><input class="sc_data description_select_sc form-control" disabled id="select_description_sc'+$('#sc_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" onclick="this.select();" id="select_sc_amount'+$('#sc_account_table tr').length+'" style="border:0; text-align:right;"></td></tr>';
+                                                                            markup=markup+'<td class="pt-3-half"><input class="sc_data description_select_sc form-control" disabled id="select_description_sc'+$('#sc_account_table tr').length+'" name="select_description_sc'+$('#sc_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" onclick="this.select();" id="select_sc_amount'+$('#sc_account_table tr').length+'" name="select_sc_amount'+$('#sc_account_table tr').length+'" style="border:0; text-align:right;"></td></tr>';
                                                                             var rowcount=$('#sc_account_table tr').length;
                                                                             $("#sc_account_table").append(markup);
                                                                         }
                                                                         
                                                                         document.getElementById('select_costcenter_sc'+rowcount).value=data[c]['et_cost_center']!="" && data[c]['et_cost_center']!=null? data[c]['et_cost_center'] : document.getElementById('CostCenterSupplierCredit').value;
                                                                         document.getElementById('select_account_sc'+rowcount).value=data[c]['et_ad_product'];
+                                                                        document.getElementById('select_credit_account_sc'+rowcount).value=data[c]['et_credit_account'];
+                                                                        console.log('credit account'+" "+data[c]['et_credit_account']);
                                                                         document.getElementById('select_description_sc'+rowcount).value=data[c]['et_ad_desc'];
                                                                         document.getElementById('select_sc_amount'+rowcount).value=data[c]['et_ad_total'];
                                                                         
@@ -5557,8 +5567,9 @@ function getModal(Location,TTTTT,e,type,sales){
                         <tr>
                             <th width="3%" class="text-center"></th>
                             <th width="4%" class="text-left">#</th>
-                            <th width="20%" class="text-left">ACCOUNT</th>
-                            <th width="20%" class="text-left">COST CENTER</th>
+                            <th width="15%" class="text-left">DEBIT ACCOUNT</th>
+                            <th width="15%" class="text-left">CREDIT ACCOUNT</th>
+                            <th width="15%" class="text-left">COST CENTER</th>
                             <th width="40%" class="text-left">DESCRIPTION</th>
                             <th width="20%" class="text-left">AMOUNT</th>
                             
@@ -10908,7 +10919,7 @@ $(".bill_lines_account").find('.bill_data').each(function() {
     $(this).attr("name", name+counter1);
     
     checker1++;
-    if(checker1%3==0){
+    if(checker1%5==0){
         counter1++;
     }
 }
@@ -11055,19 +11066,19 @@ $(".sc_lines_item").find('.sc_data').each(function() {
 }
 });
 
-$(".sc_lines_account").find('.sc_data').each(function() {
-    if( typeof( $(this).attr('id') ) != 'undefined' ) {
-    var id = $(this).attr("id");
-    var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+// $(".sc_lines_account").find('.sc_data').each(function() {
+//     if( typeof( $(this).attr('id') ) != 'undefined' ) {
+//     var id = $(this).attr("id");
+//     var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
     
-    $(this).attr("name", name+counter1);
+//     $(this).attr("name", name+counter1);
     
-    checker1++;
-    if(checker1%3==0){
-        counter1++;
-    }
-    }
-});
+//     checker1++;
+//     if(checker1%3==0){
+//         counter1++;
+//     }
+//     }
+// });
 
 
 $.ajax({
@@ -13582,9 +13593,10 @@ function removeComma(str){
 
         $("#add_lines_bill_account").click(function(event){
             event.preventDefault();
-            var markup = '<tr class="bill_lines_account" id="bill_line_account'+$('#bill_account_table tr').length+'"><td class="pt-3-half" id="number_tag_bill_account" contenteditable="false">'+$('#bill_account_table tr').length+'</td><td class="pt-3-half"><select required style="border:0;" list="account_expenses" class=" form-control bill_data account_select_bill selectpicker" data-live-search="true" id="select_account_bill'+$('#bill_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
-            markup=markup+'<td class="pt-3-half"><select required style="border:0;"  class="selectpicker form-control" data-live-search="true" name="select_cost_center_bill'+$('#bill_account_table tr').length+'" id="select_cost_center_bill'+$('#bill_account_table tr').length+'"><option value="">--Select Cost Center--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{$ccl->cc_name_code." - ".trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select></td>';
-            markup=markup+'<td class="pt-3-half"><input class="bill_data description_select_bill form-control" required id="select_description_bill'+$('#bill_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="text" class="form-control" id="unformated_select_bill_amount'+$('#bill_account_table tr').length+'" style="border:0;text-align:right;" value="0.00" required><input type="hidden" class="bill_data amount_select_bill" onclick="this.select();" id="select_bill_amount'+$('#bill_account_table tr').length+'" style="border:0; text-align:center;"></td><td class="pt-3-half" style="text-align:center;"><a href="#" id="delete_account_bill'+$('#bill_account_table tr').length+'" class="fa fa-trash delete_account_bill"></a></td></tr>';
+            var markup = '<tr class="bill_lines_account" id="bill_line_account'+$('#bill_account_table tr').length+'"><td class="pt-3-half" id="number_tag_bill_account" contenteditable="false">'+$('#bill_account_table tr').length+'</td><td class="pt-3-half"><select required style="border:0;" list="account_expenses" class=" form-control bill_data account_select_bill selectpicker" data-live-search="true" id="select_account_bill'+$('#bill_account_table tr').length+'"  ><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
+            markup=markup+'<td class="pt-3-half"><select required style="border:0;" list="account_expenses" class=" form-control bill_data et_credit_account selectpicker" data-live-search="true" id="et_credit_account'+$('#bill_account_table tr').length+'"><option value="">--Select Account--</option>'+coa_list_js+'</select></td>';
+            markup=markup+'<td class="pt-3-half"><select required style="border:0;"  class="selectpicker bill_data form-control" data-live-search="true"  id="select_cost_center_bill'+$('#bill_account_table tr').length+'"><option value="">--Select Cost Center--</option>@foreach($cost_center_list as $ccl)<option value="{{$ccl->cc_no}}">{{$ccl->cc_name_code." - ".trim(preg_replace("/\s\s+/", " ", $ccl->cc_name))}}</option> @endforeach</select></td>';
+            markup=markup+'<td class="pt-3-half"><input class="bill_data description_select_bill form-control" required id="select_description_bill'+$('#bill_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="text" class="form-control" id="unformated_select_bill_amount'+$('#bill_account_table tr').length+'"  style="border:0;text-align:right;" value="0.00" required><input type="hidden" class="bill_data amount_select_bill" onclick="this.select();" id="select_bill_amount'+$('#bill_account_table tr').length+'"  style="border:0; text-align:center;"></td><td class="pt-3-half" style="text-align:center;"><a href="#" id="delete_account_bill'+$('#bill_account_table tr').length+'" class="fa fa-trash delete_account_bill"></a></td></tr>';
             var textbox = '#unformated_select_bill_amount'+$('#bill_account_table tr').length;
             var hidden = '#select_bill_amount'+$('#bill_account_table tr').length;
             $("#bill_account_table").append(markup);
